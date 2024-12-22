@@ -7,6 +7,7 @@
 #include <QFontDatabase>
 #include <QIcon>
 #include "app_theme.hpp"
+#include "database.hpp"
 
 
 void registerTypes();

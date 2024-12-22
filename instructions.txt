@@ -1,0 +1,8 @@
+Install mysql-server:
+        sudo apt install mysql-server
+        
+Check status:
+        sudo systemctl status mysql.service
+        
+Start service if not active:
+        sudo systemctl start mysql.service

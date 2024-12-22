@@ -50,12 +50,12 @@ ApplicationWindow {
                 leftPadding: 10
                 rightPadding: 10
 
-                text: qsTr("Demo Page")
+                text: qsTr("Search Page")
 
                 onTriggered: {
-                    stackLayout.currentIndex = ufo_Demo.StackLayout.index
+                    stackLayout.currentIndex = ufo_Search.StackLayout.index
 
-                    ufo_SideBar_Main.checkTabButton("Demo Page")
+                    ufo_SideBar_Main.checkTabButton("Search Page")
                 }
             }
 
@@ -131,8 +131,8 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            UFO_Demo {
-                id: ufo_Demo
+            UFO_Search {
+                id: ufo_Search
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -159,8 +159,8 @@ ApplicationWindow {
 
                     // TODO (SAVIZ): I like to replace these with an enum, but currently I don't know how in QML.
                     switch (pageName) {
-                        case "Demo Page":
-                            stackLayout.currentIndex = ufo_Demo.StackLayout.index
+                        case "Search Page":
+                            stackLayout.currentIndex = ufo_Search.StackLayout.index
                             break
                         case "Settings Page":
                             stackLayout.currentIndex = ufo_Settings.StackLayout.index

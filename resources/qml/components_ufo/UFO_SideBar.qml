@@ -14,8 +14,8 @@ Item {
 
         // TODO (SAVIZ): I like to replace these with an enum, but currently I don't know how in QML.
         switch (targetButton) {
-            case "Demo Page":
-                ufo_SidBarButton_Demo.checked = true
+            case "Search Page":
+                ufo_SidBarButton_Search.checked = true
                 break
             case "Settings Page":
                 ufo_SidBarButton_Settings.checked = true
@@ -63,7 +63,7 @@ Item {
                     spacing: 10
 
                     UFO_SideBarButton {
-                        id: ufo_SidBarButton_Demo
+                        id: ufo_SidBarButton_Search
 
                         Layout.fillWidth: true
                         Layout.preferredHeight: 40
@@ -77,11 +77,11 @@ Item {
                         autoExclusive: true
                         checked: false
 
-                        text: qsTr("Demo")
-                        svg: "./../../icons/Google icons/settings.svg"
+                        text: qsTr("Search Patient")
+                        svg: "./../../icons/Google icons/search.svg"
 
                         onClicked: {
-                            root.tabChanged("Demo Page")
+                            root.tabChanged("Search Page")
                         }
                     }
 

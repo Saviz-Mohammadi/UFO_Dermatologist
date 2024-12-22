@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
 void registerTypes()
 {
     qmlRegisterSingletonType<AppTheme>("AppTheme", 1, 0, "AppTheme", &AppTheme::qmlInstance);
+    qmlRegisterSingletonType<Database>("Database", 1, 0, "Database", &Database::qmlInstance);
 }
 
 void setupThemeSystem()
