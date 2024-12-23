@@ -104,7 +104,7 @@ Item {
                         checked: false
 
                         text: qsTr("Search Patient")
-                        svg: "./../../icons/Google icons/search.svg"
+                        svg: "./../../icons/Google icons/person_search.svg"
 
                         onClicked: {
                             root.tabChanged("Search Page")

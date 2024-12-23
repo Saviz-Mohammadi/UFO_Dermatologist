@@ -6,18 +6,6 @@ import QtQuick.Layouts
 import AppTheme 1.0
 import Database 1.0
 
-// enabled: (Database.connectionStatus === true) ? true : false
-
-// text: qsTr("Edit")
-// svg: "./../../icons/Google icons/edit.svg"
-
-// onClicked: {
-
-//     root.editClicked()
-// }
-
-// color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
-
 Item {
     id: root
 
@@ -138,6 +126,7 @@ Item {
                 enabled: (Database.connectionStatus === true) ? true : false
 
                 text: qsTr("Edit Patient")
+                svg: "./../../icons/Google icons/edit.svg"
 
                 onClicked: {
                     root.editClicked()
