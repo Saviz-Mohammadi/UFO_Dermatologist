@@ -21,8 +21,27 @@ import Database 1.0
 UFO_Page {
     id: root
 
-    title: qsTr("Search Patients")
+    title: qsTr("Edit Patient")
     contentSpacing: 20
+
+    function setFieldValues() {
+        firstName.text = Database.editPatientMap["first_name"];
+        lastName.text = Database.editPatientMap["last_name"];
+    }
+
+    function resetFieldStates() {
+        firstName.hasChanged = false
+        lastName.hasChanged = false
+    }
+
+    Connections {
+        target: Database
+
+        function onEditPatientMapChanged() {
+            root.setFieldValues();
+            root.resetFieldStates();
+        }
+    }
 
     UFO_GroupBox {
         id: ufo_GroupBox
@@ -30,7 +49,7 @@ UFO_Page {
         Layout.fillWidth: true
         // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
 
-        title: qsTr("Search Options")
+        title: qsTr("General Information")
         contentSpacing: 0
 
         RowLayout {
@@ -44,12 +63,18 @@ UFO_Page {
             UFO_TextField {
                 id: firstName
 
+                property bool hasChanged: false
+
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
                 placeholderText: qsTr("First name")
+
+                onTextEdited: {
+                    hasChanged = true
+                }
             }
 
             UFO_Button {
@@ -70,12 +95,18 @@ UFO_Page {
             UFO_TextField {
                 id: lastName
 
+                property bool hasChanged: false
+
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
                 placeholderText: qsTr("Last name")
+
+                onTextEdited: {
+                    hasChanged = true
+                }
             }
 
             UFO_Button {
@@ -104,6 +135,8 @@ UFO_Page {
 
             UFO_TextField {
                 id: age
+
+                property bool hasChanged: false
 
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
@@ -134,6 +167,8 @@ UFO_Page {
 
             UFO_TextField {
                 id: phoneNumber
+
+                property bool hasChanged: false
 
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
@@ -174,6 +209,8 @@ UFO_Page {
             UFO_ComboBox {
                 id: gender
 
+                property bool hasChanged: false
+
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
@@ -185,6 +222,8 @@ UFO_Page {
             UFO_ComboBox {
                 id: maritalStatus
 
+                property bool hasChanged: false
+
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
@@ -194,74 +233,50 @@ UFO_Page {
             }
         }
 
-        UFO_Button {
-            Layout.preferredWidth: 120
-            Layout.preferredHeight: 35
-            Layout.alignment: Qt.AlignRight
+        RowLayout {
+            Layout.fillWidth: true
 
             Layout.topMargin: 20
             Layout.bottomMargin: 7
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            enabled: (Database.connectionStatus === true) ? true : false
+            UFO_Button {
+                Layout.preferredWidth: 120
+                Layout.preferredHeight: 35
 
-            text: qsTr("Search")
-            svg: "./../../icons/Google icons/search.svg"
+                // NOTE (SAVIZ): The enabled state of this button is more complicated as we need to also take into account the state of hasChanged() of visual elements.
+                enabled: Database.connectionStatus && (
 
-            onClicked: {
-                var first_name = firstName.text
-                var last_name = lastName.text
+                        firstName.hasChanged || lastName.hasChanged
+                )
 
-                var vage;
+                text: qsTr("Revert Changes")
+                svg: "./../../icons/Google icons/undo.svg"
 
-                if(age.text === "") {
-                    vage = -1
-                }
-
-                else {
-                   vage = parseInt(age.text)
-                }
-
-                var phone_number = phoneNumber.text
-                var sex = gender.currentText
-                var marital_status = maritalStatus.currentText
-
-                var operationOutcome = Database.search(first_name, last_name, vage, phone_number, sex, marital_status)
-
-                if(operationOutcome === false) {
-                    // TODO (SAVIZ): Perform a warning message.
+                onClicked: {
+                    root.setFieldValues();
+                    root.resetFieldStates();
                 }
             }
-        }
-    }
 
-    ListView {
-        id: listView
+            UFO_Button {
+                Layout.preferredWidth: 120
+                Layout.preferredHeight: 35
 
-        Layout.fillWidth: true
-        Layout.preferredHeight: (root.height - ufo_GroupBox.height)
+                // NOTE (SAVIZ): The enabled state of this button is more complicated as we need to also take into account the state of hasChanged() of visual elements.
+                enabled: Database.connectionStatus && (
 
-        spacing: 15
-        clip: true
+                        firstName.hasChanged || lastName.hasChanged
+                )
 
-        model: Database.searchModel
+                text: qsTr("Apply Changes")
+                svg: "./../../icons/Google icons/edit.svg"
 
-        delegate: UFO_ListDelegate {
-            width: listView.width
+                onClicked: {
 
-            backgroundColor: index % 2 === 0 ? Qt.color(AppTheme.colors["UFO_ListDelegate_Background_1"]) : Qt.color(AppTheme.colors["UFO_ListDelegate_Background_2"])
-
-            // modelData is the data inside of model. In other words, the 'QVariantMap' inside of 'QVariantList'.
-            firstName: modelData["first_name"]
-            lastName: modelData["last_name"]
-            gender: modelData["gender"]
-            age: modelData["age"]
-
-            onEditClicked: {
-
-                // We pass the index of the current delegate in the model which is the same as the index used in the 'QVariantList' to obtain the 'patient_id' from it.
-                Database.removeTask(index)
+                    // Here make sure to call the apply changes.
+                }
             }
         }
     }

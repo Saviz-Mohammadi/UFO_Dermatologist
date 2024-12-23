@@ -50,6 +50,19 @@ ApplicationWindow {
                 leftPadding: 10
                 rightPadding: 10
 
+                text: qsTr("Edit Patient Page")
+
+                onTriggered: {
+                    stackLayout.currentIndex = ufo_EditPatient.StackLayout.index
+
+                    ufo_SideBar_Main.checkTabButton("Edit Patient Page")
+                }
+            }
+
+            UFO_MenuItem {
+                leftPadding: 10
+                rightPadding: 10
+
                 text: qsTr("Search Page")
 
                 onTriggered: {
@@ -131,6 +144,13 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
+            UFO_EditPatient {
+                id: ufo_EditPatient
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
             UFO_Search {
                 id: ufo_Search
 
@@ -153,12 +173,25 @@ ApplicationWindow {
             }
 
             Connections {
+                target: ufo_Search
+
+                function onPatientSelectedForEdit() {
+                    stackLayout.currentIndex = ufo_Search.StackLayout.index
+
+                    ufo_SideBar_Main.checkTabButton("Edit Patient Page")
+                }
+            }
+
+            Connections {
                 target: ufo_SideBar_Main
 
                 function onTabChanged(pageName) {
 
                     // TODO (SAVIZ): I like to replace these with an enum, but currently I don't know how in QML.
                     switch (pageName) {
+                        case "Edit Patient Page":
+                            stackLayout.currentIndex = ufo_EditPatient.StackLayout.index
+                            break
                         case "Search Page":
                             stackLayout.currentIndex = ufo_Search.StackLayout.index
                             break

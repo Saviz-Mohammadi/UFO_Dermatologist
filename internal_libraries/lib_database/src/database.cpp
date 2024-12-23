@@ -16,7 +16,7 @@ Database::Database(QObject *parent, const QString& name)
     , m_QSqlDatabase(QSqlDatabase{})
     , m_ConnectionStatus(false)
     , m_SearchListModel(QVariantList {})
-    , m_EditPatient(Patient())
+    , m_EditPatientMap(QVariantMap {})
 {
     this->setObjectName(name);
 
@@ -260,16 +260,15 @@ bool Database::search(const QString &first_name,
 
 void Database::readyPatientForEditing(const quint64 index)
 {
-    m_EditPatient = Patient();
-    QVariantMap targetPatientMap;
+    // Firstly, obtain information from the 'QVariantMap' resulted from the search operation:
+    QVariantMap searchMap;
 
     if (m_SearchListModel[index].canConvert<QVariantMap>()) {
-        m_SearchListModel[index].toMap();
+        searchMap = m_SearchListModel[index].toMap();
     }
 
-    // Now that we know exactly what patient we are looking for, obtain everything you can about the patient:
-    QString queryString = "SELECT * FROM patients WHERE patient_id = "
-                          + targetPatientMap["patient_id"].toString();
+    // Now use the 'searchMap' to figure out which patient we are targetting and obtain everything we can about the patient:
+    QString queryString = "SELECT * FROM patients WHERE patient_id = " + searchMap["patient_id"].toString();
     QSqlQuery query;
 
     query.prepare(queryString);
@@ -280,19 +279,20 @@ void Database::readyPatientForEditing(const quint64 index)
         // TODO (SAVIZ): React to the returned failure state in QML.
     }
 
+    // Populate the 'm_EditPatientMap' with all the information needed from the patient:
     while (query.next()) {
-        m_EditPatient.patient_id = query.value("patient_id").toULongLong();
-        m_EditPatient.first_name = query.value("first_name").toString();
-        m_EditPatient.last_name = query.value("last_name").toString();
-        m_EditPatient.age = query.value("age").toUInt();
-        m_EditPatient.birth_date = query.value("birth_date").toString();
-        m_EditPatient.phone_number = query.value("phone_number").toString();
-        m_EditPatient.gender = query.value("gender").toString();
-        m_EditPatient.marital_status = query.value("marital_status").toString();
+        m_EditPatientMap["patient_id"]= query.value("patient_id").toULongLong();
+        m_EditPatientMap["first_name"] = query.value("first_name").toString();
+        m_EditPatientMap["last_name"] = query.value("last_name").toString();
+        m_EditPatientMap["age"] = query.value("age").toUInt();
+        m_EditPatientMap["birth_date"] = query.value("birth_date").toString();
+        m_EditPatientMap["phone_number"] = query.value("phone_number").toString();
+        m_EditPatientMap["gender"] = query.value("gender").toString();
+        m_EditPatientMap["marital_status"] = query.value("marital_status").toString();
     }
 
     // We can emit a signal and allow visual elements to know that changes have been made to the 'Patient':
-    emit editPatientReadied();
+    emit editPatientMapChanged();
 }
 
 QVariant Database::addTask(const QString &text)
@@ -401,6 +401,11 @@ bool Database::getConnectionStatus() const
 QVariantList Database::getSearchModel() const
 {
     return (m_SearchListModel);
+}
+
+QVariantMap Database::getEditPatientMap() const
+{
+    return (m_EditPatientMap);
 }
 
 // [[------------------------------------------------------------------------]]

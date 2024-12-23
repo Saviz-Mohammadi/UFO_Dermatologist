@@ -12,11 +12,15 @@ import Database 1.0
 UFO_Page {
     id: root
 
+    signal patientSelectedForEdit
+
     title: qsTr("Search Patients")
     contentSpacing: 20
 
     UFO_GroupBox {
-        id: ufo_GroupBox
+        id: ufo_GroupBox_SearchOptions
+
+        Layout.preferredHeight: (root.height * 0.45)
 
         Layout.fillWidth: true
         // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
@@ -26,6 +30,7 @@ UFO_Page {
 
         RowLayout {
             Layout.fillWidth: true
+            Layout.fillHeight: true
 
             Layout.topMargin: 7
             Layout.bottomMargin: 0
@@ -227,33 +232,175 @@ UFO_Page {
         }
     }
 
-    ListView {
-        id: listView
+
+    UFO_GroupBox {
+        id: ufo_GroupBox_SearchResults
 
         Layout.fillWidth: true
-        Layout.preferredHeight: (root.height - ufo_GroupBox.height)
+        Layout.preferredHeight: (root.height * 0.55)
+        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
 
-        spacing: 15
-        clip: true
+        title: qsTr("Search Options")
+        contentSpacing: 0
 
-        model: Database.searchModel
+        RowLayout {
+            id: rowLayout_TitleContainer
 
-        delegate: UFO_ListDelegate {
-            width: listView.width
+            Layout.fillWidth: true
+            //Layout.fillHeight: true
+            //anchors.fill: parent
+            spacing: 10
 
-            backgroundColor: index % 2 === 0 ? Qt.color(AppTheme.colors["UFO_ListDelegate_Background_1"]) : Qt.color(AppTheme.colors["UFO_ListDelegate_Background_2"])
 
-            // modelData is the data inside of model. In other words, the 'QVariantMap' inside of 'QVariantList'.
-            firstName: modelData["first_name"]
-            lastName: modelData["last_name"]
-            gender: modelData["gender"]
-            age: modelData["age"]
 
-            onEditClicked: {
+            // Layout.topMargin: 7
+            // Layout.bottomMargin: 0
+            // Layout.leftMargin: 15
+            // Layout.rightMargin: 15
 
-                // We pass the index of the current delegate in the model which is the same as the index used in the 'QVariantList' to obtain the 'patient_id' from it.
-                Database.removeTask(index)
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+
+                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
+
+                Text {
+                    anchors.fill: parent
+                    anchors.leftMargin: 10
+
+                    horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignVCenter
+
+                    text: qsTr("FIRST NAME")
+
+                    color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
+                    font.pointSize: Qt.application.font.pixelSize * 1
+                    elide: Text.ElideRight
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+
+                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
+
+                Text {
+                    anchors.fill: parent
+                    anchors.leftMargin: 10
+
+                    horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignVCenter
+
+                    text: qsTr("LAST NAME")
+
+                    color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
+                    font.pointSize: Qt.application.font.pixelSize * 1
+                    elide: Text.ElideRight
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+
+                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
+
+                Text {
+                    anchors.fill: parent
+                    anchors.leftMargin: 10
+
+                    horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignVCenter
+
+                    text: qsTr("GENDER")
+
+                    color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
+                    font.pointSize: Qt.application.font.pixelSize * 1
+                    elide: Text.ElideRight
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+
+                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
+
+                Text {
+                    anchors.fill: parent
+                    anchors.leftMargin: 10
+
+                    horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignVCenter
+
+                    text: qsTr("AGE")
+
+                    color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
+                    font.pointSize: Qt.application.font.pixelSize * 1
+                    elide: Text.ElideRight
+                }
+            }
+
+            Item {
+                Layout.preferredWidth: 130
+                Layout.preferredHeight: 35
+            }
+        }
+
+        ListView {
+            id: listView
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: (ufo_GroupBox_SearchResults.height * 0.55)
+
+            spacing: 15
+            clip: true
+
+            //model: Database.searchModel
+
+            delegate: UFO_ListDelegate {
+                width: listView.width
+
+                //backgroundColor: index % 2 === 0 ? Qt.color(AppTheme.colors["UFO_ListDelegate_Background_1"]) : Qt.color(AppTheme.colors["UFO_ListDelegate_Background_2"])
+
+                // modelData is the data inside of model. In other words, the 'QVariantMap' inside of 'QVariantList'.
+                firstName: modelData["first_name"]
+                lastName: modelData["last_name"]
+                gender: modelData["gender"]
+                age: modelData["age"]
+
+                onEditClicked: {
+
+                    // We pass the index of the current delegate in the model which is the same as the index used in the 'QVariantList' to obtain the 'patient_id' from it.
+                    Database.readyPatientForEditing(index)
+                    root.patientSelectedForEdit()
+                }
             }
         }
     }
+
+
+    // Rectangle {
+    //     id: rectangle_SearchResultBackground
+
+    //     Layout.fillWidth: true
+    //     Layout.preferredHeight: (root.height - ufo_GroupBox_SearchOptions.height)
+
+    //     color: "grey"
+
+
+    //     ColumnLayout {
+    //         anchors.fill: parent
+
+
+
+    //     }
+
+
+    // }
+
+
+
+
 }
