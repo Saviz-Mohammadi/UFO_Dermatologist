@@ -78,6 +78,15 @@ UFO_Page {
         }
     }
 
+    Connections {
+        target: Database
+
+        // Acts as a refresh:
+        function onPatientEditsApplied() {
+            Database.readyPatientForEditing(Database.editPatient["patient_id"])
+        }
+    }
+
     UFO_GroupBox {
         id: ufo_GroupBox
 
@@ -273,8 +282,45 @@ UFO_Page {
                 svg: "./../../icons/Google icons/edit.svg"
 
                 onClicked: {
+                    var first_name = "";
+                    var last_name = "";
+                    var age = -1;
+                    var phone_number = "";
+                    var gender = "";
+                    var marital_status = "";
 
-                    // Here make sure to call the apply changes.
+                    // Populate if viable:
+                    if(textField_FirstName.hasChanged) {
+                        first_name = textField_FirstName.text.trim()
+                    }
+
+                    if(textField_LastName.hasChanged) {
+                        last_name = textField_LastName.text.trim()
+                    }
+
+                    if(textField_Age.hasChanged) {
+                        age = parseInt(textField_Age.text.trim())
+                    }
+
+                    if(textField_PhoneNumber.hasChanged) {
+                        phone_number = textField_PhoneNumber.text.trim()
+                    }
+
+                    if(comboBox_Gender.hasChanged) {
+                        gender = comboBox_Gender.currentText
+                    }
+
+                    if(comboBox_MaritalStatus.hasChanged) {
+                        gender = comboBox_MaritalStatus.currentText
+                    }
+
+
+                    var operationOutcome = Database.editPatient(first_name, last_name, age, phone_number, gender, marital_status)
+
+                    if(operationOutcome === false) {
+
+                        ufo_StatusBar.displayMessage("Edit operation failed!")
+                    }
                 }
             }
         }

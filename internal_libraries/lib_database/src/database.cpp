@@ -460,6 +460,118 @@ bool Database::readyPatientForEditing(const quint64 index)
     return (true);
 }
 
+bool Database::editPatient(const QString &first_name, const QString &last_name, quint8 age, const QString &phone_number, const QString &gender, const QString &marital_status)
+{
+    QString queryString = "UPDATE patients SET ";
+    QSqlQuery query;
+
+
+#ifdef QT_DEBUG
+    QString message("Edit initiated!\n");
+
+    QTextStream stream(&message);
+#endif
+
+
+    // NOTE (SAVIZ): I like to use 'std::optional', but QML does not play nice.
+    if (!first_name.isEmpty())
+    {
+        queryString += "first_name = '" + first_name + "'";
+
+
+#ifdef QT_DEBUG
+        stream << "'first_name' : " << first_name << "\n";
+#endif
+    }
+
+    if (!last_name.isEmpty())
+    {
+        queryString += ", last_name = '" + last_name + "'";
+
+
+#ifdef QT_DEBUG
+        stream << "'laste_name' : " << last_name << "\n";
+#endif
+    }
+
+    // NOTE (SAVIZ): Using -1 as the sentinel value for age, which turns into 255 in unsigned format.
+    if (age != 255)
+    {
+        queryString += ", age = " + QString::number(age);
+
+
+#ifdef QT_DEBUG
+        stream << "'age' : " << age << "\n";
+#endif
+    }
+
+    if (!phone_number.isEmpty())
+    {
+        queryString += ", phone_number = '" + phone_number + "'";
+
+
+#ifdef QT_DEBUG
+        stream << "'phone_number' : " << phone_number << "\n";
+#endif
+    }
+
+    if (!gender.isEmpty() && gender != "Gender")
+    {
+        queryString += ", gender = '" + gender + "'";
+
+
+#ifdef QT_DEBUG
+        stream << "'gender' : " << gender << "\n";
+#endif
+    }
+
+    if (!marital_status.isEmpty() && marital_status != "Marital Status")
+    {
+        queryString += ", marital_status = '" + marital_status + "'";
+
+
+#ifdef QT_DEBUG
+        stream << "'marital_status' : " << marital_status << "\n";
+#endif
+    }
+
+
+#ifdef QT_DEBUG
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+    queryString += " WHERE patient_id = " + m_EditPatientMap["patient_id"].toString();
+    query.prepare(queryString);
+
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
+#endif
+
+
+        return (false);
+    }
+
+    if (query.size() == 0)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Query returned no results.");
+#endif
+
+
+        return (false);
+    }
+
+
+    // Notify QML that the results have changed.
+    emit patientEditsApplied();
+
+    return (true);
+}
+
 QVariant Database::addTask(const QString &text)
 {
     QString command("INSERT INTO tasks(task_description) VALUES(:text)");
