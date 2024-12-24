@@ -11,6 +11,7 @@ Item {
 
     property alias firstName: text_FirstName.text
     property alias lastName: text_LastName.text
+    property alias phoneNumber: text_PhoneNumber.text
     property alias gender: text_Gender.text
     property alias age: text_Age.text
 
@@ -19,118 +20,129 @@ Item {
     implicitWidth: 200
     implicitHeight: 60
 
-    Rectangle {
-        width: parent.width
-        height: parent.height
+    RowLayout {
+        anchors.fill: parent
 
-        radius: 0
+        spacing: 1
 
-        color: Qt.color(AppTheme.colors["UFO_ListDelegate_Background"])
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
 
-        RowLayout {
-            anchors.fill: parent
-            anchors.margins: 10
+            color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
 
-            spacing: 10
+            Text {
+                id: text_FirstName
 
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
+                anchors.fill: parent
+                anchors.leftMargin: 10
 
-                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
+                horizontalAlignment: Text.AlignLeft
+                verticalAlignment: Text.AlignVCenter
 
-                Text {
-                    id: text_FirstName
-
-                    anchors.fill: parent
-                    anchors.leftMargin: 10
-
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
-
-                    color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
-                    font.pointSize: Qt.application.font.pixelSize * 1
-                    elide: Text.ElideRight
-                }
+                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
+                font.pointSize: Qt.application.font.pixelSize * 1
+                elide: Text.ElideRight
             }
+        }
 
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
 
-                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
+            color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
 
-                Text {
-                    id: text_LastName
+            Text {
+                id: text_LastName
 
-                    anchors.fill: parent
-                    anchors.leftMargin: 10
+                anchors.fill: parent
+                anchors.leftMargin: 10
 
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignLeft
+                verticalAlignment: Text.AlignVCenter
 
-                    color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
-                    font.pointSize: Qt.application.font.pixelSize * 1
-                    elide: Text.ElideRight
-                }
+                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
+                font.pointSize: Qt.application.font.pixelSize * 1
+                elide: Text.ElideRight
             }
+        }
 
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
 
-                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
+            color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
 
-                Text {
-                    id: text_Gender
+            Text {
+                id: text_PhoneNumber
 
-                    anchors.fill: parent
-                    anchors.leftMargin: 10
+                anchors.fill: parent
+                anchors.leftMargin: 10
 
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignLeft
+                verticalAlignment: Text.AlignVCenter
 
-                    color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
-                    font.pointSize: Qt.application.font.pixelSize * 1
-                    elide: Text.ElideRight
-                }
+                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
+                font.pointSize: Qt.application.font.pixelSize * 1
+                elide: Text.ElideRight
             }
+        }
 
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
 
-                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
+            color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
 
-                Text {
-                    id: text_Age
+            Text {
+                id: text_Gender
 
-                    anchors.fill: parent
-                    anchors.leftMargin: 10
+                anchors.fill: parent
+                anchors.leftMargin: 10
 
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignLeft
+                verticalAlignment: Text.AlignVCenter
 
-                    color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
-                    font.pointSize: Qt.application.font.pixelSize * 1
-                    elide: Text.ElideRight
-                }
+                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
+                font.pointSize: Qt.application.font.pixelSize * 1
+                elide: Text.ElideRight
             }
+        }
 
-            UFO_ListDelegateButton {
-                Layout.preferredWidth: 130
-                Layout.preferredHeight: 35
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
 
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+            color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
 
-                enabled: (Database.connectionStatus === true) ? true : false
+            Text {
+                id: text_Age
 
-                text: qsTr("Edit Patient")
-                svg: "./../../icons/Google icons/edit.svg"
+                anchors.fill: parent
+                anchors.leftMargin: 10
 
-                onClicked: {
-                    root.editClicked()
-                }
+                horizontalAlignment: Text.AlignLeft
+                verticalAlignment: Text.AlignVCenter
+
+                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
+                font.pointSize: Qt.application.font.pixelSize * 1
+                elide: Text.ElideRight
+            }
+        }
+
+        UFO_ListDelegateButton {
+            Layout.preferredWidth: 120
+            Layout.preferredHeight: 35
+
+            Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+
+            enabled: (Database.connectionStatus === true) ? true : false
+
+            text: qsTr("Edit Patient")
+            svg: "./../../icons/Google icons/edit.svg"
+
+            onClicked: {
+                root.editClicked()
             }
         }
     }

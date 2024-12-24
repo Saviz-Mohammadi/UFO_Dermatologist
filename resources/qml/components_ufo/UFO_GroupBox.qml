@@ -12,6 +12,8 @@ Item {
     property int contentSpacing: 7
     property alias title: text.text
     property real titleFontSize: 1.3
+    property real titleSeparatorHeight: 2
+    property alias titleSeparatorColor: rectangle_2.color
     property real titleTopMargin: 0
     property real titleBottomMarign: 0
     property real titleLeftMargin: 10
@@ -59,7 +61,7 @@ Item {
         anchors.right: root.right
 
         implicitWidth: root.implicitWidth
-        implicitHeight: 2
+        implicitHeight: root.titleSeparatorHeight
 
         color: Qt.color(AppTheme.colors["UFO_GroupBox_Separator"])
     }

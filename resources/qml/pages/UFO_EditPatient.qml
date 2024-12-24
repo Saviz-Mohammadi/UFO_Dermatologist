@@ -25,13 +25,48 @@ UFO_Page {
     contentSpacing: 20
 
     function setFieldValues() {
-        firstName.text = Database.editPatientMap["first_name"];
-        lastName.text = Database.editPatientMap["last_name"];
+        textField_FirstName.text = Database.editPatientMap["first_name"];
+        textField_LastName.text = Database.editPatientMap["last_name"];
+        textField_PhoneNumber.text = Database.editPatientMap["phone_number"];
+        textField_Age.text = Database.editPatientMap["age"];
+
+        switch (Database.editPatientMap["gender"]) {
+            case "Gender":
+                comboBox_Gender.currentIndex = 0
+                break
+            case "Male":
+                comboBox_Gender.currentIndex = 1
+                break
+            default:
+                comboBox_Gender.currentIndex = 2
+        };
+
+        switch (Database.editPatientMap["marital_status"]) {
+            case "Marital Status":
+                comboBox_MaritalStatus.currentIndex = 0
+                break
+            case "Single":
+                comboBox_MaritalStatus.currentIndex = 1
+                break
+            case "Married":
+                comboBox_MaritalStatus.currentIndex = 2
+                break
+            case "Divorced":
+                comboBox_MaritalStatus.currentIndex = 3
+                break
+            default:
+                comboBox_MaritalStatus.currentIndex = 4
+        };
     }
 
     function resetFieldStates() {
-        firstName.hasChanged = false
-        lastName.hasChanged = false
+        textField_FirstName.hasChanged = false;
+        textField_LastName.hasChanged = false;
+        textField_PhoneNumber.hasChanged = false;
+        textField_Age.hasChanged = false;
+
+        comboBox_Gender.hasChanged = false;
+        comboBox_MaritalStatus.hasChanged = false;
     }
 
     Connections {
@@ -52,16 +87,34 @@ UFO_Page {
         title: qsTr("General Information")
         contentSpacing: 0
 
+        Text {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            Layout.topMargin: 20
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            text: qsTr("You can revert the information at any time by pressing the 'Revert' button, provided the changes have not already been applied.")
+
+            elide: Text.ElideRight
+            horizontalAlignment: Text.AlignLeft
+            verticalAlignment: Text.AlignVCenter
+            wrapMode: Text.Wrap
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
+
         RowLayout {
             Layout.fillWidth: true
 
             Layout.topMargin: 7
-            Layout.bottomMargin: 0
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
+            spacing: 10
+
             UFO_TextField {
-                id: firstName
+                id: textField_FirstName
 
                 property bool hasChanged: false
 
@@ -77,23 +130,8 @@ UFO_Page {
                 }
             }
 
-            UFO_Button {
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 35
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                text: qsTr("Clear")
-                svg: "./../../icons/Google icons/cancel.svg"
-
-                onClicked: {
-
-                    firstName.clear()
-                }
-            }
-
             UFO_TextField {
-                id: lastName
+                id: textField_LastName
 
                 property bool hasChanged: false
 
@@ -109,18 +147,20 @@ UFO_Page {
                 }
             }
 
-            UFO_Button {
-                Layout.preferredWidth: 120
+            UFO_ComboBox {
+                id: comboBox_Gender
+
+                property bool hasChanged: false
+
+                Layout.preferredWidth: 150
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                text: qsTr("Clear")
-                svg: "./../../icons/Google icons/cancel.svg"
+                model: ["Gender", "Male", "Female"]
 
-                onClicked: {
-
-                    lastName.clear()
+                onActivated: {
+                    hasChanged = true
                 }
             }
         }
@@ -129,12 +169,13 @@ UFO_Page {
             Layout.fillWidth: true
 
             Layout.topMargin: 7
-            Layout.bottomMargin: 0
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
+            spacing: 10
+
             UFO_TextField {
-                id: age
+                id: textField_Age
 
                 property bool hasChanged: false
 
@@ -148,25 +189,14 @@ UFO_Page {
                 validator: RegularExpressionValidator {
                     regularExpression: /^((1[0-4][0-9])|([1-9][0-9])|[0-9]|150)$/ // Ranges between (0 – 150)
                 }
-            }
 
-            UFO_Button {
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 35
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                text: qsTr("Clear")
-                svg: "./../../icons/Google icons/cancel.svg"
-
-                onClicked: {
-
-                    age.clear()
+                onTextEdited: {
+                    hasChanged = true
                 }
             }
 
             UFO_TextField {
-                id: phoneNumber
+                id: textField_PhoneNumber
 
                 property bool hasChanged: false
 
@@ -180,56 +210,27 @@ UFO_Page {
                 validator: RegularExpressionValidator {
                     regularExpression: /^\+\d{1,3} \(\d{3}\) \d{3}-\d{4}$/ // Format: +1 (555) 921-1222 -> [country code] [(Area code)] [Phone number]
                 }
-            }
 
-            UFO_Button {
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 35
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                text: qsTr("Clear")
-                svg: "./../../icons/Google icons/cancel.svg"
-
-                onClicked: {
-
-                    phoneNumber.clear()
+                onTextEdited: {
+                    hasChanged = true
                 }
             }
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-
-            Layout.topMargin: 7
-            Layout.bottomMargin: 0
-            Layout.leftMargin: 15
-            Layout.rightMargin: 15
 
             UFO_ComboBox {
-                id: gender
+                id: comboBox_MaritalStatus
 
                 property bool hasChanged: false
 
-                Layout.fillWidth: true
+                Layout.preferredWidth: 150
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                model: ["Male", "Female"]
-            }
+                model: ["Marital Status", "Single", "Married", "Divorced", "Widowed"]
 
-            UFO_ComboBox {
-                id: maritalStatus
-
-                property bool hasChanged: false
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                model: ["Single", "Married", "Divorced", "Widowed"]
+                onActivated: {
+                    hasChanged = true
+                }
             }
         }
 
@@ -245,13 +246,12 @@ UFO_Page {
                 Layout.preferredWidth: 120
                 Layout.preferredHeight: 35
 
-                // NOTE (SAVIZ): The enabled state of this button is more complicated as we need to also take into account the state of hasChanged() of visual elements.
+                // NOTE (SAVIZ): The enabled state of this button is more complicated as we need to also take into account the state of 'hasChanged' of visual elements.
                 enabled: Database.connectionStatus && (
-
-                        firstName.hasChanged || lastName.hasChanged
+                    textField_FirstName.hasChanged || textField_LastName.hasChanged || textField_PhoneNumber.hasChanged || textField_Age.hasChanged || comboBox_Gender.hasChanged || comboBox_MaritalStatus.hasChanged
                 )
 
-                text: qsTr("Revert Changes")
+                text: qsTr("Revert")
                 svg: "./../../icons/Google icons/undo.svg"
 
                 onClicked: {
@@ -264,13 +264,12 @@ UFO_Page {
                 Layout.preferredWidth: 120
                 Layout.preferredHeight: 35
 
-                // NOTE (SAVIZ): The enabled state of this button is more complicated as we need to also take into account the state of hasChanged() of visual elements.
+                // NOTE (SAVIZ): The enabled state of this button is more complicated as we need to also take into account the state of 'hasChanged' of visual elements.
                 enabled: Database.connectionStatus && (
-
-                        firstName.hasChanged || lastName.hasChanged
+                    textField_FirstName.hasChanged || textField_LastName.hasChanged || textField_PhoneNumber.hasChanged || textField_Age.hasChanged || comboBox_Gender.hasChanged || comboBox_MaritalStatus.hasChanged
                 )
 
-                text: qsTr("Apply Changes")
+                text: qsTr("Apply")
                 svg: "./../../icons/Google icons/edit.svg"
 
                 onClicked: {
@@ -281,3 +280,6 @@ UFO_Page {
         }
     }
 }
+
+
+// NOTE (SAVIZ): You can have multiple groupboxes, but only apply changes using different functions based on what has changed. I think there is something called a transaction to submit multiple changes, look it up.

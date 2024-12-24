@@ -176,7 +176,7 @@ ApplicationWindow {
                 target: ufo_Search
 
                 function onPatientSelectedForEdit() {
-                    stackLayout.currentIndex = ufo_Search.StackLayout.index
+                    stackLayout.currentIndex = ufo_EditPatient.StackLayout.index
 
                     ufo_SideBar_Main.checkTabButton("Edit Patient Page")
                 }

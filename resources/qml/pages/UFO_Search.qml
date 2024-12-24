@@ -17,11 +17,20 @@ UFO_Page {
     title: qsTr("Search Patients")
     contentSpacing: 20
 
+    function clearFields() {
+        textField_FirstName.clear()
+        textField_LastName.clear()
+        textField_PhoneNumber.clear()
+
+        comboBox_Gender.currentIndex = 0
+        comboBox_MaritalStatus.currentIndex = 0
+    }
+
     UFO_GroupBox {
         id: ufo_GroupBox_SearchOptions
 
         Layout.fillWidth: true
-        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_PtextField_Age" ignores height to enable vertical scrolling.
+        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
 
         title: qsTr("Search Options")
         contentSpacing: 0
@@ -30,7 +39,7 @@ UFO_Page {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            Layout.topMargin: 15
+            Layout.topMargin: 20
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
@@ -46,7 +55,7 @@ UFO_Page {
         RowLayout {
             Layout.fillWidth: true
 
-            Layout.topMargin: 25
+            Layout.topMargin: 7
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
@@ -75,14 +84,13 @@ UFO_Page {
             }
 
             UFO_ComboBox {
-                id: textField_Gender
+                id: comboBox_Gender
 
                 Layout.preferredWidth: 150
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                // TODO (SAVIZ): Check for 'Gender' and prevent search on it.
                 model: ["Gender", "Male", "Female"]
             }
         }
@@ -127,14 +135,13 @@ UFO_Page {
             }
 
             UFO_ComboBox {
-                id: textField_MaritalStatus
+                id: comboBox_MaritalStatus
 
                 Layout.preferredWidth: 150
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                // TODO (SAVIZ): Check for 'Marital Status' and prevent search on it.
                 model: ["Marital Status", "Single", "Married", "Divorced", "Widowed"]
             }
         }
@@ -153,11 +160,11 @@ UFO_Page {
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                text: qsTr("Find First")
+                text: qsTr("First")
                 svg: "./../../icons/Google icons/one.svg"
 
                 onClicked: {
-                    // TODO (SAVIZ): Enter Database command for finding first patient.
+                    Database.findFirstPatient()
                 }
             }
 
@@ -167,11 +174,11 @@ UFO_Page {
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                text: qsTr("Find Last")
-                svg: "./../../icons/Google icons/infinity.svg"
+                text: qsTr("Recent")
+                svg: "./../../icons/Google icons/recent.svg"
 
                 onClicked: {
-                    // TODO (SAVIZ): Enter Database command for finding last patient.
+                    Database.findLastPatient()
                 }
             }
 
@@ -190,7 +197,7 @@ UFO_Page {
 
                 onClicked: {
 
-                    // Make a function that clears everything.
+                    root.clearFields();
                 }
             }
 
@@ -204,27 +211,18 @@ UFO_Page {
                 svg: "./../../icons/Google icons/person_search.svg"
 
                 onClicked: {
-                    var first_name = textField_FirstName.text
-                    var last_name = textField_LastName.text
-
-                    var vtextField_Age;
-
-                    if(textField_Age.text === "") {
-                        vtextField_Age = -1
-                    }
-
-                    else {
-                       vtextField_Age = parseInt(textField_Age.text)
-                    }
-
+                    var first_name = textField_FirstName.text.trim()
+                    var last_name = textField_LastName.text.trim()
+                    var age = (textField_Age.text === "") ? -1 : parseInt(textField_Age.text.trim())
                     var phone_number = textField_PhoneNumber.text
-                    var sex = textField_Gender.currentText
-                    var marital_status = textField_MaritalStatus.currentText
+                    var gender = comboBox_Gender.currentText
+                    var marital_status = comboBox_MaritalStatus.currentText
 
-                    var operationOutcome = Database.search(first_name, last_name, vtextField_Age, phone_number, sex, marital_status)
+                    var operationOutcome = Database.findPatient(first_name, last_name, age, phone_number, gender, marital_status)
 
                     if(operationOutcome === false) {
-                        // TODO (SAVIZ): Perform a warning messtextField_Age.
+
+                        ufo_StatusBar.displayMessage("Search operation failed!")
                     }
                 }
             }
@@ -236,17 +234,38 @@ UFO_Page {
         id: ufo_GroupBox_SearchResults
 
         Layout.fillWidth: true
-        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_PtextField_Age" ignores height to enable vertical scrolling.
+        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
 
         title: qsTr("Search Results")
         contentSpacing: 0
+
+        Text {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            Layout.topMargin: 20
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            text: qsTr("The following list represents the results of the search operation.")
+
+            elide: Text.ElideRight
+            horizontalAlignment: Text.AlignLeft
+            verticalAlignment: Text.AlignVCenter
+            wrapMode: Text.Wrap
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
 
         RowLayout {
             id: rowLayout_TitleContainer
 
             Layout.fillWidth: true
 
-            spacing: 10
+            Layout.topMargin: 7
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            spacing: 1
 
             Rectangle {
                 Layout.fillWidth: true
@@ -303,6 +322,27 @@ UFO_Page {
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignVCenter
 
+                    text: qsTr("PHONE NUMBER")
+
+                    color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
+                    font.pointSize: Qt.application.font.pixelSize * 1
+                    elide: Text.ElideRight
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+
+                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
+
+                Text {
+                    anchors.fill: parent
+                    anchors.leftMargin: 10
+
+                    horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignVCenter
+
                     text: qsTr("GENDER")
 
                     color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
@@ -332,9 +372,20 @@ UFO_Page {
                 }
             }
 
-            Item {
-                Layout.preferredWidth: 130
+            UFO_Button {
+                Layout.preferredWidth: 120
                 Layout.preferredHeight: 35
+
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                text: qsTr("Clear")
+                svg: "./../../icons/Google icons/delete.svg"
+
+                onClicked: {
+                    Database.clearSearchResults();
+                }
             }
         }
 
@@ -342,27 +393,36 @@ UFO_Page {
             id: listView
 
             Layout.fillWidth: true
-            Layout.preferredHeight: (root.height * 0.50)
+            Layout.preferredHeight: (root.height * 0.45)
 
-            spacing: 15
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            spacing: 10
             clip: true
 
-            model: Database.searchModel
+            model: Database.searchResultList
 
             delegate: UFO_ListDelegate {
                 width: listView.width
 
-                //backgroundColor: index % 2 === 0 ? Qt.color(AppTheme.colors["UFO_ListDelegate_Background_1"]) : Qt.color(AppTheme.colors["UFO_ListDelegate_Background_2"])
-
                 // modelData is the data inside of model. In other words, the 'QVariantMap' inside of 'QVariantList'.
                 firstName: modelData["first_name"]
                 lastName: modelData["last_name"]
-                gender: modelData["textField_Gender"]
-                age: modelData["textField_Age"]
+                phoneNumber: modelData["phone_number"]
+                gender: modelData["gender"]
+                age: modelData["age"]
 
                 onEditClicked: {
                     // We pass the index of the current delegate in the model which is the same as the index used in the 'QVariantList' to obtain the 'patient_id' from it.
-                    Database.readyPatientForEditing(index)
+                    var operationStatus = Database.readyPatientForEditing(index)
+
+                    if(operationStatus !== true) {
+                        ufo_StatusBar.displayMessage("Edit operation failed!");
+
+                        return;
+                    }
+
                     root.patientSelectedForEdit()
                 }
             }
