@@ -412,8 +412,17 @@ bool Database::readyPatientForEditing(const quint64 index)
 #endif
 
 
-    QString queryString = "SELECT * FROM patients WHERE patient_id = " + patient_id;
+    QString queryString = "SELECT * FROM patients ";
     QSqlQuery query;
+
+
+    // Treatments:
+    queryString += "LEFT JOIN patient_treatments ON patients.patient_id = patient_treatments.patient_id ";
+    queryString += "LEFT JOIN treatments ON treatments.treatment_id = patient_treatments.treatment_id";
+
+
+    // Id:
+    queryString += " WHERE patients.patient_id = " + patient_id;
 
 
     query.prepare(queryString);
@@ -440,6 +449,8 @@ bool Database::readyPatientForEditing(const quint64 index)
     }
 
 
+    QVariantList treatments;
+
     while (query.next())
     {
         m_EditPatientMap["patient_id"] = query.value("patient_id").toULongLong();
@@ -450,7 +461,15 @@ bool Database::readyPatientForEditing(const quint64 index)
         m_EditPatientMap["phone_number"] = query.value("phone_number").toString();
         m_EditPatientMap["gender"] = query.value("gender").toString();
         m_EditPatientMap["marital_status"] = query.value("marital_status").toString();
+
+        treatments.append(query.value("treatments.name").toString());
     }
+
+
+    // Assign list of treatments:
+    m_EditPatientMap["treatment_names"] = treatments;
+
+    qDebug() << treatments;
 
 
     // Notify QML that the patient has changed.
