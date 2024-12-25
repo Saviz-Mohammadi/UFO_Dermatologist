@@ -24,13 +24,16 @@ UFO_Page {
     title: qsTr("Edit Patient")
     contentSpacing: 20
 
+    property var patientDataMap
     function setFieldValues() {
-        textField_FirstName.text = Database.editPatientMap["first_name"];
-        textField_LastName.text = Database.editPatientMap["last_name"];
-        textField_PhoneNumber.text = Database.editPatientMap["phone_number"];
-        textField_Age.text = Database.editPatientMap["age"];
+        let patientDataMap = Database.getPatientData();
 
-        switch (Database.editPatientMap["gender"]) {
+        textField_FirstName.text = patientDataMap["first_name"];
+        textField_LastName.text = patientDataMap["last_name"];
+        textField_PhoneNumber.text = patientDataMap["phone_number"];
+        textField_Age.text = patientDataMap["age"];
+
+        switch (patientDataMap["gender"]) {
             case "Gender":
                 comboBox_Gender.currentIndex = 0
                 break
@@ -41,7 +44,7 @@ UFO_Page {
                 comboBox_Gender.currentIndex = 2
         };
 
-        switch (Database.editPatientMap["marital_status"]) {
+        switch (patientDataMap["marital_status"]) {
             case "Marital Status":
                 comboBox_MaritalStatus.currentIndex = 0
                 break
@@ -71,7 +74,7 @@ UFO_Page {
     Connections {
         target: Database
 
-        function onEditPatientMapChanged() {
+        function onPatientDataChanged() {
             root.setFieldValues();
             root.resetFieldStates();
         }
@@ -81,8 +84,10 @@ UFO_Page {
         target: Database
 
         // Acts as a refresh:
-        function onPatientEditsApplied() {
-            Database.readyPatientForEditing(Database.editPatient["patient_id"])
+        function onUpdatesApplied() {
+            let patientDataMap = Database.getPatientData();
+
+            Database.readyPatientDataForEditing(patientDataMap["patient_id"])
         }
     }
 

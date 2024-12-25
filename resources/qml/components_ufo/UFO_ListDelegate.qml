@@ -18,7 +18,7 @@ Item {
     signal editClicked
 
     implicitWidth: 200
-    implicitHeight: 60
+    implicitHeight: 35
 
     RowLayout {
         anchors.fill: parent

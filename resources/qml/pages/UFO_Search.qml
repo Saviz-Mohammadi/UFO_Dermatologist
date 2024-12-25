@@ -17,15 +17,6 @@ UFO_Page {
     title: qsTr("Search Patients")
     contentSpacing: 20
 
-    function clearFields() {
-        textField_FirstName.clear()
-        textField_LastName.clear()
-        textField_PhoneNumber.clear()
-
-        comboBox_Gender.currentIndex = 0
-        comboBox_MaritalStatus.currentIndex = 0
-    }
-
     UFO_GroupBox {
         id: ufo_GroupBox_SearchOptions
 
@@ -174,8 +165,8 @@ UFO_Page {
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                text: qsTr("Recent")
-                svg: "./../../icons/Google icons/recent.svg"
+                text: qsTr("Last")
+                svg: "./../../icons/Google icons/infinity.svg"
 
                 onClicked: {
                     Database.findLastPatient()
@@ -196,8 +187,12 @@ UFO_Page {
                 svg: "./../../icons/Google icons/delete.svg"
 
                 onClicked: {
+                    textField_FirstName.clear()
+                    textField_LastName.clear()
+                    textField_PhoneNumber.clear()
 
-                    root.clearFields();
+                    comboBox_Gender.currentIndex = 0
+                    comboBox_MaritalStatus.currentIndex = 0
                 }
             }
 
@@ -221,7 +216,6 @@ UFO_Page {
                     var operationOutcome = Database.findPatient(first_name, last_name, age, phone_number, gender, marital_status)
 
                     if(operationOutcome === false) {
-
                         ufo_StatusBar.displayMessage("Search operation failed!")
                     }
                 }
@@ -384,46 +378,64 @@ UFO_Page {
                 svg: "./../../icons/Google icons/delete.svg"
 
                 onClicked: {
-                    Database.clearSearchResults();
+                    listModel_SearchResults.clear();
                 }
             }
         }
 
         ListView {
-            id: listView
+            id: listView_SearchResults
 
             Layout.fillWidth: true
             Layout.preferredHeight: (root.height * 0.45)
 
+            Layout.topMargin: 15
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            spacing: 10
+            spacing: 2
             clip: true
 
-            model: Database.searchResultList
+            model: ListModel { id: listModel_SearchResults }
 
             delegate: UFO_ListDelegate {
-                width: listView.width
+                width: listView_SearchResults.width
 
-                // modelData is the data inside of model. In other words, the 'QVariantMap' inside of 'QVariantList'.
-                firstName: modelData["first_name"]
-                lastName: modelData["last_name"]
-                phoneNumber: modelData["phone_number"]
-                gender: modelData["gender"]
-                age: modelData["age"]
+                firstName: model.patient_FirstName
+                lastName: model.patient_LastName
+                phoneNumber: model.patient_PhoneNumber
+                gender: model.patient_Gender
+                age: model.patient_Age
 
                 onEditClicked: {
-                    // We pass the index of the current delegate in the model which is the same as the index used in the 'QVariantList' to obtain the 'patient_id' from it.
-                    var operationStatus = Database.readyPatientForEditing(index)
+                    var operationStatus = Database.readyPatientDataForEditing(model.patient_ID)
 
                     if(operationStatus !== true) {
-                        ufo_StatusBar.displayMessage("Edit operation failed!");
+                        ufo_StatusBar.displayMessage("Could not make patient ready for editting!");
 
                         return;
                     }
 
                     root.patientSelectedForEdit()
+                }
+            }
+
+            Connections {
+                target: Database
+
+                function onSearchResultListChanged() {
+                    listModel_SearchResults.clear();
+
+                    Database.getSearchResultList().forEach(function (searchResult) {
+                        listModel_SearchResults.append({
+                            "patient_ID": searchResult["patient_id"],
+                            "patient_FirstName": searchResult["first_name"],
+                            "patient_LastName": searchResult["last_name"],
+                            "patient_PhoneNumber": searchResult["phone_number"],
+                            "patient_Gender": searchResult["gender"],
+                            "patient_Age": searchResult["age"]
+                        });
+                    })
                 }
             }
         }

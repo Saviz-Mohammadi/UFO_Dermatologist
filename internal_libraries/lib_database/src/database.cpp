@@ -15,12 +15,12 @@ Database::Database(QObject *parent, const QString &name)
     : QObject{parent}
     , m_QSqlDatabase(QSqlDatabase{})
     , m_ConnectionStatus(false)
-    , m_ListsAreObtained(false)
     , m_SearchResultList(QVariantList{})
-    , m_PatientData(QVariantMap{})
-    , m_TreatmentList(QVariantMap{})
+    , m_PatientDataMap(QVariantMap{})
+    , m_TreatmentMap(QVariantMap{})
 {
     this->setObjectName(name);
+
 
 
 #ifdef QT_DEBUG
@@ -41,6 +41,7 @@ Database::~Database()
 
     logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
 #endif
+
 
 
     // Shutdown.
@@ -92,6 +93,8 @@ void Database::establishConnection(const QString &ipAddress, qint16 port, const 
         return;
     }
 
+
+
     m_QSqlDatabase = QSqlDatabase::addDatabase("QMYSQL");
 
     m_QSqlDatabase.setHostName(ipAddress);
@@ -99,6 +102,8 @@ void Database::establishConnection(const QString &ipAddress, qint16 port, const 
     m_QSqlDatabase.setDatabaseName(schema);
     m_QSqlDatabase.setUserName(username);
     m_QSqlDatabase.setPassword(password);
+
+
 
     bool connectionFailed = !m_QSqlDatabase.open();
 
@@ -110,7 +115,7 @@ void Database::establishConnection(const QString &ipAddress, qint16 port, const 
         QTextStream stream(&message);
 
         stream << "Error       : " << m_QSqlDatabase.lastError().text() << "\n"
-               << "Path        : " << ipAddress;
+               << "IpAddress   : " << ipAddress;
 
         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
 #endif
@@ -119,31 +124,40 @@ void Database::establishConnection(const QString &ipAddress, qint16 port, const 
         return;
     }
 
-    // Notify QML that the connection status has changed.
+
+
+    // Notify QML:
     setConnectionStatus(true);
+
+
+
+    // Populate lists:
+    populateTreatmentList();
 }
 
 void Database::disconnect()
 {
-    m_QSqlDatabase.close();
-
-    setConnectionStatus(false);
-
 #ifdef QT_DEBUG
     QString message("Closing the database connection...\n");
 
     logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
 #endif
+
+
+
+    m_QSqlDatabase.close();
+
+    setConnectionStatus(false);
 }
 
 
 
 // SEARCH
-
 bool Database::findPatient(const QString &first_name, const QString &last_name, quint8 age, const QString &phone_number, const QString &gender, const QString &marital_status)
 {
     QString queryString = "SELECT * FROM patients WHERE 1=1";
     QSqlQuery query;
+
 
 
 #ifdef QT_DEBUG
@@ -151,6 +165,7 @@ bool Database::findPatient(const QString &first_name, const QString &last_name, 
 
     QTextStream stream(&message);
 #endif
+
 
 
     // NOTE (SAVIZ): I like to use 'std::optional', but QML does not play nice.
@@ -216,13 +231,14 @@ bool Database::findPatient(const QString &first_name, const QString &last_name, 
     }
 
 
+
 #ifdef QT_DEBUG
     logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
 #endif
 
 
-    query.prepare(queryString);
 
+    query.prepare(queryString);
 
     if (!query.exec())
     {
@@ -233,6 +249,8 @@ bool Database::findPatient(const QString &first_name, const QString &last_name, 
 
         return (false);
     }
+
+
 
     if (query.size() == 0)
     {
@@ -245,7 +263,9 @@ bool Database::findPatient(const QString &first_name, const QString &last_name, 
     }
 
 
+
     m_SearchResultList.clear();
+
 
 
     // NOTE (SAVIZ): Only obtain the bare minimum data on the patients for now:
@@ -268,8 +288,10 @@ bool Database::findPatient(const QString &first_name, const QString &last_name, 
     }
 
 
+
     // Notify QML that the results have changed.
     emit searchResultListChanged();
+
 
 
     return (true);
@@ -281,8 +303,8 @@ bool Database::findFirstPatient()
     QSqlQuery query;
 
 
-    query.prepare(queryString);
 
+    query.prepare(queryString);
 
     if (!query.exec())
     {
@@ -293,6 +315,8 @@ bool Database::findFirstPatient()
 
         return (false);
     }
+
+
 
     if (query.size() == 0)
     {
@@ -305,7 +329,9 @@ bool Database::findFirstPatient()
     }
 
 
+
     m_SearchResultList.clear();
+
 
 
     // NOTE (SAVIZ): Only obtain the bare minimum data on the patients for now:
@@ -328,8 +354,10 @@ bool Database::findFirstPatient()
     }
 
 
-    // Notify QML that the results have changed.
+
+    // Notify QML:
     emit searchResultListChanged();
+
 
 
     return (true);
@@ -340,8 +368,9 @@ bool Database::findLastPatient()
     QString queryString = "SELECT * FROM patients ORDER BY patient_id DESC LIMIT 1";
     QSqlQuery query;
 
-    query.prepare(queryString);
 
+
+    query.prepare(queryString);
 
     if (!query.exec())
     {
@@ -352,6 +381,8 @@ bool Database::findLastPatient()
 
         return (false);
     }
+
+
 
     if (query.size() == 0)
     {
@@ -364,7 +395,9 @@ bool Database::findLastPatient()
     }
 
 
+
     m_SearchResultList.clear();
+
 
 
     // NOTE (SAVIZ): Only obtain the bare minimum data on the patients for now:
@@ -387,110 +420,19 @@ bool Database::findLastPatient()
     }
 
 
-    // Notify QML that the results have changed.
+
+    // Notify QML:
     emit searchResultListChanged();
+
 
 
     return (true);
-}
-
-void Database::clearSearchResults()
-{
-    m_SearchResultList.clear();
-
-
-#ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Search results cleared.");
-#endif
-
-
-    // Notify QML that the model has changed.
-    emit searchResultListChanged();
 }
 
 
 
 // UPDATE
-
-bool Database::readyPatientForEditing(const quint64 index)
-{
-    // Use the selected patient index to gather all the needed information:
-    QString patient_id = m_SearchResultList[index].toMap()["patient_id"].toString();
-
-
-#ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "The patient_id is: " + patient_id);
-#endif
-
-
-    QString queryString = "SELECT * FROM patients ";
-    QSqlQuery query;
-
-
-    // Treatments:
-    queryString += "LEFT JOIN patient_treatments ON patients.patient_id = patient_treatments.patient_id ";
-    queryString += "LEFT JOIN treatments ON treatments.treatment_id = patient_treatments.treatment_id";
-
-
-    // Id:
-    queryString += " WHERE patients.patient_id = " + patient_id;
-
-
-    query.prepare(queryString);
-
-
-    if (!query.exec())
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
-#endif
-
-
-        return (false);
-    }
-
-    if (query.size() == 0)
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Query returned no results.");
-#endif
-
-
-        return (false);
-    }
-
-
-    QVariantList treatments;
-
-    while (query.next())
-    {
-        m_PatientData["patient_id"] = query.value("patient_id").toULongLong();
-        m_PatientData["first_name"] = query.value("first_name").toString();
-        m_PatientData["last_name"] = query.value("last_name").toString();
-        m_PatientData["age"] = query.value("age").toString();
-        m_PatientData["birth_date"] = query.value("birth_date").toString();
-        m_PatientData["phone_number"] = query.value("phone_number").toString();
-        m_PatientData["gender"] = query.value("gender").toString();
-        m_PatientData["marital_status"] = query.value("marital_status").toString();
-
-        treatments.append(query.value("treatments.name").toString());
-    }
-
-
-    // Assign list of treatments:
-    m_PatientData["treatment_names"] = treatments;
-
-    qDebug() << treatments;
-
-
-    // Notify QML that the patient has changed.
-    emit editPatientMapChanged();
-
-
-    return (true);
-}
-
-bool Database::updatePersonal(const QString &newFirstName, const QString &newLastName, quint8 newAge, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus)
+bool Database::updatePersonalInformation(const QString &newFirstName, const QString &newLastName, quint8 newAge, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus)
 {
     QString queryString = "UPDATE patients SET ";
     QSqlQuery query;
@@ -575,7 +517,7 @@ bool Database::updatePersonal(const QString &newFirstName, const QString &newLas
 
 
 
-    queryString += " WHERE patient_id = " + m_PatientData["patient_id"].toString();
+    queryString += " WHERE patient_id = " + m_PatientDataMap["patient_id"].toString();
     query.prepare(queryString);
 
 
@@ -630,7 +572,7 @@ bool Database::updateTreatments(const QVariantList &newTreatments)
 
 
     QSqlQuery queryDelete;
-    queryDelete.prepare("DELETE FROM patient_treatments WHERE patient_id = " + m_PatientData["patient_id"].toString());
+    queryDelete.prepare("DELETE FROM patient_treatments WHERE patient_id = " + m_PatientDataMap["patient_id"].toString());
 
     if (!queryDelete.exec())
     {
@@ -665,7 +607,7 @@ bool Database::updateTreatments(const QVariantList &newTreatments)
 
     for (std::size_t index = 0; index < newTreatments.length(); ++index)
     {
-        queryInsert.prepare(queryString.arg(m_PatientData["patient_id"].toString(), newTreatments[index].toString()));
+        queryInsert.prepare(queryString.arg(m_PatientDataMap["patient_id"].toString(), newTreatments[index].toString()));
 
         if(!queryInsert.exec())
         {
@@ -705,12 +647,12 @@ bool Database::updatePatientData(const QString &newFirstName, const QString &new
 
 
 
-    bool generalUpdateSuccessful = updatePersonal(newFirstName, newLastName, newAge, newPhoneNumber, newGender, newMaritalStatus);
+    bool personalUpdateSuccessful = updatePersonalInformation(newFirstName, newLastName, newAge, newPhoneNumber, newGender, newMaritalStatus);
 
-    if(!generalUpdateSuccessful)
+    if(!personalUpdateSuccessful)
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "General update failed!");
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Personal update failed!");
 #endif
 
 
@@ -757,32 +699,32 @@ bool Database::updatePatientData(const QString &newFirstName, const QString &new
     return (true);
 }
 
-bool Database::removeTask(QVariant id)
-{
-    QString command("DELETE FROM tasks WHERE task_id = :id");
+// bool Database::removeTask(QVariant id)
+// {
+//     QString command("DELETE FROM tasks WHERE task_id = :id");
 
-    QSqlQuery query;
-    query.prepare(command);
-    query.bindValue(":id", id.toULongLong());
+//     QSqlQuery query;
+//     query.prepare(command);
+//     query.bindValue(":id", id.toULongLong());
 
-    bool operation_success = (query.exec());
+//     bool operation_success = (query.exec());
 
-        if (!operation_success) {
-#ifdef QT_DEBUG
-        QString message("Operation failed!\n");
+//         if (!operation_success) {
+// #ifdef QT_DEBUG
+//         QString message("Operation failed!\n");
 
-        QTextStream stream(&message);
+//         QTextStream stream(&message);
 
-        stream << "Reason: " << query.lastError().text();
+//         stream << "Reason: " << query.lastError().text();
 
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
-#endif
+//         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+// #endif
 
-        return (operation_success);
-        }
+//         return (operation_success);
+//         }
 
-    return (operation_success);
-}
+//     return (operation_success);
+// }
 
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
@@ -794,6 +736,92 @@ bool Database::removeTask(QVariant id)
 // HELPER
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
+
+bool Database::readyPatientDataForEditing(const quint64 index)
+{
+    // Use the selected patient index to gather all the needed information:
+    QString patient_id = m_SearchResultList[index].toMap()["patient_id"].toString();
+
+
+
+#ifdef QT_DEBUG
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "The patient_id is: " + patient_id);
+#endif
+
+
+
+    QString queryString = "SELECT * FROM patients ";
+    QSqlQuery query;
+
+
+
+    // Treatments:
+    queryString += "LEFT JOIN patient_treatments ON patients.patient_id = patient_treatments.patient_id ";
+    queryString += "LEFT JOIN treatments ON treatments.treatment_id = patient_treatments.treatment_id";
+
+
+
+    // Id:
+    queryString += " WHERE patients.patient_id = " + patient_id;
+
+
+
+    query.prepare(queryString);
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
+#endif
+
+
+        return (false);
+    }
+
+
+
+    if (query.size() == 0)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Query returned no results.");
+#endif
+
+
+        return (false);
+    }
+
+
+
+    QVariantList treatments;
+
+    while (query.next())
+    {
+        m_PatientDataMap["patient_id"] = query.value("patient_id").toULongLong();
+        m_PatientDataMap["first_name"] = query.value("first_name").toString();
+        m_PatientDataMap["last_name"] = query.value("last_name").toString();
+        m_PatientDataMap["age"] = query.value("age").toString();
+        m_PatientDataMap["birth_date"] = query.value("birth_date").toString();
+        m_PatientDataMap["phone_number"] = query.value("phone_number").toString();
+        m_PatientDataMap["gender"] = query.value("gender").toString();
+        m_PatientDataMap["marital_status"] = query.value("marital_status").toString();
+
+        treatments.append(query.value("treatments.name").toString());
+    }
+
+
+
+    // Assign list of treatments:
+    m_PatientDataMap["treatment_names"] = treatments;
+
+
+
+    // Notify QML:
+    emit patientDataChanged();
+
+
+
+    return (true);
+}
 
 bool Database::populateTreatmentList()
 {
@@ -865,9 +893,9 @@ QVariantList Database::getSearchResultList() const
     return (m_SearchResultList);
 }
 
-QVariantMap Database::getEditPatientMap() const
+QVariantMap Database::getPatientData() const
 {
-    return (m_PatientData);
+    return (m_PatientDataMap);
 }
 
 // [[------------------------------------------------------------------------]]
