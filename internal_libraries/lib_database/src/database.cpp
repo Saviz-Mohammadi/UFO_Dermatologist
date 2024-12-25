@@ -858,8 +858,12 @@ bool Database::populateTreatmentList()
 
     while (query.next())
     {
-        m_TreatmentMap["id"] = query.value("treatment_id").toULongLong();
-        m_TreatmentMap["name"] = query.value("treatments.name").toString();
+        QVariantMap treatmentMap;
+
+        treatmentMap["treatment_id"] = query.value("treatment_id").toULongLong();
+        treatmentMap["treatment_name"] = query.value("treatments.name").toString();
+
+        m_TreatmentList.append(treatmentMap);
     }
 
 
@@ -893,9 +897,14 @@ QVariantList Database::getSearchResultList() const
     return (m_SearchResultList);
 }
 
-QVariantMap Database::getPatientData() const
+QVariantMap Database::getPatientDataMap() const
 {
     return (m_PatientDataMap);
+}
+
+QVariantList Database::getTreatmentList() const
+{
+    return (m_TreatmentList);
 }
 
 // [[------------------------------------------------------------------------]]

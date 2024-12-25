@@ -9,24 +9,16 @@ import "./../components_ufo"
 import AppTheme 1.0
 import Database 1.0
 
-
-// Here is the idea: Whene ever the patienteditchanged() signal is emitted, it means that we have a new patient to edit. We reset everything, the hasChangde() bools, the text will be set to the new m_patientEdit.
-// We will only visually figure out if there are any changes by nidividually checking the state of haschanged() with || (or) operators. when the changes are ready to be applied they will be applied to the m_patientedit by grabing its id which is already availbale ni the back-end due to the existance of M-patienedit itself.
-// and then emitting the signal again to state that it has changed and reset everything. We will also have a reset button that enbales resetting the not already applied changes of everything by emitting the signal again and having every visual go back ot info in m_editPatient.
-
-// I think a good way of guessing if haschanged should be true is not to just change it in onChaned events, but to actually check agains original m_patientEdit info to check if it really has changed. For example if we have a string, then check it on changed of vinsual element and check it against m_PatientEdit.
-// Of coures the tricky part, well... not really tricky, just tidious! is to create a function in Database to alter every aspect of the data and every filed that we are cheanging seperately.s
-
-
 UFO_Page {
     id: root
 
     title: qsTr("Edit Patient")
     contentSpacing: 20
 
-    property var patientDataMap
+
+    // TODO (SAVIZ): Write these in each connection for each element.
     function setFieldValues() {
-        let patientDataMap = Database.getPatientData();
+        let patientDataMap = Database.getPatientDataMap();
 
         textField_FirstName.text = patientDataMap["first_name"];
         textField_LastName.text = patientDataMap["last_name"];
@@ -85,7 +77,7 @@ UFO_Page {
 
         // Acts as a refresh:
         function onUpdatesApplied() {
-            let patientDataMap = Database.getPatientData();
+            let patientDataMap = Database.getPatientDataMap();
 
             Database.readyPatientDataForEditing(patientDataMap["patient_id"])
         }
@@ -246,26 +238,6 @@ UFO_Page {
                 }
             }
         }
-
-        UFO_Button {
-            Layout.preferredWidth: 120
-            Layout.preferredHeight: 35
-
-            // NOTE (SAVIZ): The enabled state of this button is more complicated as we need to also take into account the state of 'hasChanged' of visual elements.
-            enabled: Database.connectionStatus && (
-                textField_FirstName.hasChanged || textField_LastName.hasChanged || textField_PhoneNumber.hasChanged || textField_Age.hasChanged || comboBox_Gender.hasChanged || comboBox_MaritalStatus.hasChanged
-            )
-
-            text: qsTr("Revert")
-            svg: "./../../icons/Google icons/undo.svg"
-
-            onClicked: {
-
-                // TODO (SAVIZ): Only revret general information here.
-                root.setFieldValues();
-                root.resetFieldStates();
-            }
-        }
     }
 
     UFO_GroupBox {
@@ -305,10 +277,6 @@ UFO_Page {
 
             spacing: 1
 
-
-
-
-
             RowLayout {
                 Layout.fillWidth: true
 
@@ -321,8 +289,6 @@ UFO_Page {
                 UFO_ComboBox {
                     id: comboBox_Treatments
 
-
-
                     property bool hasChanged: false
 
                     Layout.fillWidth: true
@@ -330,8 +296,21 @@ UFO_Page {
 
                     enabled: (Database.connectionStatus === true) ? true : false
 
-                    Component.onCompleted: {
-                        // TODO (SAVIZ): Connect the entries of this to the list obtained from database for treatements.
+                    textRole: "treatment_Name"
+
+                    model: ListModel { id: listModel_ComboBoxTreatments }
+
+                    Connections {
+                        target: Database
+
+                        function onTreatmentsPopulated() {
+                            Database.getTreatmentList().forEach(function (treatment) {
+                                listModel_ComboBoxTreatments.append({
+                                    "treatment_ID": treatment["treatment_id"],
+                                    "treatment_Name": treatment["treatment_name"]
+                                });
+                            })
+                        }
                     }
                 }
 
@@ -351,7 +330,7 @@ UFO_Page {
 
 
                         // Search list and model to see if there is a duplicate entry.
-                        for (let index = 0; index < listModel_Treatments.count; index++) {
+                        for (let index = 0; index < listModel_ListViewTreatments.count; index++) {
                             var labelText = listView_Treatments.itemAtIndex(index).label.text;
 
                             if (labelText === comboBox_Treatments.currentText) {
@@ -366,7 +345,7 @@ UFO_Page {
                             return;
                         }
 
-                        listModel_Treatments.append(comboBox_Treatments.currentIndex);
+                        listModel_ListViewTreatments.append(comboBox_Treatments.currentIndex);
 
                         listView_Treatments.hasChanged = true;
                     }
@@ -383,10 +362,10 @@ UFO_Page {
                 target: Database
 
                 function onEditPatientMapChanged() {
-                    listModel_Treatments.clear();
+                    listModel_ListViewTreatments.clear();
 
                     Database.editPatientMap["treatment_names"].forEach(function (treatment_name) {
-                        listModel_Treatments.append({"treatment_name": treatment_name});
+                        listModel_ListViewTreatments.append({"treatment_name": treatment_name});
                     })
 
                     listView_Treatments.hasChanged = false;
@@ -403,16 +382,19 @@ UFO_Page {
             clip: true
 
             model: ListModel {
-                id: listModel_Treatments
+                id: listModel_ListViewTreatments
             }
 
             delegate: UFO_ListDelegate_Treatments {
                 width: listView_Treatments.width
 
-                treatmentName: listModel_Treatments.get(index).treatment_name
+
+                // NOTE (SAVIZ): Here in the delegate you can store the index of the treatment from ComboxBox and use it to generate a treatment_id list using 'comboBox.model.get(comboBox.currentIndex).treatment_ID'
+
+                treatmentName: listModel_ListViewTreatments.get(index).treatment_name
 
                 onDeleteClicked: {
-                    listModel_Treatments.remove(index);
+                    listModel_ListViewTreatments.remove(index);
 
                     listView_Treatments.hasChanged = true;
                 }
@@ -442,10 +424,10 @@ UFO_Page {
             svg: "./../../icons/Google icons/undo.svg"
 
             onClicked: {
-                listModel_Treatments.clear();
+                listModel_ListViewTreatments.clear();
 
                 Database.editPatient["treatment_names"].forEach(function (treatment_name) {
-                    listModel_Treatments.append({"treatment_name": treatment_name});
+                    listModel_ListViewTreatments.append({"treatment_name": treatment_name});
                 })
             }
         }

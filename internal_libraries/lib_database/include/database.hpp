@@ -12,9 +12,6 @@
 #include <QVariantList>
 #include <QFileInfo>
 #include <QTextStream>
-#include <optional>
-
-#include "patient.hpp"
 
 // NOTE (SAVIZ): The combination of 'QVariantMap' and 'QVariantList' enbales us to replicate any type of data structure and exposed it easilly to QML. For this reason I don't use any intermidiate objects or strcuts for data transfer.
 
@@ -25,7 +22,6 @@ class Database : public QObject
 
     // Q_PROPERTY
     Q_PROPERTY(bool connectionStatus READ getConnectionStatus NOTIFY connectionStatusChanged FINAL)
-    //Q_PROPERTY(QVariantMap editPatientMap READ getEditPatientMap NOTIFY editPatientMapChanged FINAL)
 
 public:
     explicit Database(QObject *parent = Q_NULLPTR, const QString& name = "No name");
@@ -42,8 +38,8 @@ private:
     QSqlDatabase m_QSqlDatabase;
     bool m_ConnectionStatus;
     QVariantList m_SearchResultList;
+    QVariantList m_TreatmentList;
     QVariantMap m_PatientDataMap;
-    QVariantMap m_TreatmentMap;
 
     // Signals
 signals:
@@ -77,7 +73,8 @@ public:
 public:
     bool getConnectionStatus() const;
     Q_INVOKABLE QVariantList getSearchResultList() const;
-    QVariantMap getPatientData() const;
+    Q_INVOKABLE QVariantList getTreatmentList() const;
+    Q_INVOKABLE QVariantMap getPatientDataMap() const;
 
     // PRIVATE Setters
 private:
