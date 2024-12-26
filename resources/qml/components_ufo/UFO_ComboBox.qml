@@ -17,7 +17,8 @@ ComboBox {
         height: 30
 
         contentItem: Text {
-            text: modelData
+
+            text: model[root.textRole]
 
             color: {
                 if (itemDelegate.highlighted) {
@@ -39,8 +40,7 @@ ComboBox {
             radius: 0
 
             width: root.width
-            color: itemDelegate.highlighted ? Qt.color(
-                                                    AppTheme.colors["UFO_ComboBox_Item_Background_Highlighted"]) : Qt.color(AppTheme.colors["UFO_ComboBox_Item_Background_Normal"])
+            color: itemDelegate.highlighted ? Qt.color(AppTheme.colors["UFO_ComboBox_Item_Background_Highlighted"]) : Qt.color(AppTheme.colors["UFO_ComboBox_Item_Background_Normal"])
         }
 
         highlighted: root.highlightedIndex === index

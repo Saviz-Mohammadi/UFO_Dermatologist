@@ -408,7 +408,8 @@ UFO_Page {
                 age: model.patient_Age
 
                 onEditClicked: {
-                    var operationStatus = Database.readyPatientDataForEditing(model.patient_ID)
+                    var operationStatus = Database.readyPatientData(model.patient_ID)
+
 
                     if(operationStatus !== true) {
                         ufo_StatusBar.displayMessage("Could not make patient ready for editting!");

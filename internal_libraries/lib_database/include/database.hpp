@@ -66,7 +66,7 @@ public:
     Q_INVOKABLE bool updatePatientData(const QString &newFirstName, const QString &newLastName, quint8 newAge, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, const QVariantList &newTreatments);
 
     // HELPER
-    Q_INVOKABLE bool readyPatientDataForEditing(const quint64 index);
+    Q_INVOKABLE bool readyPatientData(const quint64 index);
     bool populateTreatmentList();
 
     // PUBLIC Getters

@@ -16,8 +16,8 @@ Database::Database(QObject *parent, const QString &name)
     , m_QSqlDatabase(QSqlDatabase{})
     , m_ConnectionStatus(false)
     , m_SearchResultList(QVariantList{})
+    , m_TreatmentList(QVariantList{})
     , m_PatientDataMap(QVariantMap{})
-    , m_TreatmentMap(QVariantMap{})
 {
     this->setObjectName(name);
 
@@ -554,8 +554,9 @@ bool Database::updateTreatments(const QVariantList &newTreatments)
     if (newTreatments.isEmpty())
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Nothing to change about treatments.");
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Treatment list received is empty!");
 #endif
+
 
         return (true); // Technically, nothing went wrong...
     }
@@ -737,15 +738,10 @@ bool Database::updatePatientData(const QString &newFirstName, const QString &new
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 
-bool Database::readyPatientDataForEditing(const quint64 index)
+bool Database::readyPatientData(const quint64 index)
 {
-    // Use the selected patient index to gather all the needed information:
-    QString patient_id = m_SearchResultList[index].toMap()["patient_id"].toString();
-
-
-
 #ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "The patient_id is: " + patient_id);
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "The patient_id is: " + QString::number(index));
 #endif
 
 
@@ -762,7 +758,7 @@ bool Database::readyPatientDataForEditing(const quint64 index)
 
 
     // Id:
-    queryString += " WHERE patients.patient_id = " + patient_id;
+    queryString += " WHERE patients.patient_id = " + QString::number(index);
 
 
 
@@ -792,10 +788,16 @@ bool Database::readyPatientDataForEditing(const quint64 index)
 
 
 
+
     QVariantList treatments;
+
+
 
     while (query.next())
     {
+        QVariantMap treatmentMap;
+
+        // Personal Information:
         m_PatientDataMap["patient_id"] = query.value("patient_id").toULongLong();
         m_PatientDataMap["first_name"] = query.value("first_name").toString();
         m_PatientDataMap["last_name"] = query.value("last_name").toString();
@@ -805,13 +807,16 @@ bool Database::readyPatientDataForEditing(const quint64 index)
         m_PatientDataMap["gender"] = query.value("gender").toString();
         m_PatientDataMap["marital_status"] = query.value("marital_status").toString();
 
-        treatments.append(query.value("treatments.name").toString());
+        // Treatments:
+        treatmentMap["treatment_id"] = query.value("treatment_id").toULongLong();
+        treatmentMap["treatment_name"] = query.value("treatments.name").toString();
+        treatments.append(treatmentMap);
     }
 
 
 
-    // Assign list of treatments:
-    m_PatientDataMap["treatment_names"] = treatments;
+    // Assign Treatments:
+    m_PatientDataMap["treatments"] = treatments;
 
 
 

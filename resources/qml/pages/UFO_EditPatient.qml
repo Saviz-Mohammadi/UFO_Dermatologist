@@ -15,73 +15,7 @@ UFO_Page {
     title: qsTr("Edit Patient")
     contentSpacing: 20
 
-
-    // TODO (SAVIZ): Write these in each connection for each element.
-    function setFieldValues() {
-        let patientDataMap = Database.getPatientDataMap();
-
-        textField_FirstName.text = patientDataMap["first_name"];
-        textField_LastName.text = patientDataMap["last_name"];
-        textField_PhoneNumber.text = patientDataMap["phone_number"];
-        textField_Age.text = patientDataMap["age"];
-
-        switch (patientDataMap["gender"]) {
-            case "Gender":
-                comboBox_Gender.currentIndex = 0
-                break
-            case "Male":
-                comboBox_Gender.currentIndex = 1
-                break
-            default:
-                comboBox_Gender.currentIndex = 2
-        };
-
-        switch (patientDataMap["marital_status"]) {
-            case "Marital Status":
-                comboBox_MaritalStatus.currentIndex = 0
-                break
-            case "Single":
-                comboBox_MaritalStatus.currentIndex = 1
-                break
-            case "Married":
-                comboBox_MaritalStatus.currentIndex = 2
-                break
-            case "Divorced":
-                comboBox_MaritalStatus.currentIndex = 3
-                break
-            default:
-                comboBox_MaritalStatus.currentIndex = 4
-        };
-    }
-
-    function resetFieldStates() {
-        textField_FirstName.hasChanged = false;
-        textField_LastName.hasChanged = false;
-        textField_PhoneNumber.hasChanged = false;
-        textField_Age.hasChanged = false;
-        comboBox_Gender.hasChanged = false;
-        comboBox_MaritalStatus.hasChanged = false;
-    }
-
-    Connections {
-        target: Database
-
-        function onPatientDataChanged() {
-            root.setFieldValues();
-            root.resetFieldStates();
-        }
-    }
-
-    Connections {
-        target: Database
-
-        // Acts as a refresh:
-        function onUpdatesApplied() {
-            let patientDataMap = Database.getPatientDataMap();
-
-            Database.readyPatientDataForEditing(patientDataMap["patient_id"])
-        }
-    }
+    property bool patientSelected: false
 
     UFO_GroupBox {
         id: ufo_GroupBox_GeneralInformation
@@ -121,8 +55,6 @@ UFO_Page {
             UFO_TextField {
                 id: textField_FirstName
 
-                property bool hasChanged: false
-
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
@@ -130,15 +62,17 @@ UFO_Page {
 
                 placeholderText: qsTr("First name")
 
-                onTextEdited: {
-                    hasChanged = true
+                Connections {
+                    target: Database
+
+                    function onPatientDataChanged() {
+                        textField_FirstName.text = Database.getPatientDataMap()["first_name"]
+                    }
                 }
             }
 
             UFO_TextField {
                 id: textField_LastName
-
-                property bool hasChanged: false
 
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
@@ -147,25 +81,37 @@ UFO_Page {
 
                 placeholderText: qsTr("Last name")
 
-                onTextEdited: {
-                    hasChanged = true
+                Connections {
+                    target: Database
+
+                    function onPatientDataChanged() {
+                        textField_LastName.text = Database.getPatientDataMap()["last_name"]
+                    }
                 }
             }
 
             UFO_ComboBox {
                 id: comboBox_Gender
 
-                property bool hasChanged: false
-
                 Layout.preferredWidth: 150
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                model: ["Gender", "Male", "Female"]
+                model: ["Male", "Female"]
 
-                onActivated: {
-                    hasChanged = true
+                Connections {
+                    target: Database
+
+                    function onPatientDataChanged() {
+                        switch (Database.getPatientDataMap()["gender"]) {
+                            case "Male":
+                                comboBox_Gender.currentIndex = 0
+                                break
+                            default:
+                                comboBox_Gender.currentIndex = 1
+                        };
+                    }
                 }
             }
         }
@@ -182,8 +128,6 @@ UFO_Page {
             UFO_TextField {
                 id: textField_Age
 
-                property bool hasChanged: false
-
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
@@ -195,15 +139,17 @@ UFO_Page {
                     regularExpression: /^((1[0-4][0-9])|([1-9][0-9])|[0-9]|150)$/ // Ranges between (0 – 150)
                 }
 
-                onTextEdited: {
-                    hasChanged = true
+                Connections {
+                    target: Database
+
+                    function onPatientDataChanged() {
+                        textField_Age.text = Database.getPatientDataMap()["age"]
+                    }
                 }
             }
 
             UFO_TextField {
                 id: textField_PhoneNumber
-
-                property bool hasChanged: false
 
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
@@ -216,25 +162,43 @@ UFO_Page {
                     regularExpression: /^\+\d{1,3} \(\d{3}\) \d{3}-\d{4}$/ // Format: +1 (555) 921-1222 -> [country code] [(Area code)] [Phone number]
                 }
 
-                onTextEdited: {
-                    hasChanged = true
+                Connections {
+                    target: Database
+
+                    function onPatientDataChanged() {
+                        textField_PhoneNumber.text = Database.getPatientDataMap()["phone_number"]
+                    }
                 }
             }
 
             UFO_ComboBox {
                 id: comboBox_MaritalStatus
 
-                property bool hasChanged: false
-
                 Layout.preferredWidth: 150
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                model: ["Marital Status", "Single", "Married", "Divorced", "Widowed"]
+                model: ["Single", "Married", "Divorced", "Widowed"]
 
-                onActivated: {
-                    hasChanged = true
+                Connections {
+                    target: Database
+
+                    function onPatientDataChanged() {
+                        switch (Database.getPatientDataMap()["marital_status"]) {
+                            case "Single":
+                                comboBox_MaritalStatus.currentIndex = 0
+                                break
+                            case "Married":
+                                comboBox_MaritalStatus.currentIndex = 1
+                                break
+                            case "Divorced":
+                                comboBox_MaritalStatus.currentIndex = 2
+                                break
+                            default:
+                                comboBox_MaritalStatus.currentIndex = 3
+                        };
+                    }
                 }
             }
         }
@@ -289,8 +253,6 @@ UFO_Page {
                 UFO_ComboBox {
                     id: comboBox_Treatments
 
-                    property bool hasChanged: false
-
                     Layout.fillWidth: true
                     Layout.preferredHeight: 35
 
@@ -304,12 +266,22 @@ UFO_Page {
                         target: Database
 
                         function onTreatmentsPopulated() {
+                            listModel_ComboBoxTreatments.clear();
+
                             Database.getTreatmentList().forEach(function (treatment) {
-                                listModel_ComboBoxTreatments.append({
-                                    "treatment_ID": treatment["treatment_id"],
-                                    "treatment_Name": treatment["treatment_name"]
-                                });
-                            })
+                                listModel_ComboBoxTreatments.append({"treatment_ID": treatment["treatment_id"], "treatment_Name": treatment["treatment_name"]});
+                            });
+
+                            // Set default:
+                            comboBox_Treatments.currentIndex = 0;
+                        }
+                    }
+
+                    Connections {
+                        target: Database
+
+                        function onPatientDataChanged() {
+                            comboBox_Treatments.currentIndex = 0;
                         }
                     }
                 }
@@ -328,26 +300,20 @@ UFO_Page {
                     onClicked: {
                         let exists = false;
 
-
-                        // Search list and model to see if there is a duplicate entry.
+                        // Search for duplicates.
                         for (let index = 0; index < listModel_ListViewTreatments.count; index++) {
-                            var labelText = listView_Treatments.itemAtIndex(index).label.text;
-
-                            if (labelText === comboBox_Treatments.currentText) {
+                            if (listView_Treatments.model.get(index)["treatment_ID"] === comboBox_Treatments.model.get(comboBox_Treatments.currentIndex)["treatment_ID"]) {
                                 exists = true;
                             }
                         }
 
-
                         if(exists) {
-                            ufo_StatusBar.displayMessage("Cannot add treatment. An entry of the same type already exists.")
+                            ufo_StatusBar.displayMessage("Cannot add treatment. A treatment of the same type already exists.")
 
                             return;
                         }
 
-                        listModel_ListViewTreatments.append(comboBox_Treatments.currentIndex);
-
-                        listView_Treatments.hasChanged = true;
+                        listModel_ListViewTreatments.append({"treatment_ID": comboBox_Treatments.model.get(comboBox_Treatments.currentIndex)["treatment_ID"], "treatment_Name": comboBox_Treatments.model.get(comboBox_Treatments.currentIndex)["treatment_Name"]});
                     }
                 }
             }
@@ -356,19 +322,15 @@ UFO_Page {
         ListView {
             id: listView_Treatments
 
-            property bool hasChanged: false
-
             Connections {
                 target: Database
 
-                function onEditPatientMapChanged() {
+                function onPatientDataChanged() {
                     listModel_ListViewTreatments.clear();
 
-                    Database.editPatientMap["treatment_names"].forEach(function (treatment_name) {
-                        listModel_ListViewTreatments.append({"treatment_name": treatment_name});
-                    })
-
-                    listView_Treatments.hasChanged = false;
+                    Database.getPatientDataMap()["treatments"].forEach(function (treatment) {
+                        listModel_ListViewTreatments.append({"treatment_ID": treatment["treatment_id"], "treatment_Name": treatment["treatment_name"]});
+                    });
                 }
             }
 
@@ -381,22 +343,15 @@ UFO_Page {
             spacing: 10
             clip: true
 
-            model: ListModel {
-                id: listModel_ListViewTreatments
-            }
+            model: ListModel { id: listModel_ListViewTreatments }
 
             delegate: UFO_ListDelegate_Treatments {
                 width: listView_Treatments.width
 
-
-                // NOTE (SAVIZ): Here in the delegate you can store the index of the treatment from ComboxBox and use it to generate a treatment_id list using 'comboBox.model.get(comboBox.currentIndex).treatment_ID'
-
-                treatmentName: listModel_ListViewTreatments.get(index).treatment_name
+                treatmentName: model["treatment_Name"]
 
                 onDeleteClicked: {
                     listModel_ListViewTreatments.remove(index);
-
-                    listView_Treatments.hasChanged = true;
                 }
             }
         }
@@ -408,27 +363,40 @@ UFO_Page {
 
         Layout.topMargin: 20
         Layout.bottomMargin: 7
-        Layout.leftMargin: 15
-        Layout.rightMargin: 15
 
         UFO_Button {
             Layout.preferredWidth: 120
             Layout.preferredHeight: 35
 
             // NOTE (SAVIZ): The enabled state of this button is more complicated as we need to also take into account the state of 'hasChanged' of visual elements.
-            enabled: Database.connectionStatus && (
-                listView_Treatments.hasChanged
-            )
+            enabled: (Database.connectionStatus && root.patientSelected)
 
-            text: qsTr("Revert")
-            svg: "./../../icons/Google icons/undo.svg"
+            checkable: true
+            checked: false
+
+            text: qsTr("Mark Deletion")
+            svg: "./../../icons/Google icons/patient_delete.svg"
 
             onClicked: {
-                listModel_ListViewTreatments.clear();
+                // Delete here.
+            }
+        }
 
-                Database.editPatient["treatment_names"].forEach(function (treatment_name) {
-                    listModel_ListViewTreatments.append({"treatment_name": treatment_name});
-                })
+        Item {
+            Layout.fillWidth: true
+        }
+
+        UFO_Button {
+            Layout.preferredWidth: 120
+            Layout.preferredHeight: 35
+
+            enabled: (Database.connectionStatus && root.patientSelected)
+
+            text: qsTr("Sync")
+            svg: "./../../icons/Google icons/sync.svg"
+
+            onClicked: {
+                Database.readyPatientData(Database.getPatientDataMap()["patient_id"]);
             }
         }
 
@@ -436,53 +404,40 @@ UFO_Page {
             Layout.preferredWidth: 120
             Layout.preferredHeight: 35
 
-            // NOTE (SAVIZ): The enabled state of this button is more complicated as we need to also take into account the state of 'hasChanged' of visual elements.
-            enabled: Database.connectionStatus && (
-                listView_Treatments.hasChanged
-            )
+            enabled: (Database.connectionStatus && root.patientSelected)
 
             text: qsTr("Apply")
-            svg: "./../../icons/Google icons/edit.svg"
+            svg: "./../../icons/Google icons/database_apply.svg"
 
             onClicked: {
-                var first_name = "";
-                var last_name = "";
-                var age = -1;
-                var phone_number = "";
-                var gender = "";
-                var marital_status = "";
+                // Personal Information:
+                var first_name = textField_FirstName.text.trim();
+                var last_name = textField_LastName.text.trim();
+                var age = parseInt(textField_Age.text.trim());
+                var phone_number = textField_PhoneNumber.text.trim();
+                var gender = gender = comboBox_Gender.currentText;
+                var marital_status = comboBox_MaritalStatus.currentText;
 
-                // Populate if viable:
-                if(textField_FirstName.hasChanged) {
-                    first_name = textField_FirstName.text.trim()
-                }
 
-                if(textField_LastName.hasChanged) {
-                    last_name = textField_LastName.text.trim()
-                }
 
-                if(textField_Age.hasChanged) {
-                    age = parseInt(textField_Age.text.trim())
-                }
+                // Treatments:
+                let treatments = [];
 
-                if(textField_PhoneNumber.hasChanged) {
-                    phone_number = textField_PhoneNumber.text.trim()
-                }
-
-                if(comboBox_Gender.hasChanged) {
-                    gender = comboBox_Gender.currentText
-                }
-
-                if(comboBox_MaritalStatus.hasChanged) {
-                    gender = comboBox_MaritalStatus.currentText
+                for (let index = 0; index < listModel_ListViewTreatments.count; index++) {
+                    treatments.push(listView_Treatments.model.get(index)["treatment_ID"]);
                 }
 
 
-                var operationOutcome = Database.editPatient(first_name, last_name, age, phone_number, gender, marital_status)
+
+                // Apply changes:
+                var operationOutcome = Database.updatePatientData(first_name, last_name, age, phone_number, gender, marital_status, treatments);
 
                 if(operationOutcome === false) {
-
                     ufo_StatusBar.displayMessage("Edit operation failed!")
+                }
+
+                if(operationOutcome === true) {
+                    ufo_StatusBar.displayMessage("Changes applied!")
                 }
             }
         }
@@ -490,4 +445,6 @@ UFO_Page {
 }
 
 
-// NOTE (SAVIZ): You can have multiple groupboxes, but only apply changes using different functions based on what has changed. I think there is something called a transaction to submit multiple changes, look it up.
+// NOTE (SAVIZ): When a patient is deleted, you can emit a signal that disables the visibily of the entire page and optionally enables the visibly of something that says patien was deleted. Also, have the patientdata map be cleared in the background at the end of the deelte method call in database. this way everything is clean. Of course all of this should only happen if the deleet operation is succesufl.Maybe have a delete signal be emitted from the database instead.
+// NOTE (SAVIZ): Have the page begin with a visibly of false, so that the first time a patinet must be selected before attempting to modify it.
+// NOTE (SAVIZ): I think the best way to deal with deletions is to add a field to patients, which says 'mark_for_deletion', and then have a button that changes to mark and unmark in the edit patient tab. You can then also add a field in search for all people that have been marked for deletion peopel. and then in settings add a button that says deleet all marked patients.
