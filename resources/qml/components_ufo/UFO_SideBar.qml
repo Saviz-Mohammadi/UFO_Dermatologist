@@ -14,8 +14,11 @@ Item {
 
         // TODO (SAVIZ): I like to replace these with an enum, but currently I don't know how in QML.
         switch (targetButton) {
-            case "Edit Patient Page":
-                ufo_SidBarButton_EditPatient.checked = true
+            case "Create Page":
+                ufo_SidBarButton_Create.checked = true
+                break
+            case "Edit Page":
+                ufo_SidBarButton_Edit.checked = true
                 break
             case "Search Page":
                 ufo_SidBarButton_Search.checked = true
@@ -66,7 +69,30 @@ Item {
                     spacing: 10
 
                     UFO_SideBarButton {
-                        id: ufo_SidBarButton_EditPatient
+                        id: ufo_SidBarButton_Create
+
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 40
+
+                        Layout.leftMargin: 15
+                        Layout.rightMargin: 15
+
+                        ButtonGroup.group: buttonGroup
+
+                        checkable: true
+                        autoExclusive: true
+                        checked: false
+
+                        text: qsTr("Create Patient")
+                        svg: "./../../icons/Google icons/person_add.svg"
+
+                        onClicked: {
+                            root.tabChanged("Create Page")
+                        }
+                    }
+
+                    UFO_SideBarButton {
+                        id: ufo_SidBarButton_Edit
 
                         Layout.fillWidth: true
                         Layout.preferredHeight: 40
@@ -81,10 +107,10 @@ Item {
                         checked: false
 
                         text: qsTr("Edit Patient")
-                        svg: "./../../icons/Google icons/edit.svg"
+                        svg: "./../../icons/Google icons/person_edit.svg"
 
                         onClicked: {
-                            root.tabChanged("Edit Patient Page")
+                            root.tabChanged("Edit Page")
                         }
                     }
 

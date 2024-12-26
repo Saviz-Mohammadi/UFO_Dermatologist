@@ -18,12 +18,12 @@ UFO_Page {
     property bool patientSelected: false
 
     UFO_GroupBox {
-        id: ufo_GroupBox_GeneralInformation
+        id: ufo_GroupBox_PersonalInformation
 
         Layout.fillWidth: true
         // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
 
-        title: qsTr("General Information")
+        title: qsTr("Personal Information")
         contentSpacing: 0
 
         Text {
@@ -120,6 +120,7 @@ UFO_Page {
             Layout.fillWidth: true
 
             Layout.topMargin: 7
+            Layout.bottomMargin: 15
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
@@ -231,8 +232,6 @@ UFO_Page {
         }
 
         RowLayout {
-            id: rowLayout_TitleContainer
-
             Layout.fillWidth: true
 
             Layout.topMargin: 7
@@ -241,80 +240,70 @@ UFO_Page {
 
             spacing: 1
 
-            RowLayout {
+            UFO_ComboBox {
+                id: comboBox_Treatments
+
                 Layout.fillWidth: true
+                Layout.preferredHeight: 35
 
-                Layout.topMargin: 7
-                Layout.leftMargin: 15
-                Layout.rightMargin: 15
+                enabled: (Database.connectionStatus === true) ? true : false
 
-                spacing: 10
+                textRole: "treatment_Name"
 
-                UFO_ComboBox {
-                    id: comboBox_Treatments
+                model: ListModel { id: listModel_ComboBoxTreatments }
 
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 35
+                Connections {
+                    target: Database
 
-                    enabled: (Database.connectionStatus === true) ? true : false
+                    function onTreatmentsPopulated() {
+                        listModel_ComboBoxTreatments.clear();
 
-                    textRole: "treatment_Name"
+                        Database.getTreatmentList().forEach(function (treatment) {
+                            listModel_ComboBoxTreatments.append({"treatment_ID": treatment["treatment_id"], "treatment_Name": treatment["treatment_name"]});
+                        });
 
-                    model: ListModel { id: listModel_ComboBoxTreatments }
-
-                    Connections {
-                        target: Database
-
-                        function onTreatmentsPopulated() {
-                            listModel_ComboBoxTreatments.clear();
-
-                            Database.getTreatmentList().forEach(function (treatment) {
-                                listModel_ComboBoxTreatments.append({"treatment_ID": treatment["treatment_id"], "treatment_Name": treatment["treatment_name"]});
-                            });
-
-                            // Set default:
-                            comboBox_Treatments.currentIndex = 0;
-                        }
-                    }
-
-                    Connections {
-                        target: Database
-
-                        function onPatientDataChanged() {
-                            comboBox_Treatments.currentIndex = 0;
-                        }
+                        // Set default:
+                        comboBox_Treatments.currentIndex = 0;
                     }
                 }
 
-                UFO_Button {
-                    Layout.preferredWidth: 120
-                    Layout.preferredHeight: 35
+                Connections {
+                    target: Database
 
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-
-                    enabled: (Database.connectionStatus === true) ? true : false
-
-                    text: qsTr("Add")
-                    svg: "./../../icons/Google icons/add_circle.svg"
-
-                    onClicked: {
-                        let exists = false;
-
-                        // Search for duplicates.
-                        for (let index = 0; index < listModel_ListViewTreatments.count; index++) {
-                            if (listView_Treatments.model.get(index)["treatment_ID"] === comboBox_Treatments.model.get(comboBox_Treatments.currentIndex)["treatment_ID"]) {
-                                exists = true;
-                            }
-                        }
-
-                        if(exists) {
-                            ufo_StatusBar.displayMessage("Cannot add treatment. A treatment of the same type already exists.")
-
-                            return;
-                        }
-
-                        listModel_ListViewTreatments.append({"treatment_ID": comboBox_Treatments.model.get(comboBox_Treatments.currentIndex)["treatment_ID"], "treatment_Name": comboBox_Treatments.model.get(comboBox_Treatments.currentIndex)["treatment_Name"]});
+                    function onPatientDataChanged() {
+                        comboBox_Treatments.currentIndex = 0;
                     }
+                }
+            }
+
+            UFO_Button {
+                Layout.preferredWidth: 120
+                Layout.preferredHeight: 35
+
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                text: qsTr("Insert")
+                svg: "./../../icons/Google icons/add_circle.svg"
+
+                onClicked: {
+                    let exists = false;
+
+                    // Search for duplicates.
+                    for (let index = 0; index < listModel_ListViewTreatments.count; index++) {
+                        if (listView_Treatments.model.get(index)["treatment_ID"] === comboBox_Treatments.model.get(comboBox_Treatments.currentIndex)["treatment_ID"]) {
+                            exists = true;
+                        }
+                    }
+
+                    if(exists) {
+                        ufo_StatusBar.displayMessage("Cannot add treatment. A treatment of the same type already exists.")
+
+                        return;
+                    }
+
+                    listModel_ListViewTreatments.append({"treatment_ID": comboBox_Treatments.model.get(comboBox_Treatments.currentIndex)["treatment_ID"], "treatment_Name": comboBox_Treatments.model.get(comboBox_Treatments.currentIndex)["treatment_Name"]});
                 }
             }
         }
@@ -337,10 +326,11 @@ UFO_Page {
             Layout.fillWidth: true
             Layout.preferredHeight: (root.height * 0.45)
 
+            Layout.topMargin: 15
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            spacing: 10
+            spacing: 1
             clip: true
 
             model: ListModel { id: listModel_ListViewTreatments }
@@ -361,14 +351,13 @@ UFO_Page {
     RowLayout {
         Layout.fillWidth: true
 
-        Layout.topMargin: 20
+        Layout.topMargin: 10
         Layout.bottomMargin: 7
 
         UFO_Button {
             Layout.preferredWidth: 120
             Layout.preferredHeight: 35
 
-            // NOTE (SAVIZ): The enabled state of this button is more complicated as we need to also take into account the state of 'hasChanged' of visual elements.
             enabled: (Database.connectionStatus && root.patientSelected)
 
             checkable: true

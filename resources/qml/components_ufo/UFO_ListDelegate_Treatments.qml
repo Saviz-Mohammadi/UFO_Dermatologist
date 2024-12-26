@@ -9,7 +9,7 @@ import Database 1.0
 Item {
     id: root
 
-    property alias treatmentName: label.text
+    property alias treatmentName: text_TreatmentName.text
 
     signal deleteClicked
 
@@ -21,24 +21,24 @@ Item {
 
         spacing: 1
 
-        Label {
-            id: label
-
+        Rectangle {
             Layout.fillWidth: true
-            Layout.fillHeight: true
+            Layout.preferredHeight: 35
 
-            horizontalAlignment: Text.AlignLeft
-            verticalAlignment: Text.AlignVCenter
+            color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
 
-            color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
+            Text {
+                id: text_TreatmentName
 
-            font.pointSize: Qt.application.font.pixelSize * 1
-            elide: Text.ElideRight
-
-            background: Rectangle {
                 anchors.fill: parent
+                anchors.leftMargin: 10
 
-                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
+                horizontalAlignment: Text.AlignLeft
+                verticalAlignment: Text.AlignVCenter
+
+                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
+                font.pointSize: Qt.application.font.pixelSize * 1
+                elide: Text.ElideRight
             }
         }
 
@@ -50,7 +50,7 @@ Item {
 
             enabled: (Database.connectionStatus === true) ? true : false
 
-            text: qsTr("Delete")
+            text: qsTr("Remove")
             svg: "./../../icons/Google icons/edit.svg"
 
             onClicked: {

@@ -551,27 +551,6 @@ bool Database::updatePersonalInformation(const QString &newFirstName, const QStr
 
 bool Database::updateTreatments(const QVariantList &newTreatments)
 {
-    if (newTreatments.isEmpty())
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Treatment list received is empty!");
-#endif
-
-
-        return (true); // Technically, nothing went wrong...
-    }
-
-
-
-#ifdef QT_DEBUG
-    foreach (const QVariant &treatment, newTreatments)
-    {
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, treatment.toString());
-    }
-#endif
-
-
-
     QSqlQuery queryDelete;
     queryDelete.prepare("DELETE FROM patient_treatments WHERE patient_id = " + m_PatientDataMap["patient_id"].toString());
 
@@ -583,6 +562,18 @@ bool Database::updateTreatments(const QVariantList &newTreatments)
 
 
         return (false);
+    }
+
+
+
+    if (newTreatments.isEmpty())
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Treatment list received is empty!");
+#endif
+
+
+        return (true); // Technically, nothing went wrong...
     }
 
 
@@ -699,33 +690,6 @@ bool Database::updatePatientData(const QString &newFirstName, const QString &new
 
     return (true);
 }
-
-// bool Database::removeTask(QVariant id)
-// {
-//     QString command("DELETE FROM tasks WHERE task_id = :id");
-
-//     QSqlQuery query;
-//     query.prepare(command);
-//     query.bindValue(":id", id.toULongLong());
-
-//     bool operation_success = (query.exec());
-
-//         if (!operation_success) {
-// #ifdef QT_DEBUG
-//         QString message("Operation failed!\n");
-
-//         QTextStream stream(&message);
-
-//         stream << "Reason: " << query.lastError().text();
-
-//         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
-// #endif
-
-//         return (operation_success);
-//         }
-
-//     return (operation_success);
-// }
 
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]

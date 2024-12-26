@@ -17,7 +17,7 @@ ApplicationWindow {
     height: 600
 
     visible: true
-    title: qsTr("UFO_QML")
+    title: qsTr("UFO_Dermatologist")
 
     menuBar: UFO_MenuBar {
         spacing: 0
@@ -50,12 +50,25 @@ ApplicationWindow {
                 leftPadding: 10
                 rightPadding: 10
 
-                text: qsTr("Edit Patient Page")
+                text: qsTr("Create Page")
 
                 onTriggered: {
-                    stackLayout.currentIndex = ufo_EditPatient.StackLayout.index
+                    stackLayout.currentIndex = ufo_Create.StackLayout.index
 
-                    ufo_SideBar_Main.checkTabButton("Edit Patient Page")
+                    ufo_SideBar_Main.checkTabButton("Create Page")
+                }
+            }
+
+            UFO_MenuItem {
+                leftPadding: 10
+                rightPadding: 10
+
+                text: qsTr("Edit Page")
+
+                onTriggered: {
+                    stackLayout.currentIndex = ufo_Edit.StackLayout.index
+
+                    ufo_SideBar_Main.checkTabButton("Edit Page")
                 }
             }
 
@@ -109,7 +122,7 @@ ApplicationWindow {
                 leftPadding: 10
                 rightPadding: 10
 
-                text: qsTr("About UFO_QML")
+                text: qsTr("About UFO_Dermatologist")
 
                 onTriggered: {
                     stackLayout.currentIndex = ufo_About.StackLayout.index
@@ -123,7 +136,7 @@ ApplicationWindow {
     footer: UFO_StatusBar {
         id: ufo_StatusBar
 
-        text: qsTr("Application ready...")
+        text: qsTr("Application is ready")
     }
 
 
@@ -144,8 +157,15 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            UFO_EditPatient {
-                id: ufo_EditPatient
+            UFO_Create {
+                id: ufo_Create
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
+            UFO_Edit {
+                id: ufo_Edit
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -154,7 +174,7 @@ ApplicationWindow {
                     target: ufo_Search
 
                     function onPatientSelectedForEdit() {
-                        ufo_EditPatient.patientSelected = true
+                        ufo_Edit.patientSelected = true
                     }
                 }
             }
@@ -184,9 +204,9 @@ ApplicationWindow {
                 target: ufo_Search
 
                 function onPatientSelectedForEdit() {
-                    stackLayout.currentIndex = ufo_EditPatient.StackLayout.index
+                    stackLayout.currentIndex = ufo_Edit.StackLayout.index
 
-                    ufo_SideBar_Main.checkTabButton("Edit Patient Page")
+                    ufo_SideBar_Main.checkTabButton("Edit Page")
                 }
             }
 
@@ -197,8 +217,11 @@ ApplicationWindow {
 
                     // TODO (SAVIZ): I like to replace these with an enum, but currently I don't know how in QML.
                     switch (pageName) {
-                        case "Edit Patient Page":
-                            stackLayout.currentIndex = ufo_EditPatient.StackLayout.index
+                        case "Create Page":
+                            stackLayout.currentIndex = ufo_Create.StackLayout.index
+                            break
+                        case "Edit Page":
+                            stackLayout.currentIndex = ufo_Edit.StackLayout.index
                             break
                         case "Search Page":
                             stackLayout.currentIndex = ufo_Search.StackLayout.index
