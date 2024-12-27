@@ -150,7 +150,83 @@ void Database::disconnect()
     setConnectionStatus(false);
 }
 
+bool Database::createPatient(const QString &first_name, const QString &last_name, quint8 age, const QString &phone_number, const QString &gender, const QString &marital_status)
+{
+#ifdef QT_DEBUG
+    QString message("Insert initiated!\n");
 
+    QTextStream stream(&message);
+
+    stream << "'first_name'     : " << first_name << "\n";
+    stream << "'laste_name'     : " << last_name << "\n";
+    stream << "'age'            : " << QString::number(age) << "\n";
+    stream << "'phone_number'   : " << phone_number << "\n";
+    stream << "'gender'         : " << gender << "\n";
+    stream << "'marital_status' : " << marital_status << "\n";
+#endif
+
+
+
+    // NOTE (SAVIZ): Given the current configuration of the database and application, it is guaranteed that all values will always be provided. As a result, additional checks are unnecessary.
+    QString queryString = "INSERT INTO patients (first_name, last_name, age, birth_date, phone_number, gender, marital_status) VALUES (:first_name, :last_name, :age, :birth_date, :phone_number, :gender, :marital_status);";
+    QSqlQuery query;
+
+
+
+    query.prepare(queryString);
+
+
+
+    query.bindValue(":first_name", first_name);
+    query.bindValue(":last_name", last_name);
+    query.bindValue(":age", age);
+    query.bindValue(":birth_date", QDate::currentDate()); // TODO (SAVIZ): Replace this with actual birth_date. (You can use QDate::fromString(string, "dd-mm-yyyy"))
+    query.bindValue(":phone_number", phone_number);
+    query.bindValue(":gender", gender);
+    query.bindValue(":marital_status", marital_status);
+
+
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
+
+
+        // NOTE (SAVIZ): Sometimes, the values will not be binded until after 'query.exec()' call. For this reason I decided to print the information here:
+        message.clear();
+
+        const QVariantList values = query.boundValues();
+
+        for (std::size_t index = 0; index < values.size(); ++index)
+        {
+            stream << index << " : " << values.at(index).toString();
+        }
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+        emit patientInsertionFailed();
+
+
+        return (false);
+    }
+
+
+
+    // Notify QML:
+    emit patientInsertionSuccessful();
+
+
+#ifdef QT_DEBUG
+
+logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+    return (true);
+}
 
 // SEARCH
 bool Database::findPatient(const QString &first_name, const QString &last_name, quint8 age, const QString &phone_number, const QString &gender, const QString &marital_status)

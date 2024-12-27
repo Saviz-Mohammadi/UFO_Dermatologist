@@ -37,7 +37,7 @@ Item {
                 verticalAlignment: Text.AlignVCenter
 
                 color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
-                font.pointSize: Qt.application.font.pixelSize * 1
+                font.pointSize: Qt.application.font.pointSize * 1
                 elide: Text.ElideRight
             }
         }

@@ -4,6 +4,7 @@ import QtQuick.Layouts
 
 // Custom QML Files
 import "./../components_ufo"
+import "./../components_custom"
 
 // Custom CPP Registered Types
 import AppTheme 1.0
@@ -11,6 +12,8 @@ import Database 1.0
 
 UFO_Page {
     id: root
+
+    signal searchMatchedNewPatient
 
     title: qsTr("Create Patient")
     contentSpacing: 20
@@ -54,24 +57,12 @@ UFO_Page {
             UFO_TextField {
                 id: textField_FirstName
 
-                property bool isEmpty: false
-
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
                 placeholderText: qsTr("First name")
-
-                onEditingFinished: {
-                    if(textField_FirstName.text === "") {
-                        textField_FirstName.isEmpty = true;
-
-                        return;
-                    }
-
-                    textField_FirstName.isEmpty = false;
-                }
 
                 Connections {
                     target: ufo_Button_Clear
@@ -201,14 +192,7 @@ UFO_Page {
     // Create | Clear
     RowLayout {
         Layout.fillWidth: true
-
         Layout.topMargin: 10
-
-        CheckBox {
-            // Switch to edit mode after creation.
-
-            text: qsTr("Edit patient after creation.")
-        }
 
         Item {
             Layout.fillWidth: true
@@ -233,6 +217,10 @@ UFO_Page {
         }
 
         UFO_Button {
+            id: ufo_Button_Insert
+
+            property var context: ({})
+
             Layout.preferredWidth: 120
             Layout.preferredHeight: 35
 
@@ -241,32 +229,137 @@ UFO_Page {
             text: qsTr("Create")
             svg: "./../../icons/Google icons/person_add.svg"
 
+            function setContextElement(key, value) {
+                ufo_Button_Insert.context[key] = value;
+            }
+
+            Connections {
+                target: ufo_Dialog
+
+                function onAccepted() {
+                    if(ufo_Dialog.callbackIdentifier === "<UFO_Create>: Input not provided") {
+                        ufo_Dialog.close();
+
+                        return;
+                    }
+
+                    if(ufo_Dialog.callbackIdentifier === "<UFO_Create>: Potential search matches found") {
+                        ufo_Dialog.close();
+                        Database.createPatient(ufo_Button_Insert.context["first_name"], ufo_Button_Insert.context["last_name"], ufo_Button_Insert.context["age"], ufo_Button_Insert.context["phone_number"], ufo_Button_Insert.context["gender"], ufo_Button_Insert.context["marital_status"]);
+
+                        return;
+                    }
+                }
+            }
+
+            Connections {
+                target: ufo_Dialog
+
+                function onRejected() {
+                    if(ufo_Dialog.callbackIdentifier === "<UFO_Create>: Potential search matches found") {
+                        ufo_Dialog.close();
+                        root.searchMatchedNewPatient();
+
+                        return;
+                    }
+                }
+            }
+
             onClicked: {
+                let emptyFieldWasDetected = textField_FirstName.text === "" || textField_LastName.text === "" || textField_PhoneNumber.text === "" || textField_Age.text === "";
+
+
+                if(emptyFieldWasDetected) {
+                    let message = "Please ensure the following fields have valid inputs before prcoceeding to add a new patient:<br>";
+
+                    message += "<ul>";
+
+
+                    if(textField_FirstName.text === "") {
+                        message += "<li>First Name</li>";
+                    }
+
+                    if(textField_LastName.text === "") {
+                        message += "<li>Last Name</li>";
+                    }
+
+                    if(textField_PhoneNumber.text === "") {
+                        message += "<li>Phone Number</li>";
+                    }
+
+                    if(textField_Age.text === "") {
+                        message += "<li>Age</li>";
+                    }
+
+                    message += "</ul>";
+
+
+                    ufo_Dialog.titleString = "<b>WARNING! Empty fields detected!<b>";
+                    ufo_Dialog.messageString = message;
+                    ufo_Dialog.callbackIdentifier = "<UFO_Create>: Input not provided";
+                    ufo_Dialog.hasAccept = true;
+                    ufo_Dialog.hasReject = false;
+                    ufo_Dialog.acceptButtonText = qsTr("OK")
+                    ufo_Dialog.rejectButtonText = qsTr("Cancel")
+                    ufo_Dialog.open();
+
+
+                    return;
+                }
 
 
                 // Personal Information:
-                // var first_name = textField_FirstName.text.trim();
-                // var last_name = textField_LastName.text.trim();
-                // var age = parseInt(textField_Age.text.trim());
-                // var phone_number = textField_PhoneNumber.text.trim();
-                // var gender = gender = comboBox_Gender.currentText;
-                // var marital_status = comboBox_MaritalStatus.currentText;
+                ufo_Button_Insert.setContextElement("first_name", textField_FirstName.text.trim());
+                ufo_Button_Insert.setContextElement("last_name", textField_LastName.text.trim());
+                ufo_Button_Insert.setContextElement("age", parseInt(textField_Age.text.trim()));
+                ufo_Button_Insert.setContextElement("phone_number", textField_PhoneNumber.text.trim());
+                ufo_Button_Insert.setContextElement("gender", comboBox_Gender.currentText.trim());
+                ufo_Button_Insert.setContextElement("marital_status", comboBox_MaritalStatus.currentText.trim());
 
-                // Display message box, if a field is missing data.
 
-                // Clear fields once creation is done.
-                // Switch to edit if need be.
+                // Perform Search:
+                Database.findPatient(ufo_Button_Insert.context["first_name"], ufo_Button_Insert.context["last_name"], ufo_Button_Insert.context["age"], ufo_Button_Insert.context["phone_number"], ufo_Button_Insert.context["gender"], ufo_Button_Insert.context["marital_status"]);
 
-                // Create patient:
-                // var operationOutcome = Database.updatePatientData(first_name, last_name, age, phone_number, gender, marital_status, treatments);
+                if(Database.getSearchResultList().length === 0) {
+                    Database.createPatient(ufo_Button_Insert.context["first_name"], ufo_Button_Insert.context["last_name"], ufo_Button_Insert.context["age"], ufo_Button_Insert.context["phone_number"], ufo_Button_Insert.context["gender"], ufo_Button_Insert.context["marital_status"]);
 
-                // if(operationOutcome === false) {
-                //     ufo_StatusBar.displayMessage("Edit operation failed!")
-                // }
+                    return;
+                }
 
-                // if(operationOutcome === true) {
-                //     ufo_StatusBar.displayMessage("Changes applied!")
-                // }
+
+                ufo_Dialog.titleString = "<b>WARNING! Potential matches found!<b>";
+                ufo_Dialog.messageString = "The application found potential already existing matches of patients. Please switch to the ";
+                ufo_Dialog.callbackIdentifier = "<UFO_Create>: Potential search matches found";
+                ufo_Dialog.hasAccept = true;
+                ufo_Dialog.hasReject = true;
+                ufo_Dialog.acceptButtonText = qsTr("Create Anyway")
+                ufo_Dialog.rejectButtonText = qsTr("View Search")
+                ufo_Dialog.open();
+            }
+        }
+    }
+
+    UFO_OperationResult {
+        id: ufo_OperationResult
+
+        Layout.fillWidth: true
+        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
+
+        Connections {
+            target: Database
+
+            function onPatientInsertionSuccessful() {
+                ufo_OperationResult.svg = "./../../icons/Google icons/check_circle.svg";
+                ufo_OperationResult.displayMessage("Patient created successfully. You may now proceed to editing the patient.", 3000);
+            }
+        }
+
+        Connections {
+            target: Database
+
+            function onPatientInsertionFailed() {
+                ufo_OperationResult.svg = "./../../icons/Google icons/error.svg";
+                ufo_OperationResult.displayMessage("Patient creation failed. You may try agian or return at another time.", 3000);
             }
         }
     }

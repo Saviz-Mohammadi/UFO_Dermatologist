@@ -44,6 +44,8 @@ private:
     // Signals
 signals:
     void connectionStatusChanged();
+    void patientInsertionSuccessful();
+    void patientInsertionFailed();
     void searchResultListChanged();
     void patientDataChanged();
     void updatesApplied();
@@ -54,6 +56,9 @@ public:
     // CONNECTIONS
     Q_INVOKABLE void establishConnection(const QString &ipAddress, qint16 port, const QString &schema, const QString &username, const QString &password);
     Q_INVOKABLE void disconnect();
+
+    // INSERT
+    Q_INVOKABLE bool createPatient(const QString &first_name, const QString &last_name, quint8 age, const QString &phone_number, const QString &gender, const QString &marital_status);
 
     // SEARCH
     Q_INVOKABLE bool findPatient(const QString &first_name, const QString &last_name, quint8 age, const QString &phone_number, const QString &gender, const QString &marital_status);

@@ -139,6 +139,13 @@ ApplicationWindow {
         text: qsTr("Application is ready")
     }
 
+    UFO_Dialog {
+        id: ufo_Dialog
+
+        anchors.centerIn: parent
+
+        visible: false
+    }
 
     UFO_SplitView {
         anchors.fill: parent
@@ -198,6 +205,16 @@ ApplicationWindow {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+            }
+
+            Connections {
+                target: ufo_Create
+
+                function onSearchMatchedNewPatient() {
+                    stackLayout.currentIndex = ufo_Search.StackLayout.index
+
+                    ufo_SideBar_Main.checkTabButton("Search Page")
+                }
             }
 
             Connections {
