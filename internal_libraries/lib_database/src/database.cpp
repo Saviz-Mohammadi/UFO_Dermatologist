@@ -767,6 +767,61 @@ bool Database::updatePatientData(const QString &newFirstName, const QString &new
     return (true);
 }
 
+
+// DELETION
+bool Database::changeDeletionStatus(bool newStatus)
+{
+    QString queryString = "UPDATE patients SET mark_for_deletion = :newStatus WHERE patient_id = :patient_id;";
+    QSqlQuery query;
+
+
+
+    query.prepare(queryString);
+
+
+
+    query.bindValue(":newStatus", newStatus);
+    query.bindValue(":patient_id", m_PatientDataMap["patient_id"].toULongLong());
+
+
+
+    if (!query.exec())
+    {
+
+
+
+        return (false);
+    }
+
+
+
+    return (true);
+}
+
+bool Database::deleteAll()
+{
+    QString queryString = "DELETE FROM patients WHERE mark_for_deletion = TRUE;";
+    QSqlQuery query;
+
+
+
+    query.prepare(queryString);
+
+
+
+    if (!query.exec())
+    {
+
+
+
+        return (false);
+    }
+
+
+
+    return (true);
+}
+
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 

@@ -355,6 +355,8 @@ UFO_Page {
         Layout.bottomMargin: 7
 
         UFO_Button {
+            id: ufo_Button_DeletionStatus
+
             Layout.preferredWidth: 120
             Layout.preferredHeight: 35
 
@@ -367,7 +369,8 @@ UFO_Page {
             svg: "./../../icons/Google icons/patient_delete.svg"
 
             onClicked: {
-                // Delete here.
+                // NOTE (SAVIZ): Before you ask... Yes! I have trust issues.
+                (ufo_Button_DeletionStatus.checked === true) ? Database.changeDeletionStatus(true) : Database.changeDeletionStatus(false)
             }
         }
 

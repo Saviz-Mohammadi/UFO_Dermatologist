@@ -70,6 +70,13 @@ public:
     bool updateTreatments(const QVariantList &newTreatments);
     Q_INVOKABLE bool updatePatientData(const QString &newFirstName, const QString &newLastName, quint8 newAge, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, const QVariantList &newTreatments);
 
+    // DELETION
+    Q_INVOKABLE bool changeDeletionStatus(bool newStatus);
+    // TODO (SAVIZ): Make a simple check before deleting all patints to see if current patient edit map is one of the patients, and send a special delete signal to notify the edit page to clear its contents. But, you have to make sure that per each element in edit hat reacts to onpatientchanged you also account what should happen if patinetmap is empty.
+
+    // Maybe a better way is to implement a signal that everyone in every page reacts to: in edit everything is cleared and patientdata is cleared as well in here from back-end, in search the list is cleared. You can show a dialog that says deletion is a dangerous operation and say in order to delet take place all actions must be halted and cleared and then give the option to do so ornot.
+    Q_INVOKABLE bool deleteAll();
+
     // HELPER
     Q_INVOKABLE bool readyPatientData(const quint64 index);
     bool populateTreatmentList();

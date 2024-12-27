@@ -273,4 +273,23 @@ UFO_Page {
             }
         }
     }
+
+    UFO_Button {
+        id: ufo_Button_DeleteAll
+
+        Layout.preferredWidth: 120
+        Layout.preferredHeight: 35
+
+        enabled: (Database.connectionStatus === true) ? true : false
+
+        checkable: true
+        checked: false
+
+        text: qsTr("Delete All")
+        svg: "./../../icons/Google icons/patient_delete.svg"
+
+        onClicked: {
+            Database.deleteAll();
+        }
+    }
 }
