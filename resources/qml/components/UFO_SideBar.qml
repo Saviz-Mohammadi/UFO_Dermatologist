@@ -14,14 +14,14 @@ Item {
 
         // TODO (SAVIZ): I like to replace these with an enum, but currently I don't know how in QML.
         switch (targetButton) {
-            case "Create Page":
-                ufo_SidBarButton_Create.checked = true
+            case "Search Page":
+                ufo_SidBarButton_Search.checked = true
                 break
             case "Edit Page":
                 ufo_SidBarButton_Edit.checked = true
                 break
-            case "Search Page":
-                ufo_SidBarButton_Search.checked = true
+            case "Create Page":
+                ufo_SidBarButton_Create.checked = true
                 break
             case "Settings Page":
                 ufo_SidBarButton_Settings.checked = true
@@ -69,7 +69,7 @@ Item {
                     spacing: 10
 
                     UFO_SideBarButton {
-                        id: ufo_SidBarButton_Create
+                        id: ufo_SidBarButton_Search
 
                         Layout.fillWidth: true
                         Layout.preferredHeight: 40
@@ -83,11 +83,11 @@ Item {
                         autoExclusive: true
                         checked: false
 
-                        text: qsTr("Create Patient")
-                        svg: "./../../icons/Google icons/person_add.svg"
+                        text: qsTr("Search")
+                        svg: "./../../icons/Google icons/person_search.svg"
 
                         onClicked: {
-                            root.tabChanged("Create Page")
+                            root.tabChanged("Search Page")
                         }
                     }
 
@@ -106,7 +106,7 @@ Item {
                         autoExclusive: true
                         checked: false
 
-                        text: qsTr("Edit Patient")
+                        text: qsTr("Edit")
                         svg: "./../../icons/Google icons/person_edit.svg"
 
                         onClicked: {
@@ -115,7 +115,7 @@ Item {
                     }
 
                     UFO_SideBarButton {
-                        id: ufo_SidBarButton_Search
+                        id: ufo_SidBarButton_Create
 
                         Layout.fillWidth: true
                         Layout.preferredHeight: 40
@@ -129,11 +129,11 @@ Item {
                         autoExclusive: true
                         checked: false
 
-                        text: qsTr("Search Patient")
-                        svg: "./../../icons/Google icons/person_search.svg"
+                        text: qsTr("Create")
+                        svg: "./../../icons/Google icons/person_add.svg"
 
                         onClicked: {
-                            root.tabChanged("Search Page")
+                            root.tabChanged("Create Page")
                         }
                     }
 

@@ -3,7 +3,7 @@ import QtQuick.Controls.Basic
 import QtQuick.Layouts
 
 // Custom QML Files
-import "./../components_ufo"
+import "./../components"
 
 // Custom CPP Registered Types
 import AppTheme 1.0

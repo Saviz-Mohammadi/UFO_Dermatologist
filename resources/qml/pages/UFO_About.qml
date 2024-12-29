@@ -3,7 +3,7 @@ import QtQuick.Controls.Basic
 import QtQuick.Layouts
 
 // Custom QML Files
-import "./../components_ufo"
+import "./../components"
 
 // Custom CPP Registered Types
 import AppTheme 1.0
@@ -38,8 +38,6 @@ UFO_Page {
         }
     }
 
-
-
     UFO_GroupBox {
         Layout.fillWidth: true
         // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
@@ -70,8 +68,6 @@ UFO_Page {
             elide: Text.ElideRight
         }
     }
-
-
 
     UFO_GroupBox {
         Layout.fillWidth: true

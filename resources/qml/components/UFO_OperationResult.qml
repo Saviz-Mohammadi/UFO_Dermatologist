@@ -9,12 +9,13 @@ Item {
     id: root
 
     property alias svg: iconImage.source
+    property bool state: true
     property int svgWidth: 42
     property int svgHeight: 42
     property int borderRadius: 0
 
     implicitWidth: 120
-    implicitHeight: 60
+    implicitHeight: svgHeight + 20
 
     visible: false
 
@@ -27,7 +28,7 @@ Item {
         }
 
         timer.interval = duration;
-        timer.start();
+        timer.restart();
     }
 
     Timer {
@@ -39,12 +40,21 @@ Item {
     }
 
     Rectangle {
+        id: rectangle_Background
+
         anchors.fill: parent
 
         radius: root.borderRadius
 
-        color: "green"
-        //color: Qt.color(AppTheme.colors["UFO_Button_Icon_Checked"])
+        color: {
+            if(root.state === true) {
+                return ("springgreen");
+            }
+
+            if(root.state === false) {
+                return ("tomato");
+            }
+        }
 
         RowLayout {
             anchors.fill: parent
@@ -64,19 +74,7 @@ Item {
                 source: ""
                 verticalAlignment: Image.AlignVCenter
 
-                color: {
-                    if (root.checked) {
-                        Qt.color(AppTheme.colors["UFO_Button_Icon_Checked"])
-                    }
-
-                    else if (root.hovered) {
-                        Qt.color(AppTheme.colors["UFO_Button_Icon_Hovered"])
-                    }
-
-                    else {
-                        Qt.color(AppTheme.colors["UFO_Button_Icon_Normal"])
-                    }
-                }
+                color: Qt.rgba(0, 0, 0, 0.85)
             }
 
             Text {
@@ -86,23 +84,12 @@ Item {
                 Layout.fillHeight: true
 
                 elide: Text.ElideRight
+                wrapMode: Text.Wrap
 
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
 
-                color: {
-                    if (root.checked) {
-                        Qt.color(AppTheme.colors["UFO_Button_Text_Checked"])
-                    }
-
-                    else if (root.hovered) {
-                        Qt.color(AppTheme.colors["UFO_Button_Text_Hovered"])
-                    }
-
-                    else {
-                        Qt.color(AppTheme.colors["UFO_Button_Text_Normal"])
-                    }
-                }
+                color: Qt.rgba(0, 0, 0, 0.85)
             }
 
             Item {

@@ -87,15 +87,31 @@ Database *Database::cppInstance(QObject *parent)
 // CONNECTIONS
 void Database::establishConnection(const QString &ipAddress, qint16 port, const QString &schema, const QString &username, const QString &password)
 {
-    // Connection already exists, abort operation.
+#ifdef QT_DEBUG
+    QString message("Connection request initiated!\n");
+
+    QTextStream stream(&message);
+#endif
+
+
+
+    // Connection exists, abort operation.
     if (m_ConnectionStatus)
     {
+#ifdef QT_DEBUG
+        stream << "Connection exists. Aborting operation.";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
         return;
     }
 
 
 
-    m_QSqlDatabase = QSqlDatabase::addDatabase("QMYSQL");
+    m_QSqlDatabase = QSqlDatabase::addDatabase("QMYSQL", "MySQL database");
 
     m_QSqlDatabase.setHostName(ipAddress);
     m_QSqlDatabase.setPort(port);
@@ -110,15 +126,23 @@ void Database::establishConnection(const QString &ipAddress, qint16 port, const 
     if (connectionFailed)
     {
 #ifdef QT_DEBUG
-        QString message("Connection failed!\n");
+        stream  << "Connection failed!\n";
 
-        QTextStream stream(&message);
-
-        stream << "Error       : " << m_QSqlDatabase.lastError().text() << "\n"
-               << "IpAddress   : " << ipAddress;
+        stream  << "Error     : " << m_QSqlDatabase.lastError().text() << "\n"
+                << "IpAddress : " << ipAddress << "\n"
+                << "Port      : " << port << "\n"
+                << "Schema    : " << schema << "\n"
+                << "Username  : " << username << "\n"
+                << "Password  : " << password << "\n";
 
         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
 #endif
+
+
+
+        // Notify QML:
+        setConnectionStatus(false, "Unable to establish a connection to the database.");
+
 
 
         return;
@@ -126,30 +150,45 @@ void Database::establishConnection(const QString &ipAddress, qint16 port, const 
 
 
 
+#ifdef QT_DEBUG
+    stream  << "Connection established!\n";
+
+    stream  << "IpAddress : " << ipAddress << "\n"
+            << "Port      : " << port << "\n"
+            << "Schema    : " << schema << "\n"
+            << "Username  : " << username << "\n"
+            << "Password  : " << password << "\n";
+
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
     // Notify QML:
-    setConnectionStatus(true);
+    setConnectionStatus(true, "Successfully connected to the database.");
 
 
 
     // Populate lists:
-    populateTreatmentList();
+    //populateTreatmentList();
 }
 
 void Database::disconnect()
 {
 #ifdef QT_DEBUG
-    QString message("Closing the database connection...\n");
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Closing the database connection...\n");
 #endif
 
 
 
     m_QSqlDatabase.close();
 
-    setConnectionStatus(false);
+
+
+    // Notify QML:
+    setConnectionStatus(false, "Disconnected from database.");
 }
 
+// CREATE
 bool Database::createPatient(const QString &first_name, const QString &last_name, quint8 age, const QString &phone_number, const QString &gender, const QString &marital_status)
 {
 #ifdef QT_DEBUG
@@ -229,15 +268,125 @@ logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
 }
 
 // SEARCH
-bool Database::findPatient(const QString &first_name, const QString &last_name, quint8 age, const QString &phone_number, const QString &gender, const QString &marital_status)
+bool Database::findPatient(const quint64 patientID)
 {
-    QString queryString = "SELECT * FROM patients WHERE 1=1";
+    QString queryString = "SELECT * FROM patients WHERE patient_id = :patiend_id";
     QSqlQuery query;
 
 
 
 #ifdef QT_DEBUG
-    QString message("Search initiated!\n");
+    QString message("Search initiated! (patient_id)\n");
+
+    QTextStream stream(&message);
+#endif
+
+
+
+    query.prepare(queryString);
+
+
+
+    query.bindValue(":patient_id", patientID);
+
+
+
+    m_SearchResultList.clear();
+
+
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        stream << query.lastError().text();
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        //m_LatestMessage = query.lastError().text();
+
+
+
+        // Notify QML:.
+        emit searchResultListChanged();
+
+
+
+        return (false);
+    }
+
+
+
+    if (query.size() == 0)
+    {
+#ifdef QT_DEBUG
+        stream << "Query returned no results.";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        // Notify QML:.
+        emit searchResultListChanged();
+
+
+
+        return (false);
+    }
+
+
+
+#ifdef QT_DEBUG
+    stream  << "patient_id : " << patientID;
+
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+    // NOTE (SAVIZ): Only obtain minimum data:
+    while (query.next())
+    {
+        QVariantMap patientMap;
+
+
+
+        patientMap["patient_id"] = query.value("patient_id").toULongLong();
+        patientMap["first_name"] = query.value("first_name").toString();
+        patientMap["last_name"] = query.value("last_name").toString();
+        patientMap["birth_year"] = query.value("birth_year").toString();
+        patientMap["phone_number"] = query.value("phone_number").toString();
+        patientMap["gender"] = query.value("gender").toString();
+        patientMap["marital_status"] = query.value("marital_status").toString();
+        patientMap["service_price"] = query.value("service_price").toString();
+
+
+
+        m_SearchResultList.append(patientMap);
+    }
+
+
+
+    // Notify QML:.
+    emit searchResultListChanged();
+
+
+
+    return (true);
+}
+
+bool Database::findPatient(const QString &firstName, const QString &lastName, quint32 birthYearStart, quint32 birthYearEnd, const QString &phoneNumber, const QString &gender, const QString &maritalStatus)
+{
+    QSqlQuery query(m_QSqlDatabase);
+    QString queryString = "SELECT * FROM patients WHERE 1 = 1";
+
+
+
+#ifdef QT_DEBUG
+    QString message("Search initiated! (patient data)\n");
 
     QTextStream stream(&message);
 #endif
@@ -245,185 +394,209 @@ bool Database::findPatient(const QString &first_name, const QString &last_name, 
 
 
     // NOTE (SAVIZ): I like to use 'std::optional', but QML does not play nice.
-    if (!first_name.isEmpty())
+    if (!firstName.isEmpty())
     {
-        queryString += " AND first_name LIKE '%" + first_name + "%'";
-
-
 #ifdef QT_DEBUG
-        stream << "'first_name' : " << first_name << "\n";
+        stream << "first_name : " << firstName << "\n";
 #endif
+
+
+
+        queryString += " AND first_name LIKE :first_name";
     }
 
-    if (!last_name.isEmpty())
+    if (!lastName.isEmpty())
     {
-        queryString += " AND last_name LIKE '%" + last_name + "%'";
-
-
 #ifdef QT_DEBUG
-        stream << "'laste_name' : " << last_name << "\n";
+        stream << "last_name : " << lastName << "\n";
 #endif
+
+
+
+        queryString += " AND last_name LIKE :last_name";
     }
 
-    // NOTE (SAVIZ): Using -1 as the sentinel value for age, which turns into 255 in unsigned format.
-    if (age != 255)
+    // NOTE (SAVIZ): I use the value of '0' as the sentinel value.
+    if (birthYearStart > 0 && birthYearEnd > 0)
     {
-        queryString += " AND age = " + QString::number(age);
-
-
 #ifdef QT_DEBUG
-        stream << "'age' : " << age << "\n";
+        stream << "birth_year_start : " << birthYearStart << "\n";
+        stream << "birth_year_end   : " << birthYearEnd   << "\n";
 #endif
+
+
+
+        queryString += " AND birth_year BETWEEN :birth_year_start AND :birth_year_end";
     }
 
-    if (!phone_number.isEmpty())
+    if (!phoneNumber.isEmpty())
     {
-        queryString += " AND phone_number LIKE '%" + phone_number + "%'";
-
-
 #ifdef QT_DEBUG
-        stream << "'phone_number' : " << phone_number << "\n";
+        stream << "phone_number : " << phoneNumber << "\n";
 #endif
+
+
+
+        queryString += " AND phone_number LIKE :phone_number";
     }
 
-    if (!gender.isEmpty() && gender != "Gender")
+    if (!gender.isEmpty())
     {
-        queryString += " AND gender = '" + gender + "'";
-
-
 #ifdef QT_DEBUG
-        stream << "'gender' : " << gender << "\n";
+        stream << "gender : " << gender << "\n";
 #endif
+
+
+
+        queryString += " AND gender = :gender";
     }
 
-    if (!marital_status.isEmpty() && marital_status != "Marital Status")
+    if (!maritalStatus.isEmpty())
     {
-        queryString += " AND marital_status = '" + marital_status + "'";
-
-
 #ifdef QT_DEBUG
-        stream << "'marital_status' : " << marital_status << "\n";
+        stream << "marital_status : " << maritalStatus << "\n";
 #endif
+
+
+
+        queryString += " AND marital_status = :marital_status";
+    }
+
+
+
+    query.prepare(queryString);
+
+
+
+    if (!firstName.isEmpty())
+    {
+        query.bindValue(":first_name", firstName + "%");
+    }
+
+    if(!lastName.isEmpty())
+    {
+        query.bindValue(":last_name", lastName + "%");
+    }
+
+    if (!phoneNumber.isEmpty())
+    {
+        query.bindValue(":phone_number", phoneNumber + "%");
+    }
+
+    if (birthYearStart > 0 && birthYearEnd > 0)
+    {
+        query.bindValue(":birth_year_start", birthYearStart);
+        query.bindValue(":birth_year_end", birthYearEnd);
+    }
+
+    if (!gender.isEmpty())
+    {
+        query.bindValue(":gender", gender);
+    }
+
+    if (!maritalStatus.isEmpty())
+    {
+        query.bindValue(":marital_status", maritalStatus);
+    }
+
+
+
+    m_SearchResultList.clear();
+
+
+
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        stream  << query.lastError().text() << "\n";
+
+        stream  << "first_name       : " << firstName      << "\n"
+                << "last_name        : " << lastName       << "\n"
+                << "birth_year_start : " << birthYearStart << "\n"
+                << "birth_year_end   : " << birthYearEnd   << "\n"
+                << "phone_number     : " << phoneNumber    << "\n"
+                << "gender           : " << gender         << "\n"
+                << "marital_status   : " << maritalStatus;
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        //m_LatestMessage = query.lastError().text();
+
+
+
+        // Notify QML:
+        emit queryExecuted(QueryType::SEARCH, false, query.lastError().text());
+        emit searchResultListChanged();
+
+
+
+        return (false);
+    }
+
+
+
+    if (query.size() == 0)
+    {
+#ifdef QT_DEBUG
+        stream  << "Query returned no results." << "\n";
+
+        stream  << "first_name       : " << firstName      << "\n"
+                << "last_name        : " << lastName       << "\n"
+                << "birth_year_start : " << birthYearStart << "\n"
+                << "birth_year_end   : " << birthYearEnd   << "\n"
+                << "phone_number     : " << phoneNumber    << "\n"
+                << "gender           : " << gender         << "\n"
+                << "marital_status   : " << maritalStatus;
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        // Notify QML:
+        emit searchResultListChanged();
+
+
+
+        return (false);
     }
 
 
 
 #ifdef QT_DEBUG
+    stream  << "first_name       : " << firstName      << "\n"
+            << "last_name        : " << lastName       << "\n"
+            << "birth_year_start : " << birthYearStart << "\n"
+            << "birth_year_end   : " << birthYearEnd   << "\n"
+            << "phone_number     : " << phoneNumber    << "\n"
+            << "gender           : " << gender         << "\n"
+            << "marital_status   : " << maritalStatus;
+
     logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
 #endif
 
 
 
-    query.prepare(queryString);
-
-    if (!query.exec())
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
-#endif
-
-
-        return (false);
-    }
-
-
-
-    if (query.size() == 0)
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Query returned no results.");
-#endif
-
-
-        return (false);
-    }
-
-
-
-    m_SearchResultList.clear();
-
-
-
-    // NOTE (SAVIZ): Only obtain the bare minimum data on the patients for now:
+    // NOTE (SAVIZ): Only obtain minimum data:
     while (query.next())
     {
         QVariantMap patientMap;
 
 
-        patientMap["patient_id"] = query.value("patient_id").toULongLong();
-        patientMap["first_name"] = query.value("first_name").toString();
-        patientMap["last_name"] = query.value("last_name").toString();
-        patientMap["age"] = query.value("age").toString();
-        patientMap["birth_date"] = query.value("birth_date").toString();
-        patientMap["phone_number"] = query.value("phone_number").toString();
-        patientMap["gender"] = query.value("gender").toString();
-        patientMap["marital_status"] = query.value("marital_status").toString();
-
-
-        m_SearchResultList.append(patientMap);
-    }
-
-
-
-    // Notify QML that the results have changed.
-    emit searchResultListChanged();
-
-
-
-    return (true);
-}
-
-bool Database::findFirstPatient()
-{
-    QString queryString = "SELECT * FROM patients ORDER BY patient_id ASC LIMIT 1";
-    QSqlQuery query;
-
-
-
-    query.prepare(queryString);
-
-    if (!query.exec())
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
-#endif
-
-
-        return (false);
-    }
-
-
-
-    if (query.size() == 0)
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Query returned no results.");
-#endif
-
-
-        return (false);
-    }
-
-
-
-    m_SearchResultList.clear();
-
-
-
-    // NOTE (SAVIZ): Only obtain the bare minimum data on the patients for now:
-    while (query.next())
-    {
-        QVariantMap patientMap;
-
 
         patientMap["patient_id"] = query.value("patient_id").toULongLong();
         patientMap["first_name"] = query.value("first_name").toString();
         patientMap["last_name"] = query.value("last_name").toString();
-        patientMap["age"] = query.value("age").toString();
-        patientMap["birth_date"] = query.value("birth_date").toString();
+        patientMap["birth_year"] = query.value("birth_year").toString();
         patientMap["phone_number"] = query.value("phone_number").toString();
         patientMap["gender"] = query.value("gender").toString();
         patientMap["marital_status"] = query.value("marital_status").toString();
+        patientMap["service_price"] = query.value("service_price").toString();
+
 
 
         m_SearchResultList.append(patientMap);
@@ -432,6 +605,7 @@ bool Database::findFirstPatient()
 
 
     // Notify QML:
+    emit queryExecuted(QueryType::SEARCH, true, "Success");
     emit searchResultListChanged();
 
 
@@ -439,20 +613,46 @@ bool Database::findFirstPatient()
     return (true);
 }
 
-bool Database::findLastPatient()
+bool Database::findFirstXPatients(const quint64 count)
 {
-    QString queryString = "SELECT * FROM patients ORDER BY patient_id DESC LIMIT 1";
+    QString queryString = "SELECT * FROM patients ORDER BY patient_id ASC LIMIT :count";
     QSqlQuery query;
+
+
+
+#ifdef QT_DEBUG
+    QString message("Search initiated! (First X)\n");
+
+    QTextStream stream(&message);
+#endif
 
 
 
     query.prepare(queryString);
 
+
+
+    query.bindValue(":count", count);
+
+
+
+    m_SearchResultList.clear();
+
+
+
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
+        stream << query.lastError().text();
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
 #endif
+
+
+
+        // Notify QML:.
+        emit searchResultListChanged();
+
 
 
         return (false);
@@ -463,8 +663,16 @@ bool Database::findLastPatient()
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Query returned no results.");
+        stream << "Query returned no results.";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
 #endif
+
+
+
+        // Notify QML:.
+        emit searchResultListChanged();
+
 
 
         return (false);
@@ -472,24 +680,30 @@ bool Database::findLastPatient()
 
 
 
-    m_SearchResultList.clear();
+#ifdef QT_DEBUG
+    stream  << "count : " << count;
+
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
 
 
 
-    // NOTE (SAVIZ): Only obtain the bare minimum data on the patients for now:
+    // NOTE (SAVIZ): Only obtain minimum data:
     while (query.next())
     {
         QVariantMap patientMap;
 
 
+
         patientMap["patient_id"] = query.value("patient_id").toULongLong();
         patientMap["first_name"] = query.value("first_name").toString();
         patientMap["last_name"] = query.value("last_name").toString();
-        patientMap["age"] = query.value("age").toString();
-        patientMap["birth_date"] = query.value("birth_date").toString();
+        patientMap["birth_year"] = query.value("birth_year").toString();
         patientMap["phone_number"] = query.value("phone_number").toString();
         patientMap["gender"] = query.value("gender").toString();
         patientMap["marital_status"] = query.value("marital_status").toString();
+        patientMap["service_price"] = query.value("service_price").toString();
+
 
 
         m_SearchResultList.append(patientMap);
@@ -497,7 +711,113 @@ bool Database::findLastPatient()
 
 
 
-    // Notify QML:
+    // Notify QML:.
+    emit searchResultListChanged();
+
+
+
+    return (true);
+}
+
+bool Database::findLastXPatients(const quint64 count)
+{
+    QString queryString = "SELECT * FROM patients ORDER BY patient_id DESC LIMIT :count";
+    QSqlQuery query;
+
+
+
+#ifdef QT_DEBUG
+    QString message("Search initiated! (Last X)\n");
+
+    QTextStream stream(&message);
+#endif
+
+
+
+    query.prepare(queryString);
+
+
+
+    query.bindValue(":count", count);
+
+
+
+    m_SearchResultList.clear();
+
+
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        stream << query.lastError().text();
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        // Notify QML:.
+        emit searchResultListChanged();
+
+
+
+        return (false);
+    }
+
+
+
+    if (query.size() == 0)
+    {
+#ifdef QT_DEBUG
+        stream << "Query returned no results.";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        // Notify QML:.
+        emit searchResultListChanged();
+
+
+
+        return (false);
+    }
+
+
+
+#ifdef QT_DEBUG
+    stream  << "count : " << count;
+
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+    // NOTE (SAVIZ): Only obtain minimum data:
+    while (query.next())
+    {
+        QVariantMap patientMap;
+
+
+
+        patientMap["patient_id"] = query.value("patient_id").toULongLong();
+        patientMap["first_name"] = query.value("first_name").toString();
+        patientMap["last_name"] = query.value("last_name").toString();
+        patientMap["birth_year"] = query.value("birth_year").toString();
+        patientMap["phone_number"] = query.value("phone_number").toString();
+        patientMap["gender"] = query.value("gender").toString();
+        patientMap["marital_status"] = query.value("marital_status").toString();
+        patientMap["service_price"] = query.value("service_price").toString();
+
+
+
+        m_SearchResultList.append(patientMap);
+    }
+
+
+
+    // Notify QML:.
     emit searchResultListChanged();
 
 
@@ -822,17 +1142,8 @@ bool Database::deleteAll()
     return (true);
 }
 
-// [[------------------------------------------------------------------------]]
-// [[------------------------------------------------------------------------]]
-
-
-
-
 
 // HELPER
-// [[------------------------------------------------------------------------]]
-// [[------------------------------------------------------------------------]]
-
 bool Database::readyPatientData(const quint64 index)
 {
 #ifdef QT_DEBUG
@@ -922,6 +1233,17 @@ bool Database::readyPatientData(const quint64 index)
 
     return (true);
 }
+
+// [[------------------------------------------------------------------------]]
+// [[------------------------------------------------------------------------]]
+
+
+
+
+
+// PRIVATE Methods
+// [[------------------------------------------------------------------------]]
+// [[------------------------------------------------------------------------]]
 
 bool Database::populateTreatmentList()
 {
@@ -1014,11 +1336,11 @@ QVariantList Database::getTreatmentList() const
 
 
 
-// PUBLIC Setters
+// PRIVATE Setters
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 
-void Database::setConnectionStatus(const bool newStatus)
+void Database::setConnectionStatus(const bool newStatus, const QString &newMessage)
 {
     if (m_ConnectionStatus == newStatus)
     {
@@ -1026,7 +1348,7 @@ void Database::setConnectionStatus(const bool newStatus)
     }
 
     m_ConnectionStatus = newStatus;
-    emit connectionStatusChanged();
+    emit connectionStatusChanged(newMessage);
 }
 
 // [[------------------------------------------------------------------------]]

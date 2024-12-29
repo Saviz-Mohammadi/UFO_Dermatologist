@@ -3,8 +3,7 @@ import QtQuick.Controls.Basic
 import QtQuick.Layouts
 
 // Custom QML Files
-import "components_ufo"
-import "components_custom"
+import "components"
 import "pages"
 
 // Custom CPP Registered Types
@@ -50,12 +49,12 @@ ApplicationWindow {
                 leftPadding: 10
                 rightPadding: 10
 
-                text: qsTr("Create Page")
+                text: qsTr("Search Page")
 
                 onTriggered: {
-                    stackLayout.currentIndex = ufo_Create.StackLayout.index
+                    stackLayout.currentIndex = ufo_Search.StackLayout.index
 
-                    ufo_SideBar_Main.checkTabButton("Create Page")
+                    ufo_SideBar_Main.checkTabButton("Search Page")
                 }
             }
 
@@ -76,12 +75,12 @@ ApplicationWindow {
                 leftPadding: 10
                 rightPadding: 10
 
-                text: qsTr("Search Page")
+                text: qsTr("Create Page")
 
                 onTriggered: {
-                    stackLayout.currentIndex = ufo_Search.StackLayout.index
+                    stackLayout.currentIndex = ufo_Create.StackLayout.index
 
-                    ufo_SideBar_Main.checkTabButton("Search Page")
+                    ufo_SideBar_Main.checkTabButton("Create Page")
                 }
             }
 
@@ -164,8 +163,8 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            UFO_Create {
-                id: ufo_Create
+            UFO_Search {
+                id: ufo_Search
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -186,8 +185,8 @@ ApplicationWindow {
                 }
             }
 
-            UFO_Search {
-                id: ufo_Search
+            UFO_Create {
+                id: ufo_Create
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true

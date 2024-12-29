@@ -3,7 +3,7 @@ import QtQuick.Controls.Basic
 import QtQuick.Layouts
 
 // Custom QML Files
-import "./../components_ufo"
+import "./../components"
 
 // Custom CPP Registered Types
 import AppTheme 1.0
@@ -56,9 +56,9 @@ UFO_Page {
             }
 
             Component.onCompleted: {
-                var cachedTheme = AppTheme.getCachedTheme()
+                let cachedTheme = AppTheme.getCachedTheme()
 
-                for (var index = 0; index < ufo_ComboBox_Style.model.length; ++index) {
+                for (let index = 0; index < ufo_ComboBox_Style.model.length; ++index) {
 
                     if (cachedTheme === "" && ufo_ComboBox_Style.model[index] === "ufo_light") {
                         ufo_ComboBox_Style.currentIndex = index
@@ -150,8 +150,6 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            // NOTE (SAVIZ): I am not sure if schema name needs RegularExpression, because it is just a name that can be anything.
-
             placeholderText: qsTr("schema")
 
             text: "ufo_dermatologist"
@@ -168,8 +166,6 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            // NOTE (SAVIZ): I am not sure if username needs RegularExpression, because it is just a name that can be anything.
-
             placeholderText: qsTr("username")
 
             text: "UFO_Dermatologist"
@@ -185,8 +181,6 @@ UFO_Page {
             Layout.bottomMargin: 0
             Layout.leftMargin: 15
             Layout.rightMargin: 15
-
-            // NOTE (SAVIZ): I am not sure if password needs RegularExpression, because it is just a password that can be anything.
 
             placeholderText: qsTr("password")
 
@@ -207,52 +201,49 @@ UFO_Page {
                 enabled: (Database.connectionStatus === true) ? false : true
 
                 text: qsTr("Connect")
-                svg: "./../../icons/Google icons/wifi.svg"
+                svg: "./../../icons/Google icons/wifi_on.svg"
 
                 onClicked: {
-                    var ipAddress = ipAddressField.text
-                    var port = parseInt(portField.text)
-                    var schema = schemaField.text
-                    var username = usernameField.text
-                    var password = passwordField.text
+                    var ipAddress = ipAddressField.text.trim();
+                    var port = parseInt(portField.text.trim());
+                    var schema = schemaField.text.trim();
+                    var username = usernameField.text.trim();
+                    var password = passwordField.text.trim();
+
+
 
                     if (ipAddress === "") {
+                        ufo_StatusBar.displayMessage("IP Address is a required field!");
 
-                        ufo_StatusBar.displayMessage("IP Address is a required field!")
-
-                        return
+                        return;
                     }
 
                     if (isNaN(port)) {
+                        ufo_StatusBar.displayMessage("Port is a required field!");
 
-                        ufo_StatusBar.displayMessage("Port is a required field!")
-
-                        return
+                        return;
                     }
 
                     if (schema === "") {
+                        ufo_StatusBar.displayMessage("Schema is a required field!");
 
-                        ufo_StatusBar.displayMessage("Schema is a required field!")
-
-                        return
+                        return;
                     }
 
                     if (username === "") {
+                        ufo_StatusBar.displayMessage("Username is a required field!");
 
-                        ufo_StatusBar.displayMessage("Username is a required field!")
-
-                        return
+                        return;
                     }
 
                     if (password === "") {
+                        ufo_StatusBar.displayMessage("Password is a required field!");
 
-                        ufo_StatusBar.displayMessage("Password is a required field!")
-
-                        return
+                        return;
                     }
 
 
-                    // If all requirements are meet, then attempt connection:
+
                     Database.establishConnection(ipAddress, port, schema, username, password);
                 }
             }
@@ -267,29 +258,38 @@ UFO_Page {
                 svg: "./../../icons/Google icons/wifi_off.svg"
 
                 onClicked: {
-
                     Database.disconnect();
                 }
             }
         }
     }
 
-    UFO_Button {
-        id: ufo_Button_DeleteAll
+    UFO_OperationResult {
+        id: ufo_OperationResult
 
-        Layout.preferredWidth: 120
-        Layout.preferredHeight: 35
+        Layout.fillWidth: true
+        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
 
-        enabled: (Database.connectionStatus === true) ? true : false
+        Connections {
+            target: Database
 
-        checkable: true
-        checked: false
+            function onConnectionStatusChanged(message) {
+                if(Database.connectionStatus === true) {
+                    ufo_OperationResult.svg = "./../../icons/Google icons/check_box.svg";
+                    ufo_OperationResult.state = true;
+                    ufo_OperationResult.displayMessage(message, 5000);
 
-        text: qsTr("Delete All")
-        svg: "./../../icons/Google icons/patient_delete.svg"
+                    return;
+                }
 
-        onClicked: {
-            Database.deleteAll();
+                if(Database.connectionStatus === false) {
+                    ufo_OperationResult.svg = "./../../icons/Google icons/error.svg";
+                    ufo_OperationResult.state = false;
+                    ufo_OperationResult.displayMessage(message, 5000);
+
+                    return;
+                }
+            }
         }
     }
 }

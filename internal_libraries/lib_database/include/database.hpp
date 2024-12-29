@@ -30,6 +30,18 @@ public:
     static Database *qmlInstance(QQmlEngine *engine, QJSEngine *scriptEngine);
     static Database *cppInstance(QObject *parent = Q_NULLPTR);
 
+    // Enum
+public:
+    enum class QueryType
+    {
+        CREATE,
+        SEARCH,
+        UPDATE,
+        DELETE,
+    };
+
+    Q_ENUM(QueryType)
+
 private:
     static Database *m_Instance;
 
@@ -43,7 +55,8 @@ private:
 
     // Signals
 signals:
-    void connectionStatusChanged();
+    void connectionStatusChanged(const QString &message);
+    void queryExecuted(QueryType type, bool success, const QString &message);
     void patientInsertionSuccessful();
     void patientInsertionFailed();
     void searchResultListChanged();
@@ -61,9 +74,10 @@ public:
     Q_INVOKABLE bool createPatient(const QString &first_name, const QString &last_name, quint8 age, const QString &phone_number, const QString &gender, const QString &marital_status);
 
     // SEARCH
-    Q_INVOKABLE bool findPatient(const QString &first_name, const QString &last_name, quint8 age, const QString &phone_number, const QString &gender, const QString &marital_status);
-    Q_INVOKABLE bool findFirstPatient();
-    Q_INVOKABLE bool findLastPatient();
+    Q_INVOKABLE bool findPatient(const quint64 patient_id);
+    Q_INVOKABLE bool findPatient(const QString &first_name, const QString &last_name, quint32 birth_year_start, quint32 birth_year_end, const QString &phone_number, const QString &gender, const QString &marital_status);
+    Q_INVOKABLE bool findFirstXPatients(const quint64 count);
+    Q_INVOKABLE bool findLastXPatients(const quint64 count);
 
     // UPDATE
     bool updatePersonalInformation(const QString &newFirstName, const QString &newLastName, quint8 newAge, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus);
@@ -79,6 +93,9 @@ public:
 
     // HELPER
     Q_INVOKABLE bool readyPatientData(const quint64 index);
+
+    // PRIVATE Methods
+private:
     bool populateTreatmentList();
 
     // PUBLIC Getters
@@ -90,7 +107,7 @@ public:
 
     // PRIVATE Setters
 private:
-    void setConnectionStatus(const bool newStatus);
+    void setConnectionStatus(const bool newStatus, const QString &newMessage);
 };
 
 #endif // DATABASE_H

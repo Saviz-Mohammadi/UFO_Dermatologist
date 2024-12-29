@@ -3,7 +3,7 @@ import QtQuick.Controls.Basic
 import QtQuick.Layouts
 
 // Custom QML Files
-import "./../components_ufo"
+import "./../components"
 
 // Custom CPP Registered Types
 import AppTheme 1.0
@@ -26,97 +26,41 @@ UFO_Page {
         title: qsTr("Search Options")
         contentSpacing: 0
 
-        Text {
+        GridLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            Layout.topMargin: 20
-            Layout.leftMargin: 15
-            Layout.rightMargin: 15
+            Layout.margins: 20
 
-            text: qsTr("Use the following fields to search for a patient. The more fields you use and the more information you provide, the more accurate the result list will be. Once you find a patient, click the 'Edit Patient' button to update the patient's information.")
+            columns: 2
+            rows: 5
 
-            elide: Text.ElideRight
-            horizontalAlignment: Text.AlignLeft
-            verticalAlignment: Text.AlignVCenter
-            wrapMode: Text.Wrap
-            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-        }
+            columnSpacing: 2
+            rowSpacing: 2
 
-        RowLayout {
-            Layout.fillWidth: true
-
-            Layout.topMargin: 7
-            Layout.leftMargin: 15
-            Layout.rightMargin: 15
-
-            spacing: 10
-
+            // Patient ID field, spanning all columns
             UFO_TextField {
-                id: textField_FirstName
+                id: textField_PatientID
 
+                Layout.column: 0
+                Layout.row: 0
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                placeholderText: qsTr("First name")
-            }
-
-            UFO_TextField {
-                id: textField_LastName
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                placeholderText: qsTr("Last name")
-            }
-
-            UFO_ComboBox {
-                id: comboBox_Gender
-
-                Layout.preferredWidth: 150
-                Layout.preferredHeight: 35
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                model: ["Gender", "Male", "Female"]
-            }
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-
-            Layout.topMargin: 7
-            Layout.leftMargin: 15
-            Layout.rightMargin: 15
-
-            spacing: 10
-
-            UFO_TextField {
-                id: textField_Age
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                placeholderText: qsTr("Age")
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                validator: RegularExpressionValidator {
-                    regularExpression: /^((1[0-4][0-9])|([1-9][0-9])|[0-9]|150)$/ // Ranges between (0 – 150)
-                }
+                placeholderText: qsTr("[patient id]")
             }
 
             UFO_TextField {
                 id: textField_PhoneNumber
 
+                Layout.column: 1
+                Layout.row: 0
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
-                placeholderText: qsTr("Phone Number")
+                placeholderText: qsTr("Enter phone number...")
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
@@ -125,25 +69,143 @@ UFO_Page {
                 }
             }
 
+            // First Name field, spanning the first two columns
+            UFO_TextField {
+                id: textField_FirstName
+
+                Layout.column: 0
+                Layout.row: 1
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+                Layout.topMargin: 20
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                placeholderText: qsTr("[first name]")
+            }
+
+            // Last Name field, spanning the last two columns
+            UFO_TextField {
+                id: textField_LastName
+
+                Layout.column: 1
+                Layout.row: 1
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+                Layout.topMargin: 20
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                placeholderText: qsTr("[last name]")
+            }
+
+            // Birth Year Start field, spanning the first two columns
+            UFO_TextField {
+                id: textField_BirthYearStart
+
+                Layout.column: 0
+                Layout.row: 2
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+
+                placeholderText: qsTr("Enter birth year start...")
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                validator: RegularExpressionValidator {
+                    regularExpression: /^[0-9]*$/
+                }
+
+                onTextChanged: {
+                    if (textField_BirthYearStart.text === "") {
+                        textField_BirthYearStart.text = "0";
+                    }
+                }
+            }
+
+            // Birth Year End field, spanning the last two columns
+            UFO_TextField {
+                id: textField_BirthYearEnd
+
+                Layout.column: 1
+                Layout.row: 2
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+
+                placeholderText: qsTr("Enter birth year end...")
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                validator: RegularExpressionValidator {
+                    regularExpression: /^[0-9]*$/
+                }
+
+                onTextChanged: {
+                    if (textField_BirthYearStart.text === "") {
+                        textField_BirthYearStart.text = "0";
+                    }
+                }
+            }
+
+            // Gender ComboBox
+            UFO_ComboBox {
+                id: comboBox_Gender
+
+                Layout.column: 0
+                Layout.row: 4
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+                Layout.topMargin: 20
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                model: ["Unknown", "Male", "Female"]
+            }
+
+            // Gender Checkbox
+            UFO_CheckBox {
+                Layout.column: 1
+                Layout.row: 4
+                Layout.preferredWidth: 35
+                Layout.preferredHeight: 35
+                Layout.topMargin: 20
+
+                text: qsTr("Check to enable field")
+            }
+
+            // Marital Status ComboBox
             UFO_ComboBox {
                 id: comboBox_MaritalStatus
 
-                Layout.preferredWidth: 150
+                Layout.column: 0
+                Layout.row: 5
+                Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                model: ["Marital Status", "Single", "Married", "Divorced", "Widowed"]
+                model: ["Unknown", "Single", "Married"]
+            }
+
+            // Marital Status Checkbox
+            UFO_CheckBox {
+                Layout.column: 1
+                Layout.row: 5
+                Layout.preferredWidth: 35
+                Layout.preferredHeight: 35
+
+                text: qsTr("Check to enable field")
             }
         }
 
         RowLayout {
             Layout.fillWidth: true
+            Layout.margins: 20
 
-            Layout.topMargin: 60
-            Layout.bottomMargin: 15
-            Layout.leftMargin: 15
-            Layout.rightMargin: 15
+            UFO_TextField {
+                Layout.preferredWidth: 120
+                Layout.preferredHeight: 35
+            }
 
             UFO_Button {
                 Layout.preferredWidth: 120
@@ -151,7 +213,7 @@ UFO_Page {
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                text: qsTr("First")
+                text: qsTr("First X count")
                 svg: "./../../icons/Google icons/one.svg"
 
                 onClicked: {
@@ -165,7 +227,7 @@ UFO_Page {
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                text: qsTr("Last")
+                text: qsTr("Last X count")
                 svg: "./../../icons/Google icons/infinity.svg"
 
                 onClicked: {
@@ -206,14 +268,15 @@ UFO_Page {
                 svg: "./../../icons/Google icons/person_search.svg"
 
                 onClicked: {
-                    var first_name = textField_FirstName.text.trim()
-                    var last_name = textField_LastName.text.trim()
-                    var age = (textField_Age.text === "") ? -1 : parseInt(textField_Age.text.trim())
-                    var phone_number = textField_PhoneNumber.text
+                    var firstName = textField_FirstName.text.trim()
+                    var lastName = textField_LastName.text.trim()
+                    var birthYearStart = parseInt(textField_BirthYearStart.text.trim());
+                    var birthYearEnd = parseInt(textField_BirthYearEnd.text.trim());
+                    var phoneNumber = textField_PhoneNumber.text
                     var gender = comboBox_Gender.currentText
-                    var marital_status = comboBox_MaritalStatus.currentText
+                    var maritalStatus = comboBox_MaritalStatus.currentText
 
-                    var operationOutcome = Database.findPatient(first_name, last_name, age, phone_number, gender, marital_status)
+                    var operationOutcome = Database.findPatient(firstName, lastName, birthYearStart, birthYearEnd, phoneNumber, "", "");
 
                     if(operationOutcome === false) {
                         ufo_StatusBar.displayMessage("Search operation failed!")
@@ -233,161 +296,11 @@ UFO_Page {
         title: qsTr("Search Results")
         contentSpacing: 0
 
-        Text {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            Layout.topMargin: 20
-            Layout.leftMargin: 15
-            Layout.rightMargin: 15
-
-            text: qsTr("The following list represents the results of the search operation.")
-
-            elide: Text.ElideRight
-            horizontalAlignment: Text.AlignLeft
-            verticalAlignment: Text.AlignVCenter
-            wrapMode: Text.Wrap
-            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-        }
-
-        RowLayout {
-            id: rowLayout_TitleContainer
-
-            Layout.fillWidth: true
-
-            Layout.topMargin: 7
-            Layout.leftMargin: 15
-            Layout.rightMargin: 15
-
-            spacing: 1
-
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
-
-                Text {
-                    anchors.fill: parent
-                    anchors.leftMargin: 10
-
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
-
-                    text: qsTr("FIRST NAME")
-
-                    color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
-                    font.pointSize: Qt.application.font.pixelSize * 1
-                    elide: Text.ElideRight
-                }
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
-
-                Text {
-                    anchors.fill: parent
-                    anchors.leftMargin: 10
-
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
-
-                    text: qsTr("LAST NAME")
-
-                    color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
-                    font.pointSize: Qt.application.font.pixelSize * 1
-                    elide: Text.ElideRight
-                }
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
-
-                Text {
-                    anchors.fill: parent
-                    anchors.leftMargin: 10
-
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
-
-                    text: qsTr("PHONE NUMBER")
-
-                    color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
-                    font.pointSize: Qt.application.font.pixelSize * 1
-                    elide: Text.ElideRight
-                }
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
-
-                Text {
-                    anchors.fill: parent
-                    anchors.leftMargin: 10
-
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
-
-                    text: qsTr("GENDER")
-
-                    color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
-                    font.pointSize: Qt.application.font.pixelSize * 1
-                    elide: Text.ElideRight
-                }
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
-
-                Text {
-                    anchors.fill: parent
-                    anchors.leftMargin: 10
-
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
-
-                    text: qsTr("AGE")
-
-                    color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
-                    font.pointSize: Qt.application.font.pixelSize * 1
-                    elide: Text.ElideRight
-                }
-            }
-
-            UFO_Button {
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 35
-
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                text: qsTr("Clear")
-                svg: "./../../icons/Google icons/delete.svg"
-
-                onClicked: {
-                    listModel_SearchResults.clear();
-                }
-            }
-        }
-
         ListView {
             id: listView_SearchResults
 
             Layout.fillWidth: true
-            Layout.preferredHeight: (root.height * 0.45)
+            Layout.preferredHeight: 450
 
             Layout.topMargin: 15
             Layout.leftMargin: 15
@@ -398,45 +311,91 @@ UFO_Page {
 
             model: ListModel { id: listModel_SearchResults }
 
-            delegate: UFO_ListDelegate {
+            delegate: UFO_SearchDelegate {
                 width: listView_SearchResults.width
 
-                firstName: model.patient_FirstName
-                lastName: model.patient_LastName
-                phoneNumber: model.patient_PhoneNumber
-                gender: model.patient_Gender
-                age: model.patient_Age
+                patientId: model.patient_id
+                header: model.first_name + model.last_name
+                birthYear: model.birth_year
+                phoneNumber: model.phone_number
+                gender: model.gender
+                maritalStatus: model.marital_status
+                servicePrice: model.service_price
+
 
                 onEditClicked: {
-                    var operationStatus = Database.readyPatientData(model.patient_ID)
+                    // var operationStatus = Database.readyPatientData(model.patient_ID)
 
 
-                    if(operationStatus !== true) {
-                        ufo_StatusBar.displayMessage("Could not make patient ready for editting!");
+                    // if(operationStatus !== true) {
+                    //     ufo_StatusBar.displayMessage("Could not make patient ready for editting!");
 
-                        return;
-                    }
+                    //     return;
+                    // }
 
-                    root.patientSelectedForEdit()
+                    // root.patientSelectedForEdit()
                 }
             }
 
             Connections {
                 target: Database
 
-                function onSearchResultListChanged() {
+                function onQueryExecuted(type, success, message) {
+                    if(type !== Database.QueryType.SEARCH) {
+                        return;
+                    }
+
+                    if(success === false) {
+                        return;
+                    }
+
                     listModel_SearchResults.clear();
 
                     Database.getSearchResultList().forEach(function (searchResult) {
                         listModel_SearchResults.append({
-                            "patient_ID": searchResult["patient_id"],
-                            "patient_FirstName": searchResult["first_name"],
-                            "patient_LastName": searchResult["last_name"],
-                            "patient_PhoneNumber": searchResult["phone_number"],
-                            "patient_Gender": searchResult["gender"],
-                            "patient_Age": searchResult["age"]
+                            "patient_id": searchResult["patient_id"],
+                            "first_name": searchResult["first_name"],
+                            "last_name": searchResult["last_name"],
+                            "birth_year": searchResult["birth_year"],
+                            "phone_number": searchResult["phone_number"],
+                            "gender": searchResult["gender"],
+                            "marital_status": searchResult["marital_status"],
+                            "service_price": searchResult["service_price"]
                         });
                     })
+                }
+            }
+        }
+    }
+
+    UFO_OperationResult {
+        id: ufo_OperationResult
+
+        Layout.fillWidth: true
+        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
+
+        Connections {
+            target: Database
+
+            function onQueryExecuted(type, success, message)  {
+                if(type !== Database.QueryType.SEARCH) {
+                    return;
+                }
+
+                if(success === true) {
+                    ufo_OperationResult.svg = "./../../icons/Google icons/check_box.svg";
+                    ufo_OperationResult.state = true;
+                    ufo_OperationResult.displayMessage(message, 5000);
+
+                    return;
+                }
+
+                if(success === false) {
+                    ufo_OperationResult.svg = "./../../icons/Google icons/error.svg";
+                    ufo_OperationResult.state = false;
+                    ufo_OperationResult.displayMessage(message, 5000);
+
+                    return;
                 }
             }
         }
