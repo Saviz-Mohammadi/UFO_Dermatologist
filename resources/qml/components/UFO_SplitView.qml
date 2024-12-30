@@ -9,7 +9,7 @@ SplitView {
     id: splitView
 
     handle: Rectangle {
-        id: rectangle_Handle
+        radius: 0
 
         implicitWidth: 6
         implicitHeight: 6

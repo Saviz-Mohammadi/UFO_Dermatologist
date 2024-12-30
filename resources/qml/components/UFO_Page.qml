@@ -23,12 +23,12 @@ Item {
     Rectangle {
         anchors.fill: parent
 
+        radius: 0
         color: Qt.color(AppTheme.colors["UFO_Page_Background"])
 
         ScrollView {
             anchors.fill: parent
 
-            // NOTE (SAVIZ): Setting "contentWidth" to -1 will disable horizontal scrolling.
             contentWidth: -1
             contentHeight: columnLayout.height + contentBottomMargin
 

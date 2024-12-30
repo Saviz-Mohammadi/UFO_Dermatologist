@@ -8,10 +8,10 @@ import AppTheme 1.0
 Button {
     id: root
 
+    property alias borderRadius: rectangle_Background.radius
     property alias svg: iconImage.source
     property int svgWidth: 24
     property int svgHeight: 24
-    property int borderRadius: 0
 
     implicitWidth: 120
     implicitHeight: 35
@@ -74,7 +74,6 @@ Button {
             }
         }
 
-        // NOTE (SAVIZ): Item is used to create white space.
         Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -84,7 +83,9 @@ Button {
 
 
     background: Rectangle {
-        radius: borderRadius
+        id: rectangle_Background
+
+        radius: 0
 
         color: {
             if (root.checked) {

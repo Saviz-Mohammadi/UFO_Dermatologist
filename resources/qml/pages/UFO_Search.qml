@@ -21,126 +21,131 @@ UFO_SplitView {
         title: qsTr("Search Patients")
         contentSpacing: 25
 
-        // UFO_GroupBox {
-        //     id: ufo_GroupBox_SearchResults
-
-        //     Layout.fillWidth: true
-        //     // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
-
-        //     title: qsTr("Search Results")
-        //     contentSpacing: 0
-
-
-        // }
-
-        ListView {
-            id: listView_SearchResults
-
+        Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: 600
+            Layout.preferredHeight: root.height - 100
 
-            Layout.topMargin: 15
-            Layout.leftMargin: 15
-            Layout.rightMargin: 15
+            radius: 0
 
-            spacing: 2
-            clip: true
+            color: Qt.color(AppTheme.colors["UFO_ListView_Background"])
 
-            model: ListModel { id: listModel_SearchResults }
+            Rectangle {
+                id: rectangle_Title
 
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
 
+                height: 50
 
-            ScrollBar.vertical: ScrollBar {
-                id: scrollBar
+                radius: 0
+                color: Qt.color(AppTheme.colors["UFO_ListView_Title_Background"])
 
-                width: 10
-                policy: ScrollBar.AsNeeded
-            }
+                RowLayout {
+                    anchors.fill: parent
 
-            // WheelHandler {
-            //     // Consume the wheel event to stop propagation.
-            //     acceptedDevices: PointerDevice.Mouse
+                    Text {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
 
-            //     property int speed: 2
-            //     property Flickable flickable: parent.parent
+                        Layout.margins: 15
 
-            //     onWheel: (event) => {
-
-            //         let scroll_flick = event.angleDelta.y * speed;
-
-            //         if(flickable.verticalOvershoot != 0.0 ||
-            //           (scroll_flick>0 && (flickable.verticalVelocity<=0)) ||
-            //           (scroll_flick<0 && (flickable.verticalVelocity>=0)))
-            //         {
-            //             flickable.flick(0, (scroll_flick - flickable.verticalVelocity));
-            //             return;
-            //         }
-            //         else
-            //         {
-            //             flickable.cancelFlick();
-            //             return;
-            //         }
-            //     }
-            // }
-
-            delegate: UFO_SearchDelegate {
-                width: listView_SearchResults.width - scrollBar.width - 10
-
-                patientId: model.patient_id
-                header: model.first_name + model.last_name
-                birthYear: model.birth_year
-                phoneNumber: model.phone_number
-                gender: model.gender
-                maritalStatus: model.marital_status
-                servicePrice: model.service_price
-
-
-                onEditClicked: {
-                    // var operationStatus = Database.readyPatientData(model.patient_ID)
-
-
-                    // if(operationStatus !== true) {
-                    //     ufo_StatusBar.displayMessage("Could not make patient ready for editting!");
-
-                    //     return;
-                    // }
-
-                    // root.patientSelectedForEdit()
+                        text: qsTr("Search Results : ") + listView_SearchResults.count
+                        color: Qt.color(AppTheme.colors["UFO_ListView_Title_Text"])
+                    }
                 }
             }
 
-            Connections {
-                target: Database
 
-                function onQueryExecuted(type, success, message) {
-                    if(type !== Database.QueryType.SEARCH) {
-                        return;
+            ListView {
+                id: listView_SearchResults
+
+                anchors.top: rectangle_Title.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+
+                spacing: 2
+                clip: true
+
+                model: ListModel { id: listModel_SearchResults }
+
+                ScrollBar.vertical: ScrollBar {
+                    id: scrollBar
+
+                    width: 10
+                    policy: ScrollBar.AsNeeded
+                }
+
+                delegate: UFO_Delegate_Search {
+                    width: listView_SearchResults.width - scrollBar.width - 10
+
+                    patientId: model.patient_id
+                    header: model.first_name + " " + model.last_name
+                    birthYear: model.birth_year
+                    phoneNumber: model.phone_number
+                    gender: model.gender
+                    maritalStatus: model.marital_status
+                    servicePrice: model.service_price
+
+
+                    onEditClicked: {
+                        // var operationStatus = Database.readyPatientData(model.patient_ID)
+
+
+                        // if(operationStatus !== true) {
+                        //     ufo_StatusBar.displayMessage("Could not make patient ready for editting!");
+
+                        //     return;
+                        // }
+
+                        // root.patientSelectedForEdit()
                     }
+                }
 
-                    if(success === false) {
-                        return;
+                Connections {
+                    target: Database
+
+                    function onQueryExecuted(type, success, message) {
+                        if(type !== Database.QueryType.SEARCH) {
+                            return;
+                        }
+
+                        if(success === false) {
+                            return;
+                        }
+
+                        listModel_SearchResults.clear();
+
+                        Database.getSearchResultList().forEach(function (searchResult) {
+                            listModel_SearchResults.append({
+                                "patient_id": searchResult["patient_id"],
+                                "first_name": searchResult["first_name"],
+                                "last_name": searchResult["last_name"],
+                                "birth_year": searchResult["birth_year"],
+                                "phone_number": searchResult["phone_number"],
+                                "gender": searchResult["gender"],
+                                "marital_status": searchResult["marital_status"],
+                                "service_price": searchResult["service_price"]
+                            });
+                        })
                     }
+                }
 
-                    listModel_SearchResults.clear();
+                Connections {
+                    target: ufo_SideBar_Search
 
-                    Database.getSearchResultList().forEach(function (searchResult) {
-                        listModel_SearchResults.append({
-                            "patient_id": searchResult["patient_id"],
-                            "first_name": searchResult["first_name"],
-                            "last_name": searchResult["last_name"],
-                            "birth_year": searchResult["birth_year"],
-                            "phone_number": searchResult["phone_number"],
-                            "gender": searchResult["gender"],
-                            "marital_status": searchResult["marital_status"],
-                            "service_price": searchResult["service_price"]
-                        });
-                    })
+                    function onClearClicked() {
+                        listModel_SearchResults.clear();
+                    }
                 }
             }
         }
     }
 
-    UFO_SearchSideBar {
+    UFO_SideBar_Search {
+        id: ufo_SideBar_Search
+
         Layout.preferredWidth: 200
         Layout.fillHeight: true
     }

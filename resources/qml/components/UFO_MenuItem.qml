@@ -22,10 +22,8 @@ MenuItem {
 
         text: root.text
         font: root.font
-        opacity: enabled ? 1.0 : 0.3
-        color: root.highlighted ? Qt.color(
-                                      AppTheme.colors["UFO_MenuItem_Text_Highlighted"]) : Qt.color(
-                                      AppTheme.colors["UFO_MenuItem_Text_Normal"])
+        opacity: enabled ? 1.0 : 0.5
+        color: root.highlighted ? Qt.color(AppTheme.colors["UFO_MenuItem_Text_Highlighted"]) : Qt.color(AppTheme.colors["UFO_MenuItem_Text_Normal"])
         elide: Text.ElideRight
     }
 
@@ -34,9 +32,7 @@ MenuItem {
         implicitHeight: 28
 
         radius: 0
-        opacity: enabled ? 1 : 0.3
-        color: root.highlighted ? Qt.color(
-                                      AppTheme.colors["UFO_MenuItem_Background_Highlighted"]) : Qt.color(
-                                      AppTheme.colors["UFO_MenuItem_Background_Normal"])
+        opacity: enabled ? 1 : 0.5
+        color: root.highlighted ? Qt.color(AppTheme.colors["UFO_MenuItem_Background_Highlighted"]) : Qt.color(AppTheme.colors["UFO_MenuItem_Background_Normal"])
     }
 }

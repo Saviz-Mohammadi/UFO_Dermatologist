@@ -9,11 +9,13 @@ CheckBox {
 
     property alias contentText: text_Content.text
 
+    opacity: enabled ? 1.0 : 0.5
+
     indicator: Rectangle {
         anchors.fill: parent
 
         radius: 0
-        color: Qt.color(AppTheme.colors["UFO_SideBar_CheckBox_Background1"])
+        color: Qt.color(AppTheme.colors["UFO_SideBar_CheckBox_Indicator_Main"])
 
         Rectangle {
             width: parent.width / 2
@@ -22,7 +24,7 @@ CheckBox {
             anchors.centerIn: parent
 
             radius: 0
-            color: root.checked ? Qt.color(AppTheme.colors["UFO_SideBar_CheckBox_Background2_Checked"]) : Qt.color(AppTheme.colors["UFO_SideBar_CheckBox_Background2_Normal"])
+            color: root.checked ? Qt.color(AppTheme.colors["UFO_SideBar_CheckBox_Indicator_Filler_Checked"]) : Qt.color(AppTheme.colors["UFO_SideBar_CheckBox_Indicator_Filler_Normal"])
             visible: root.checked
         }
     }
@@ -32,7 +34,6 @@ CheckBox {
 
         text: root.text
         font: root.font
-        opacity: enabled ? 1.0 : 0.3
         color: Qt.color(AppTheme.colors["UFO_SideBar_CheckBox_Text"])
         verticalAlignment: Text.AlignVCenter
         leftPadding: root.indicator.width + root.spacing

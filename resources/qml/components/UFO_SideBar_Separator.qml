@@ -9,5 +9,5 @@ Rectangle {
     implicitWidth: 200
     implicitHeight: 1
 
-    color: Qt.color(AppTheme.colors["UFO_SideBarSeparator"])
+    color: Qt.color(AppTheme.colors["UFO_SideBar_Separator"])
 }

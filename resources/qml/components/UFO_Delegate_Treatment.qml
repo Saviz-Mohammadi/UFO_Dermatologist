@@ -42,7 +42,7 @@ Item {
             }
         }
 
-        UFO_ListDelegateButton {
+        UFO_Delegate_Button {
             Layout.preferredWidth: 120
             Layout.preferredHeight: 35
 

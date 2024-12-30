@@ -5,18 +5,19 @@ import QtQuick.Layouts
 // Custom CPP Registered Types
 import AppTheme 1.0
 
-TabButton {
+Button {
     id: root
 
+    property alias borderRadius: rectangle_Background.radius
     property alias svg: iconImage.source
     property int svgWidth: 24
     property int svgHeight: 24
-    property int borderRadius: 0
 
     implicitWidth: 120
     implicitHeight: 35
 
     opacity: enabled ? 1.0 : 0.5
+    hoverEnabled: enabled ? true : false
 
     contentItem: RowLayout {
 
@@ -30,20 +31,19 @@ TabButton {
             Layout.rightMargin: 5
 
             source: ""
-
             verticalAlignment: Image.AlignVCenter
 
             color: {
                 if (root.checked) {
-                    Qt.color(AppTheme.colors["UFO_SideBarButton_Icon_Checked"])
+                    Qt.color(AppTheme.colors["UFO_SideBar_Button_Icon_Checked"])
                 }
 
                 else if (root.hovered) {
-                    Qt.color(AppTheme.colors["UFO_SideBarButton_Icon_Hovered"])
+                    Qt.color(AppTheme.colors["UFO_SideBar_Button_Icon_Hovered"])
                 }
 
                 else {
-                    Qt.color(AppTheme.colors["UFO_SideBarButton_Icon_Normal"])
+                    Qt.color(AppTheme.colors["UFO_SideBar_Button_Icon_Normal"])
                 }
             }
         }
@@ -61,41 +61,43 @@ TabButton {
 
             color: {
                 if (root.checked) {
-                    Qt.color(AppTheme.colors["UFO_SideBarButton_Text_Checked"])
+                    Qt.color(AppTheme.colors["UFO_SideBar_Button_Text_Checked"])
                 }
 
                 else if (root.hovered) {
-                    Qt.color(AppTheme.colors["UFO_SideBarButton_Text_Hovered"])
+                    Qt.color(AppTheme.colors["UFO_SideBar_Button_Text_Hovered"])
                 }
 
                 else {
-                    Qt.color(AppTheme.colors["UFO_SideBarButton_Text_Normal"])
+                    Qt.color(AppTheme.colors["UFO_SideBar_Button_Text_Normal"])
                 }
             }
         }
 
-        // NOTE (SAVIZ): Item is used to create white space.
         Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
         }
     }
 
-    background: Rectangle {
 
-        radius: borderRadius
+
+    background: Rectangle {
+        id: rectangle_Background
+
+        radius: 0
 
         color: {
             if (root.checked) {
-                Qt.color(AppTheme.colors["UFO_SideBarButton_Background_Checked"])
+                Qt.color(AppTheme.colors["UFO_SideBar_Button_Background_Checked"])
             }
 
             else if (root.hovered) {
-                Qt.color(AppTheme.colors["UFO_SideBarButton_Background_Hovered"])
+                Qt.color(AppTheme.colors["UFO_SideBar_Button_Background_Hovered"])
             }
 
             else {
-                Qt.color(AppTheme.colors["UFO_SideBarButton_Background_Normal"])
+                Qt.color(AppTheme.colors["UFO_SideBar_Button_Background_Normal"])
             }
         }
     }

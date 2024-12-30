@@ -8,18 +8,19 @@ import AppTheme 1.0
 Item {
     id: root
 
-    property alias text: text_1.text
+    property alias borderRadius: rectangle_Background.radius
+    property alias text: text_DisplayMessage.text
     property real textLeftMargin: 7
 
     function displayMessage(message, duration) {
-        text_1.text = qsTr(message)
+        text_DisplayMessage.text = qsTr(message)
 
         if(duration === undefined) {
             return
         }
 
         timer.interval = duration
-        timer.start()
+        timer.restart()
     }
 
     implicitWidth: 200
@@ -29,19 +30,20 @@ Item {
         id: timer
 
         onTriggered: {
-            text_1.text = qsTr("")
+            text_DisplayMessage.text = qsTr("")
         }
     }
 
     Rectangle {
-        id: rectangle_1
+        id: rectangle_Background
 
         anchors.fill: parent
 
+        radius: 0
         color: Qt.color(AppTheme.colors["UFO_StatusBar_Background"])
 
         Text {
-            id: text_1
+            id: text_DisplayMessage
 
             anchors.fill: parent
             anchors.leftMargin: textLeftMargin

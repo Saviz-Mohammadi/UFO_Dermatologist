@@ -77,8 +77,8 @@ Item {
         implicitWidth: root.implicitWidth
         implicitHeight: columnLayout.implicitHeight
 
-        color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Background"])
         radius: 0
+        color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Background"])
 
         ColumnLayout {
             id: columnLayout

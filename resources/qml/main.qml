@@ -149,7 +149,7 @@ ApplicationWindow {
     UFO_SplitView {
         anchors.fill: parent
 
-        UFO_SideBar {
+        UFO_SideBar_Main {
             id: ufo_SideBar_Main
 
             // NOTE (SAVIZ): Initial startup width for the main SideBar.

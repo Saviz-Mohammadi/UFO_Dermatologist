@@ -22,9 +22,9 @@ Item {
 
         anchors.centerIn: parent
 
+        radius: 0
         visible: false
         border.color: "transparent"
-        radius: 0
 
         Rectangle {
             id: rectangle_2
@@ -33,10 +33,9 @@ Item {
             height: 8
             anchors.centerIn: parent
 
-            visible: false
-            color: Qt.color(
-                       AppTheme.colors["UFO_MenuItemIndicator_Background_Checked"])
             radius: 0
+            visible: false
+            color: Qt.color(AppTheme.colors["UFO_MenuItemIndicator_Background_Checked"])
         }
     }
 }

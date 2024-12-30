@@ -12,6 +12,11 @@ import Database 1.0
 Item {
     id: root
 
+    signal clearClicked
+
+    implicitWidth: 200
+    implicitHeight: 500
+
     Rectangle {
         anchors.fill: parent
 
@@ -44,7 +49,7 @@ Item {
                     clip: true
                     spacing: 5
 
-                    UFO_SideBarTextField {
+                    UFO_SideBar_TextField {
                         id: textField_PatientID
 
                         Layout.fillWidth: true
@@ -58,7 +63,7 @@ Item {
                         }
                     }
 
-                    UFO_SideBarTextField {
+                    UFO_SideBar_TextField {
                         id: textField_PhoneNumber
 
                         Layout.fillWidth: true
@@ -72,7 +77,17 @@ Item {
                         }
                     }
 
-                    UFO_SideBarTextField {
+                    UFO_SideBar_Separator {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 1
+
+                        Layout.topMargin: 15
+                        Layout.leftMargin: 4
+                        Layout.rightMargin: 4
+                        Layout.bottomMargin: 15
+                    }
+
+                    UFO_SideBar_TextField {
                         id: textField_FirstName
 
                         Layout.fillWidth: true
@@ -86,7 +101,7 @@ Item {
                         }
                     }
 
-                    UFO_SideBarTextField {
+                    UFO_SideBar_TextField {
                         id: textField_LastName
 
                         Layout.fillWidth: true
@@ -98,6 +113,16 @@ Item {
                         validator: RegularExpressionValidator {
                             regularExpression: /^[A-Za-z]+$/
                         }
+                    }
+
+                    UFO_SideBar_Separator {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 1
+
+                        Layout.topMargin: 15
+                        Layout.leftMargin: 4
+                        Layout.rightMargin: 4
+                        Layout.bottomMargin: 15
                     }
 
                     RowLayout {
@@ -115,7 +140,7 @@ Item {
                             checked: false
                         }
 
-                        UFO_SideBarTextField {
+                        UFO_SideBar_TextField {
                             id: textField_BirthYearStart
 
                             Layout.fillWidth: true
@@ -145,7 +170,7 @@ Item {
                             checked: false
                         }
 
-                        UFO_SideBarTextField {
+                        UFO_SideBar_TextField {
                             id: textField_BirthYearEnd
 
                             Layout.fillWidth: true
@@ -158,6 +183,16 @@ Item {
                                 regularExpression: /^[0-9]*$/
                             }
                         }
+                    }
+
+                    UFO_SideBar_Separator {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 1
+
+                        Layout.topMargin: 15
+                        Layout.leftMargin: 4
+                        Layout.rightMargin: 4
+                        Layout.bottomMargin: 15
                     }
 
                     RowLayout {
@@ -173,7 +208,6 @@ Item {
 
                             enabled: (Database.connectionStatus === true) ? true : false
                             checked: false
-                            text: qsTr("Enable Gender")
                         }
 
                         UFO_SideBar_ComboBox {
@@ -200,7 +234,6 @@ Item {
 
                             enabled: (Database.connectionStatus === true) ? true : false
                             checked: false
-                            text: qsTr("Enable Marital Status")
                         }
 
                         UFO_SideBar_ComboBox {
@@ -216,9 +249,17 @@ Item {
                 }
             }
 
-            UFO_SearchSideBarButton {
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 35
+            UFO_SideBar_Separator {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 1
+
+                Layout.leftMargin: 4
+                Layout.rightMargin: 4
+            }
+
+            UFO_SideBar_Button {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
 
                 enabled: (Database.connectionStatus === true) ? true : false
                 text: qsTr("Clear")
@@ -241,12 +282,14 @@ Item {
 
                     comboBox_Gender.currentIndex = 0;
                     comboBox_MaritalStatus.currentIndex = 0;
+
+                    root.clearClicked();
                 }
             }
 
-            UFO_SearchSideBarButton {
+            UFO_SideBar_Button {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 35
+                Layout.preferredHeight: 40
 
                 enabled: (Database.connectionStatus === true) ? true : false
                 text: qsTr("First 10")
@@ -257,9 +300,9 @@ Item {
                 }
             }
 
-            UFO_SearchSideBarButton {
+            UFO_SideBar_Button {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 35
+                Layout.preferredHeight: 40
 
                 enabled: (Database.connectionStatus === true) ? true : false
                 text: qsTr("Last 10")
@@ -270,9 +313,9 @@ Item {
                 }
             }
 
-            UFO_SearchSideBarButton {
+            UFO_SideBar_Button {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 35
+                Layout.preferredHeight: 40
 
                 enabled: (Database.connectionStatus === true) ? true : false
                 text: qsTr("Search")

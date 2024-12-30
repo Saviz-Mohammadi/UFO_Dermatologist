@@ -15,10 +15,7 @@ Canvas {
 
     onPaint: {
         var ctx = getContext("2d")
-        ctx.fillStyle
-                = parent.highlighted ? Qt.color(
-                                           AppTheme.colors["UFO_MenuItemArrow_Background_Highlighted"]) : Qt.color(
-                                           AppTheme.colors["UFO_MenuItemArrow_Background_Normal"])
+        ctx.fillStyle = parent.highlighted ? Qt.color(AppTheme.colors["UFO_MenuItemArrow_Background_Highlighted"]) : Qt.color(AppTheme.colors["UFO_MenuItemArrow_Background_Normal"])
         ctx.moveTo(15, 15)
         ctx.lineTo(width - 15, height / 2)
         ctx.lineTo(15, height - 15)

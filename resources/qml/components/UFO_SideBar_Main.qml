@@ -15,19 +15,19 @@ Item {
         // TODO (SAVIZ): I like to replace these with an enum, but currently I don't know how in QML.
         switch (targetButton) {
             case "Search Page":
-                ufo_SidBarButton_Search.checked = true
+                ufo_SideBar_TabButton_Search.checked = true
                 break
             case "Edit Page":
-                ufo_SidBarButton_Edit.checked = true
+                ufo_SideBar_TabButton_Edit.checked = true
                 break
             case "Create Page":
-                ufo_SidBarButton_Create.checked = true
+                ufo_SideBar_TabButton_Create.checked = true
                 break
             case "Settings Page":
-                ufo_SidBarButton_Settings.checked = true
+                ufo_SideBar_TabButton_Settings.checked = true
                 break
             case "About Page":
-                ufo_SidBarButton_About.checked = true
+                ufo_SideBar_TabButton_About.checked = true
                 break
             default:
                 console.log("No valid value");
@@ -68,8 +68,8 @@ Item {
                     clip: true
                     spacing: 10
 
-                    UFO_SideBarButton {
-                        id: ufo_SidBarButton_Search
+                    UFO_SideBar_TabButton {
+                        id: ufo_SideBar_TabButton_Search
 
                         Layout.fillWidth: true
                         Layout.preferredHeight: 40
@@ -91,8 +91,8 @@ Item {
                         }
                     }
 
-                    UFO_SideBarButton {
-                        id: ufo_SidBarButton_Edit
+                    UFO_SideBar_TabButton {
+                        id: ufo_SideBar_TabButton_Edit
 
                         Layout.fillWidth: true
                         Layout.preferredHeight: 40
@@ -114,8 +114,8 @@ Item {
                         }
                     }
 
-                    UFO_SideBarButton {
-                        id: ufo_SidBarButton_Create
+                    UFO_SideBar_TabButton {
+                        id: ufo_SideBar_TabButton_Create
 
                         Layout.fillWidth: true
                         Layout.preferredHeight: 40
@@ -147,7 +147,7 @@ Item {
                 Layout.fillHeight: true
             }
 
-            UFO_SideBarSeparator {
+            UFO_SideBar_Separator {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 1
 
@@ -155,8 +155,8 @@ Item {
                 Layout.rightMargin: 4
             }
 
-            UFO_SideBarButton {
-                id: ufo_SidBarButton_Settings
+            UFO_SideBar_TabButton {
+                id: ufo_SideBar_TabButton_Settings
 
                 Layout.fillWidth: true
                 Layout.preferredHeight: 40
@@ -179,8 +179,8 @@ Item {
                 }
             }
 
-            UFO_SideBarButton {
-                id: ufo_SidBarButton_About
+            UFO_SideBar_TabButton {
+                id: ufo_SideBar_TabButton_About
 
                 Layout.fillWidth: true
                 Layout.preferredHeight: 40
