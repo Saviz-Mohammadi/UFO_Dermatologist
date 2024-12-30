@@ -5,7 +5,7 @@ import QtQuick.Layouts
 // Custom CPP Registered Types
 import AppTheme 1.0
 
-TabButton {
+Button {
     id: root
 
     property alias svg: iconImage.source
@@ -17,6 +17,7 @@ TabButton {
     implicitHeight: 35
 
     opacity: enabled ? 1.0 : 0.5
+    hoverEnabled: enabled ? true : false
 
     contentItem: RowLayout {
 
@@ -30,20 +31,19 @@ TabButton {
             Layout.rightMargin: 5
 
             source: ""
-
             verticalAlignment: Image.AlignVCenter
 
             color: {
                 if (root.checked) {
-                    Qt.color(AppTheme.colors["UFO_SideBarButton_Icon_Checked"])
+                    Qt.color(AppTheme.colors["UFO_SearchSideBarButton_Icon_Checked"])
                 }
 
                 else if (root.hovered) {
-                    Qt.color(AppTheme.colors["UFO_SideBarButton_Icon_Hovered"])
+                    Qt.color(AppTheme.colors["UFO_SearchSideBarButton_Icon_Hovered"])
                 }
 
                 else {
-                    Qt.color(AppTheme.colors["UFO_SideBarButton_Icon_Normal"])
+                    Qt.color(AppTheme.colors["UFO_SearchSideBarButton_Icon_Normal"])
                 }
             }
         }
@@ -61,15 +61,15 @@ TabButton {
 
             color: {
                 if (root.checked) {
-                    Qt.color(AppTheme.colors["UFO_SideBarButton_Text_Checked"])
+                    Qt.color(AppTheme.colors["UFO_SearchSideBarButton_Text_Checked"])
                 }
 
                 else if (root.hovered) {
-                    Qt.color(AppTheme.colors["UFO_SideBarButton_Text_Hovered"])
+                    Qt.color(AppTheme.colors["UFO_SearchSideBarButton_Text_Hovered"])
                 }
 
                 else {
-                    Qt.color(AppTheme.colors["UFO_SideBarButton_Text_Normal"])
+                    Qt.color(AppTheme.colors["UFO_SearchSideBarButton_Text_Normal"])
                 }
             }
         }
@@ -81,21 +81,22 @@ TabButton {
         }
     }
 
-    background: Rectangle {
 
+
+    background: Rectangle {
         radius: borderRadius
 
         color: {
             if (root.checked) {
-                Qt.color(AppTheme.colors["UFO_SideBarButton_Background_Checked"])
+                Qt.color(AppTheme.colors["UFO_SearchSideBarButton_Background_Checked"])
             }
 
             else if (root.hovered) {
-                Qt.color(AppTheme.colors["UFO_SideBarButton_Background_Hovered"])
+                Qt.color(AppTheme.colors["UFO_SearchSideBarButton_Background_Hovered"])
             }
 
             else {
-                Qt.color(AppTheme.colors["UFO_SideBarButton_Background_Normal"])
+                Qt.color(AppTheme.colors["UFO_SearchSideBarButton_Background_Normal"])
             }
         }
     }

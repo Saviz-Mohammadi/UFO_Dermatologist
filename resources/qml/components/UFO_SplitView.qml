@@ -6,11 +6,13 @@ import QtQuick.Layouts
 import AppTheme 1.0
 
 SplitView {
-    anchors.fill: parent
+    id: splitView
 
     handle: Rectangle {
-        implicitWidth: 4
-        implicitHeight: 4
+        id: rectangle_Handle
+
+        implicitWidth: 6
+        implicitHeight: 6
 
         color: SplitHandle.pressed ? Qt.color(AppTheme.colors["UFO_SplitView_Handle_Pressed"]) : (SplitHandle.hovered ? Qt.color(AppTheme.colors["UFO_SplitView_Handle_Hovered"]) : Qt.color(AppTheme.colors["UFO_SplitView_Handle_Normal"]))
     }

@@ -15,7 +15,7 @@ UFO_Page {
     signal searchMatchedNewPatient
 
     title: qsTr("Create Patient")
-    contentSpacing: 20
+    contentSpacing: 25
 
     // Personal Information
     UFO_GroupBox {

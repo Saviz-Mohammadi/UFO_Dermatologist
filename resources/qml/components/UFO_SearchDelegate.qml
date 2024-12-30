@@ -20,25 +20,32 @@ Item {
     signal editClicked
 
     implicitWidth: 200
-    implicitHeight: columnLayout_Content.implicitHeight
+    implicitHeight: 150
 
-    ColumnLayout {
-        id: columnLayout_Content
-
+    Rectangle {
         anchors.fill: parent
 
-        RowLayout {
-            id: rowLayout_Header
+        color: 'white'
+        radius: 0
 
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+        GridLayout {
+            id: gridLayout_Content
+
+            anchors.fill: parent
+
+            columns: 4
+            rows: 3
+
+            columnSpacing: 7
+            rowSpacing: 7
 
             IconImage {
                 Layout.preferredWidth: 32
                 Layout.preferredHeight: 32
 
-                Layout.leftMargin: 10
-                Layout.rightMargin: 10
+                Layout.column: 0
+                Layout.row: 0
+                Layout.rowSpan: 2
 
                 sourceSize.width: 32
                 sourceSize.height: 32
@@ -55,32 +62,45 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
+                Layout.column: 1
+                Layout.row: 0
+                Layout.columnSpan: 2
+
                 elide: Text.ElideRight
                 wrapMode: Text.NoWrap
 
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
 
-                font.pixelSize: Qt.application.font.pixelSize * 1
+                font.pixelSize: Qt.application.font.pixelSize * 1.10
                 color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
             }
 
-            Item {
-                Layout.fillWidth: true
+            UFO_ListDelegateButton {
+                Layout.preferredWidth: 120
+                Layout.preferredHeight: 35
+
+                Layout.column: 3
+                Layout.row: 0
+
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                text: qsTr("Edit")
+                svg: "./../../icons/Google icons/person_edit.svg"
+
+                onClicked: {
+                    root.editClicked()
+                }
             }
-        }
-
-        RowLayout {
-            id: rowLayout_content1
-
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            spacing: 1
 
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
+
+                Layout.column: 1
+                Layout.row: 1
 
                 color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
 
@@ -88,7 +108,6 @@ Item {
                     id: text_ID
 
                     anchors.fill: parent
-                    anchors.leftMargin: 10
 
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignVCenter
@@ -102,6 +121,9 @@ Item {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
+
+                Layout.column: 2
+                Layout.row: 1
 
                 color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
 
@@ -109,7 +131,6 @@ Item {
                     id: text_BirthYear
 
                     anchors.fill: parent
-                    anchors.leftMargin: 10
 
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignVCenter
@@ -123,6 +144,9 @@ Item {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
+
+                Layout.column: 3
+                Layout.row: 1
 
                 color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
 
@@ -140,15 +164,13 @@ Item {
                     elide: Text.ElideRight
                 }
             }
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
 
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
+
+                Layout.column: 1
+                Layout.row: 2
 
                 color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
 
@@ -171,6 +193,9 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
+                Layout.column: 2
+                Layout.row: 2
+
                 color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
 
                 Text {
@@ -192,6 +217,9 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
+                Layout.column: 3
+                Layout.row: 2
+
                 color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
 
                 Text {
@@ -206,31 +234,6 @@ Item {
                     color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
                     font.pixelSize: Qt.application.font.pixelSize * 1
                     elide: Text.ElideRight
-                }
-            }
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            Item {
-                Layout.fillWidth: true
-            }
-
-            UFO_ListDelegateButton {
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 35
-
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                text: qsTr("Edit")
-                svg: "./../../icons/Google icons/person_edit.svg"
-
-                onClicked: {
-                    root.editClicked()
                 }
             }
         }

@@ -106,6 +106,11 @@ void Database::establishConnection(const QString &ipAddress, qint16 port, const 
 
 
 
+        // Notify QML:
+        setConnectionStatus(true, "Connection exists. Aborting operation.");
+
+
+
         return;
     }
 
@@ -163,13 +168,14 @@ void Database::establishConnection(const QString &ipAddress, qint16 port, const 
 #endif
 
 
-    // Notify QML:
-    setConnectionStatus(true, "Successfully connected to the database.");
-
-
 
     // Populate lists:
     //populateTreatmentList();
+
+
+
+    // Notify QML:
+    setConnectionStatus(true, "Successfully connected to the database.");
 }
 
 void Database::disconnect()
@@ -188,7 +194,7 @@ void Database::disconnect()
     setConnectionStatus(false, "Disconnected from database.");
 }
 
-// CREATE
+// INSERT
 bool Database::createPatient(const QString &first_name, const QString &last_name, quint8 age, const QString &phone_number, const QString &gender, const QString &marital_status)
 {
 #ifdef QT_DEBUG
@@ -271,7 +277,7 @@ logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
 bool Database::findPatient(const quint64 patientID)
 {
     QString queryString = "SELECT * FROM patients WHERE patient_id = :patiend_id";
-    QSqlQuery query;
+    QSqlQuery query(m_QSqlDatabase);
 
 
 
@@ -305,12 +311,8 @@ bool Database::findPatient(const quint64 patientID)
 
 
 
-        //m_LatestMessage = query.lastError().text();
-
-
-
-        // Notify QML:.
-        emit searchResultListChanged();
+        // Notify QML:
+        emit queryExecuted(QueryType::SEARCH, false, query.lastError().text());
 
 
 
@@ -329,8 +331,8 @@ bool Database::findPatient(const quint64 patientID)
 
 
 
-        // Notify QML:.
-        emit searchResultListChanged();
+        // Notify QML:
+        emit queryExecuted(QueryType::SEARCH, false, "Query returned no results.");
 
 
 
@@ -370,8 +372,8 @@ bool Database::findPatient(const quint64 patientID)
 
 
 
-    // Notify QML:.
-    emit searchResultListChanged();
+    // Notify QML:
+    emit queryExecuted(QueryType::SEARCH, true, "Search query executed successfully.");
 
 
 
@@ -380,8 +382,8 @@ bool Database::findPatient(const quint64 patientID)
 
 bool Database::findPatient(const QString &firstName, const QString &lastName, quint32 birthYearStart, quint32 birthYearEnd, const QString &phoneNumber, const QString &gender, const QString &maritalStatus)
 {
-    QSqlQuery query(m_QSqlDatabase);
     QString queryString = "SELECT * FROM patients WHERE 1 = 1";
+    QSqlQuery query(m_QSqlDatabase);
 
 
 
@@ -505,7 +507,6 @@ bool Database::findPatient(const QString &firstName, const QString &lastName, qu
 
 
 
-
     if (!query.exec())
     {
 #ifdef QT_DEBUG
@@ -524,13 +525,8 @@ bool Database::findPatient(const QString &firstName, const QString &lastName, qu
 
 
 
-        //m_LatestMessage = query.lastError().text();
-
-
-
         // Notify QML:
         emit queryExecuted(QueryType::SEARCH, false, query.lastError().text());
-        emit searchResultListChanged();
 
 
 
@@ -558,7 +554,7 @@ bool Database::findPatient(const QString &firstName, const QString &lastName, qu
 
 
         // Notify QML:
-        emit searchResultListChanged();
+        emit queryExecuted(QueryType::SEARCH, false, "Query returned no results.");
 
 
 
@@ -605,8 +601,7 @@ bool Database::findPatient(const QString &firstName, const QString &lastName, qu
 
 
     // Notify QML:
-    emit queryExecuted(QueryType::SEARCH, true, "Success");
-    emit searchResultListChanged();
+    emit queryExecuted(QueryType::SEARCH, true, "Search query executed successfully.");
 
 
 
@@ -616,7 +611,7 @@ bool Database::findPatient(const QString &firstName, const QString &lastName, qu
 bool Database::findFirstXPatients(const quint64 count)
 {
     QString queryString = "SELECT * FROM patients ORDER BY patient_id ASC LIMIT :count";
-    QSqlQuery query;
+    QSqlQuery query(m_QSqlDatabase);
 
 
 
@@ -650,8 +645,8 @@ bool Database::findFirstXPatients(const quint64 count)
 
 
 
-        // Notify QML:.
-        emit searchResultListChanged();
+        // Notify QML:
+        emit queryExecuted(QueryType::SEARCH, false, query.lastError().text());
 
 
 
@@ -670,8 +665,8 @@ bool Database::findFirstXPatients(const quint64 count)
 
 
 
-        // Notify QML:.
-        emit searchResultListChanged();
+        // Notify QML:
+        emit queryExecuted(QueryType::SEARCH, false, "Query returned no results.");
 
 
 
@@ -711,8 +706,8 @@ bool Database::findFirstXPatients(const quint64 count)
 
 
 
-    // Notify QML:.
-    emit searchResultListChanged();
+    // Notify QML:
+    emit queryExecuted(QueryType::SEARCH, true, "Search query executed successfully.");
 
 
 
@@ -722,7 +717,7 @@ bool Database::findFirstXPatients(const quint64 count)
 bool Database::findLastXPatients(const quint64 count)
 {
     QString queryString = "SELECT * FROM patients ORDER BY patient_id DESC LIMIT :count";
-    QSqlQuery query;
+    QSqlQuery query(m_QSqlDatabase);
 
 
 
@@ -756,8 +751,8 @@ bool Database::findLastXPatients(const quint64 count)
 
 
 
-        // Notify QML:.
-        emit searchResultListChanged();
+        // Notify QML:
+        emit queryExecuted(QueryType::SEARCH, false, query.lastError().text());
 
 
 
@@ -776,8 +771,8 @@ bool Database::findLastXPatients(const quint64 count)
 
 
 
-        // Notify QML:.
-        emit searchResultListChanged();
+        // Notify QML:
+        emit queryExecuted(QueryType::SEARCH, false, "Query returned no results.");
 
 
 
@@ -817,15 +812,13 @@ bool Database::findLastXPatients(const quint64 count)
 
 
 
-    // Notify QML:.
-    emit searchResultListChanged();
+    // Notify QML:
+    emit queryExecuted(QueryType::SEARCH, true, "Search query executed successfully.");
 
 
 
     return (true);
 }
-
-
 
 // UPDATE
 bool Database::updatePersonalInformation(const QString &newFirstName, const QString &newLastName, quint8 newAge, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus)

@@ -127,5 +127,55 @@
     "UFO_CheckBox_Background1": "Color_Light_8",
     "UFO_CheckBox_Background2_Normal": "Color_Light_8",
     "UFO_CheckBox_Background2_Checked": "Color_Blue_3",
-    "UFO_CheckBox_Text": "Color_Dark_4"
+    "UFO_CheckBox_Text": "Color_Dark_4",
+
+    "UFO_SideBar_TextField_Background_Normal": "Color_Dark_2",
+    "UFO_SideBar_TextField_Background_Hovered": "Color_Dark_2",
+    "UFO_TextField_Background_Active": "Color_Blue_3",
+
+    "UFO_SideBar_TextField_Border": "Color_Dark_2",
+
+    "UFO_SideBar_TextField_Text_Normal": "Color_Light_3",
+    "UFO_SideBar_TextField_Text_Hovered": "Color_Light_3",
+    "UFO_SideBar_TextField_Text_Active": "Color_Dark_4",
+
+    "UFO_SideBar_TextField_SelectedText": "Color_Light_3",
+
+    "UFO_SideBar_TextField_Placeholder_Normal": "Color_Light_3",
+    "UFO_SideBar_TextField_Placeholder_Hovered": "Color_Light_3",
+    "UFO_SideBar_TextField_Placeholder_Active": "Color_Dark_4",
+
+    "UFO_SideBar_ComboBox_Text_Normal": "Color_Light_3",
+    "UFO_SideBar_ComboBox_Text_Pressed": "Color_Light_3",
+    "UFO_SideBar_ComboBox_Background": "Color_Dark_4",
+    "UFO_SideBar_ComboBox_Border_Normal": "Color_Dark_4",
+    "UFO_SideBar_ComboBox_Border_Pressed": "Color_Dark_4",
+
+    "UFO_SideBar_ComboBox_Item_Text_Normal": "Color_Light_3",
+    "UFO_SideBar_ComboBox_Item_Text_Highlighted": "Color_Dark_4",
+    "UFO_SideBar_ComboBox_Item_Background_Normal": "Color_Dark_4",
+    "UFO_SideBar_ComboBox_Item_Background_Highlighted": "Color_Blue_3",
+
+    "UFO_SideBar_ComboBox_Arrow_Background_Normal": "Color_Light_3",
+    "UFO_SideBar_ComboBox_Arrow_Background_Pressed": "Color_Light_3",
+
+    "UFO_SideBar_ComboBox_DropBox_Border": "Color_Dark_3",
+    "UFO_SideBar_ComboBox_Popup_Background": "Color_Dark_3",
+
+    "UFO_SideBar_CheckBox_Background1": "Color_Dark_4",
+    "UFO_SideBar_CheckBox_Background2_Normal": "Color_Dark_4",
+    "UFO_SideBar_CheckBox_Background2_Checked": "Color_Blue_3",
+    "UFO_SideBar_CheckBox_Text": "Color_Light_8",
+
+    "UFO_SearchSideBarButton_Icon_Checked": "Color_Dark_4",
+    "UFO_SearchSideBarButton_Icon_Hovered": "Color_Light_4",
+    "UFO_SearchSideBarButton_Icon_Normal": "Color_Light_2",
+
+    "UFO_SearchSideBarButton_Text_Checked": "Color_Dark_4",
+    "UFO_SearchSideBarButton_Text_Hovered": "Color_Light_4",
+    "UFO_SearchSideBarButton_Text_Normal": "Color_Light_2",
+
+    "UFO_SearchSideBarButton_Background_Checked": "Color_Blue_3",
+    "UFO_SearchSideBarButton_Background_Hovered": "Color_Dark_3",
+    "UFO_SearchSideBarButton_Background_Normal": "Color_Dark_2"
 }
