@@ -13,7 +13,7 @@ UFO_Page {
     id: root
 
     title: qsTr("Edit Patient")
-    contentSpacing: 20
+    contentSpacing: 25
 
     property bool patientSelected: false
 

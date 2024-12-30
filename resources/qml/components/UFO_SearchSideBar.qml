@@ -51,7 +51,7 @@ Item {
                         Layout.preferredHeight: 35
 
                         enabled: (Database.connectionStatus === true) ? true : false
-                        placeholderText: qsTr("Patient ID (e.g. 277)")
+                        placeholderText: qsTr("Patient ID (e.g., 277)")
 
                         validator: RegularExpressionValidator {
                             regularExpression: /^[0-9]*$/
@@ -65,7 +65,7 @@ Item {
                         Layout.preferredHeight: 35
 
                         enabled: (Database.connectionStatus === true) ? true : false
-                        placeholderText: qsTr("Phone number (e.g. +1 (250) 800-1234)")
+                        placeholderText: qsTr("Phone number (e.g., +1 (250) 800-1234)")
 
                         validator: RegularExpressionValidator {
                             regularExpression: /^\+\d{1,3} \(\d{3}\) \d{3}-\d{4}$/
@@ -79,7 +79,7 @@ Item {
                         Layout.preferredHeight: 35
 
                         enabled: (Database.connectionStatus === true) ? true : false
-                        placeholderText: qsTr("First name (e.g. Hank)")
+                        placeholderText: qsTr("First name (e.g., Hank)")
 
                         validator: RegularExpressionValidator {
                             regularExpression: /^[A-Za-z]+$/

@@ -17,7 +17,6 @@ UFO_Page {
     title: qsTr("Create Patient")
     contentSpacing: 25
 
-    // Personal Information
     UFO_GroupBox {
         id: ufo_GroupBox_PersonalInformation
 
@@ -44,14 +43,17 @@ UFO_Page {
             color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
         }
 
-        RowLayout {
+        GridLayout {
             Layout.fillWidth: true
+            Layout.fillHeight: true
 
-            Layout.topMargin: 7
-            Layout.leftMargin: 15
-            Layout.rightMargin: 15
+            Layout.margins: 15
 
-            spacing: 10
+            columns: 2
+            rows: 6
+
+            columnSpacing: 2
+            rowSpacing: 2
 
             UFO_TextField {
                 id: textField_FirstName
@@ -59,9 +61,15 @@ UFO_Page {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
-                enabled: (Database.connectionStatus === true) ? true : false
+                Layout.column: 0
+                Layout.row: 0
 
-                placeholderText: qsTr("First name")
+                enabled: (Database.connectionStatus === true) ? true : false
+                placeholderText: qsTr("First name*")
+
+                validator: RegularExpressionValidator {
+                    regularExpression: /^[A-Za-z]+$/
+                }
 
                 Connections {
                     target: ufo_Button_Clear
@@ -78,9 +86,15 @@ UFO_Page {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
-                enabled: (Database.connectionStatus === true) ? true : false
+                Layout.column: 1
+                Layout.row: 0
 
-                placeholderText: qsTr("Last name")
+                enabled: (Database.connectionStatus === true) ? true : false
+                placeholderText: qsTr("Last name*")
+
+                validator: RegularExpressionValidator {
+                    regularExpression: /^[A-Za-z]+$/
+                }
 
                 Connections {
                     target: ufo_Button_Clear
@@ -91,11 +105,79 @@ UFO_Page {
                 }
             }
 
+            UFO_TextField {
+                id: textField_BirthYear
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+
+                Layout.column: 0
+                Layout.row: 1
+
+                enabled: (Database.connectionStatus === true) ? true : false
+                placeholderText: qsTr("Birth year*")
+
+                validator: RegularExpressionValidator {
+                    regularExpression: /^[0-9]*$/
+                }
+
+                Connections {
+                    target: ufo_Button_Clear
+
+                    function onClearButtonClicked() {
+                        textField_BirthYear.clear();
+                    }
+                }
+            }
+
+            UFO_TextField {
+                id: textField_PhoneNumber
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+
+                Layout.column: 1
+                Layout.row: 1
+
+                enabled: (Database.connectionStatus === true) ? true : false
+                placeholderText: qsTr("Phone Number*")
+
+                validator: RegularExpressionValidator {
+                    regularExpression: /^\+\d{1,3} \(\d{3}\) \d{3}-\d{4}$/
+                }
+
+                Connections {
+                    target: ufo_Button_Clear
+
+                    function onClearButtonClicked() {
+                        textField_PhoneNumber.clear();
+                    }
+                }
+            }
+
+            UFO_SideBar_CheckBox {
+                id: ufo_CheckBox_Gender
+
+                Layout.preferredWidth: 24
+                Layout.preferredHeight: 24
+
+                Layout.topMargin: 25
+
+                Layout.column: 0
+                Layout.row: 2
+
+                enabled: (Database.connectionStatus === true) ? true : false
+                checked: false
+            }
+
             UFO_ComboBox {
                 id: comboBox_Gender
 
-                Layout.preferredWidth: 150
+                Layout.fillWidth: true
                 Layout.preferredHeight: 35
+
+                Layout.column: 0
+                Layout.row: 3
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
@@ -109,69 +191,30 @@ UFO_Page {
                     }
                 }
             }
-        }
 
-        RowLayout {
-            Layout.fillWidth: true
+            UFO_SideBar_CheckBox {
+                id: ufo_CheckBox_MaritalStatus
 
-            Layout.topMargin: 7
-            Layout.bottomMargin: 15
-            Layout.leftMargin: 15
-            Layout.rightMargin: 15
+                Layout.preferredWidth: 24
+                Layout.preferredHeight: 24
 
-            spacing: 10
+                Layout.topMargin: 25
 
-            UFO_TextField {
-                id: textField_Age
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                placeholderText: qsTr("Age")
+                Layout.column: 1
+                Layout.row: 2
 
                 enabled: (Database.connectionStatus === true) ? true : false
-
-                validator: RegularExpressionValidator {
-                    regularExpression: /^((1[0-4][0-9])|([1-9][0-9])|[0-9]|150)$/ // Ranges between (0 – 150)
-                }
-
-                Connections {
-                    target: ufo_Button_Clear
-
-                    function onClearButtonClicked() {
-                        textField_Age.clear();
-                    }
-                }
-            }
-
-            UFO_TextField {
-                id: textField_PhoneNumber
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                placeholderText: qsTr("Phone Number")
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                validator: RegularExpressionValidator {
-                    regularExpression: /^\+\d{1,3} \(\d{3}\) \d{3}-\d{4}$/ // Format: +1 (555) 921-1222 -> [country code] [(Area code)] [Phone number]
-                }
-
-                Connections {
-                    target: ufo_Button_Clear
-
-                    function onClearButtonClicked() {
-                        textField_PhoneNumber.clear();
-                    }
-                }
+                checked: false
             }
 
             UFO_ComboBox {
                 id: comboBox_MaritalStatus
 
-                Layout.preferredWidth: 150
+                Layout.fillWidth: true
                 Layout.preferredHeight: 35
+
+                Layout.column: 1
+                Layout.row: 3
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
@@ -188,7 +231,6 @@ UFO_Page {
         }
     }
 
-    // Create | Clear
     RowLayout {
         Layout.fillWidth: true
         Layout.topMargin: 10

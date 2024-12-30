@@ -195,26 +195,26 @@ void Database::disconnect()
 }
 
 // INSERT
-bool Database::createPatient(const QString &first_name, const QString &last_name, quint8 age, const QString &phone_number, const QString &gender, const QString &marital_status)
+bool Database::createPatient(const QString &firstName, const QString &lastName, quint32 birthYear, const QString &phoneNumber, const QString &gender, const QString &maritalStatus)
 {
+    // NOTE (SAVIZ): The application assumes that 'Creating a patient for the first time' corresponds to their 'First visit.' As a result, certain fields, such as first_visit_date and recent_visit_date, are automatically populated.
+
 #ifdef QT_DEBUG
     QString message("Insert initiated!\n");
 
     QTextStream stream(&message);
 
-    stream << "'first_name'     : " << first_name << "\n";
-    stream << "'laste_name'     : " << last_name << "\n";
-    stream << "'age'            : " << QString::number(age) << "\n";
-    stream << "'phone_number'   : " << phone_number << "\n";
-    stream << "'gender'         : " << gender << "\n";
-    stream << "'marital_status' : " << marital_status << "\n";
+    stream << "first_name     : " << firstName     << "\n";
+    stream << "last_name      : " << lastName      << "\n";
+    stream << "phone_number   : " << phoneNumber   << "\n";
+    stream << "gender         : " << gender        << "\n";
+    stream << "marital_status : " << maritalStatus << "\n";
 #endif
 
 
 
-    // NOTE (SAVIZ): Given the current configuration of the database and application, it is guaranteed that all values will always be provided. As a result, additional checks are unnecessary.
-    QString queryString = "INSERT INTO patients (first_name, last_name, age, birth_date, phone_number, gender, marital_status) VALUES (:first_name, :last_name, :age, :birth_date, :phone_number, :gender, :marital_status);";
-    QSqlQuery query;
+    QString queryString = "INSERT IGNORE INTO patients (first_name, last_name, birth_year, phone_number, gender, marital_status, first_visit_date, recent_visit_date) VALUES (:first_name, :last_name, :birth_year, :phone_number, :gender, :marital_status, :first_visit_date, :recent_visit_date);";
+    QSqlQuery query(m_QSqlDatabase);
 
 
 
@@ -222,37 +222,50 @@ bool Database::createPatient(const QString &first_name, const QString &last_name
 
 
 
-    query.bindValue(":first_name", first_name);
-    query.bindValue(":last_name", last_name);
-    query.bindValue(":age", age);
-    query.bindValue(":birth_date", QDate::currentDate()); // TODO (SAVIZ): Replace this with actual birth_date. (You can use QDate::fromString(string, "dd-mm-yyyy"))
-    query.bindValue(":phone_number", phone_number);
-    query.bindValue(":gender", gender);
-    query.bindValue(":marital_status", marital_status);
+    // First bind required fields:
+    query.bindValue(":first_name", firstName);
+    query.bindValue(":last_name", lastName);
+    query.bindValue(":birth_year", birthYear);
+    query.bindValue(":phone_number", phoneNumber);
+
+    // Now bind automatic fields:
+    query.bindValue(":first_visit_date", QDate::currentDate());
+    query.bindValue(":recent_visit_date", QDate::currentDate());
+
+
+    // Last but not least, bind non-required fields:
+    if(!gender.isEmpty())
+    {
+        query.bindValue(":gender", gender);
+    }
+
+    else
+    {
+        query.bindValue(":gender", QVariant()); // Using a null 'QVariant' to instruct the database to create default value.
+    }
+
+    if(!gender.isEmpty())
+    {
+        query.bindValue(":marital_status", maritalStatus);
+    }
+
+    else
+    {
+        query.bindValue(":marital_status", QVariant()); // Using a null 'QVariant' to instruct the database to create default value.
+    }
 
 
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
-
-
-        // NOTE (SAVIZ): Sometimes, the values will not be binded until after 'query.exec()' call. For this reason I decided to print the information here:
-        message.clear();
-
-        const QVariantList values = query.boundValues();
-
-        for (std::size_t index = 0; index < values.size(); ++index)
-        {
-            stream << index << " : " << values.at(index).toString();
-        }
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text() + "\n" + message);
 #endif
 
 
-        emit patientInsertionFailed();
+
+        emit queryExecuted(QueryType::CREATE, false, query.lastError().text());
+
 
 
         return (false);
@@ -260,14 +273,33 @@ bool Database::createPatient(const QString &first_name, const QString &last_name
 
 
 
-    // Notify QML:
-    emit patientInsertionSuccessful();
+    if (query.numRowsAffected() == 0)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "The record already exists and was not inserted.\n" + message);
+#endif
+
+
+
+        // Notify QML:
+        emit queryExecuted(QueryType::CREATE, false, "The record already exists and was not inserted.");
+
+
+
+        return(false);
+    }
+
 
 
 #ifdef QT_DEBUG
-
-logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
 #endif
+
+
+
+    // Notify QML:
+    emit queryExecuted(QueryType::CREATE, true, "The patient record was inserted successfully.");
+
 
 
     return (true);

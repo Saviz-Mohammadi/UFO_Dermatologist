@@ -57,9 +57,6 @@ private:
 signals:
     void connectionStatusChanged(const QString &message);
     void queryExecuted(QueryType type, bool success, const QString &message);
-    void patientInsertionSuccessful();
-    void patientInsertionFailed();
-    void searchResultListChanged();
     void patientDataChanged();
     void updatesApplied();
     void treatmentsPopulated();
@@ -71,11 +68,11 @@ public:
     Q_INVOKABLE void disconnect();
 
     // INSERT
-    Q_INVOKABLE bool createPatient(const QString &first_name, const QString &last_name, quint8 age, const QString &phone_number, const QString &gender, const QString &marital_status);
+    Q_INVOKABLE bool createPatient(const QString &firstName, const QString &lastName, quint32 birthYear, const QString &phoneNumber, const QString &gender, const QString &maritalStatus);
 
     // SEARCH
-    Q_INVOKABLE bool findPatient(const quint64 patient_id);
-    Q_INVOKABLE bool findPatient(const QString &first_name, const QString &last_name, quint32 birth_year_start, quint32 birth_year_end, const QString &phone_number, const QString &gender, const QString &marital_status);
+    Q_INVOKABLE bool findPatient(const quint64 patientID);
+    Q_INVOKABLE bool findPatient(const QString &firstName, const QString &lastName, quint32 birthYearStart, quint32 birthYearEnd, const QString &phoneNumber, const QString &gender, const QString &maritalStatus);
     Q_INVOKABLE bool findFirstXPatients(const quint64 count);
     Q_INVOKABLE bool findLastXPatients(const quint64 count);
 
