@@ -78,7 +78,7 @@ UFO_SplitView {
                 }
 
                 delegate: UFO_Delegate_Search {
-                    width: listView_SearchResults.width - scrollBar.width - 10
+                    width: listView_SearchResults.width - scrollBar.width / 2
 
                     patientId: model.patient_id
                     header: model.first_name + " " + model.last_name

@@ -20,7 +20,7 @@ Item {
     signal editClicked
 
     implicitWidth: 200
-    implicitHeight: 175
+    implicitHeight: 250
 
     Rectangle {
         anchors.fill: parent
@@ -38,10 +38,10 @@ Item {
             RowLayout {
                 Layout.fillWidth: true
 
-                Layout.leftMargin: 10
-                Layout.rightMargin: 10
+                Layout.leftMargin: 15
+                Layout.rightMargin: 15
 
-                spacing: 7
+                spacing: 15
 
                 IconImage {
                     Layout.preferredWidth: 64
@@ -89,15 +89,35 @@ Item {
                 }
             }
 
-            RowLayout {
+            GridLayout {
                 Layout.fillWidth: true
+                Layout.fillHeight: true
 
-                Layout.leftMargin: 10
-                Layout.rightMargin: 10
+                Layout.bottomMargin: 15
+                Layout.leftMargin: 15
+                Layout.rightMargin: 15
+
+                columns: 3
+                rows: 4
+
+                Text {
+                    Layout.column: 0
+                    Layout.row: 0
+
+                    text: qsTr("Patient ID")
+
+                    horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignBottom
+
+                    color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
+                }
 
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 35
+
+                    Layout.column: 0
+                    Layout.row: 1
 
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Background"])
 
@@ -116,9 +136,24 @@ Item {
                     }
                 }
 
+                Text {
+                    Layout.column: 1
+                    Layout.row: 0
+
+                    text: qsTr("Birth year")
+
+                    horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignBottom
+
+                    color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
+                }
+
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 35
+
+                    Layout.column: 1
+                    Layout.row: 1
 
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Background"])
 
@@ -137,9 +172,24 @@ Item {
                     }
                 }
 
+                Text {
+                    Layout.column: 2
+                    Layout.row: 0
+
+                    text: qsTr("Phone number")
+
+                    horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignBottom
+
+                    color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
+                }
+
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 35
+
+                    Layout.column: 2
+                    Layout.row: 1
 
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Background"])
 
@@ -157,18 +207,25 @@ Item {
                         elide: Text.ElideRight
                     }
                 }
-            }
 
-            RowLayout {
-                Layout.fillWidth: true
+                Text {
+                    Layout.column: 0
+                    Layout.row: 2
 
-                Layout.bottomMargin: 10
-                Layout.leftMargin: 10
-                Layout.rightMargin: 10
+                    text: qsTr("Gender")
+
+                    horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignBottom
+
+                    color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
+                }
 
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 35
+
+                    Layout.column: 0
+                    Layout.row: 3
 
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Background"])
 
@@ -187,9 +244,24 @@ Item {
                     }
                 }
 
+                Text {
+                    Layout.column: 1
+                    Layout.row: 2
+
+                    text: qsTr("Marital status")
+
+                    horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignBottom
+
+                    color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
+                }
+
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 35
+
+                    Layout.column: 1
+                    Layout.row: 3
 
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Background"])
 
@@ -208,9 +280,24 @@ Item {
                     }
                 }
 
+                Text {
+                    Layout.column: 2
+                    Layout.row: 2
+
+                    text: qsTr("Service price")
+
+                    horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignBottom
+
+                    color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
+                }
+
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 35
+
+                    Layout.column: 2
+                    Layout.row: 3
 
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Background"])
 

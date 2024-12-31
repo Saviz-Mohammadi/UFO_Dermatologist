@@ -207,6 +207,7 @@ bool Database::createPatient(const QString &firstName, const QString &lastName, 
     stream << "first_name     : " << firstName     << "\n";
     stream << "last_name      : " << lastName      << "\n";
     stream << "phone_number   : " << phoneNumber   << "\n";
+    stream << "birth_year     : " << birthYear     << "\n";
     stream << "gender         : " << gender        << "\n";
     stream << "marital_status : " << maritalStatus << "\n";
 #endif
@@ -227,32 +228,12 @@ bool Database::createPatient(const QString &firstName, const QString &lastName, 
     query.bindValue(":last_name", lastName);
     query.bindValue(":birth_year", birthYear);
     query.bindValue(":phone_number", phoneNumber);
+    query.bindValue(":gender", gender);
+    query.bindValue(":marital_status", maritalStatus);
 
     // Now bind automatic fields:
     query.bindValue(":first_visit_date", QDate::currentDate());
     query.bindValue(":recent_visit_date", QDate::currentDate());
-
-
-    // Last but not least, bind non-required fields:
-    if(!gender.isEmpty())
-    {
-        query.bindValue(":gender", gender);
-    }
-
-    else
-    {
-        query.bindValue(":gender", QVariant()); // Using a null 'QVariant' to instruct the database to create default value.
-    }
-
-    if(!gender.isEmpty())
-    {
-        query.bindValue(":marital_status", maritalStatus);
-    }
-
-    else
-    {
-        query.bindValue(":marital_status", QVariant()); // Using a null 'QVariant' to instruct the database to create default value.
-    }
 
 
 
@@ -308,7 +289,7 @@ bool Database::createPatient(const QString &firstName, const QString &lastName, 
 // SEARCH
 bool Database::findPatient(const quint64 patientID)
 {
-    QString queryString = "SELECT * FROM patients WHERE patient_id = :patiend_id";
+    QString queryString = "SELECT * FROM patients WHERE patient_id = :patient_id";
     QSqlQuery query(m_QSqlDatabase);
 
 
@@ -414,6 +395,24 @@ bool Database::findPatient(const quint64 patientID)
 
 bool Database::findPatient(const QString &firstName, const QString &lastName, quint32 birthYearStart, quint32 birthYearEnd, const QString &phoneNumber, const QString &gender, const QString &maritalStatus)
 {
+    if(firstName.isEmpty() && lastName.isEmpty() && birthYearStart <= 0 && birthYearEnd <= 0 && phoneNumber.isEmpty() && gender.isEmpty() && maritalStatus.isEmpty())
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "All fields were denied.");
+#endif
+
+
+
+        // Notify QML:
+        emit queryExecuted(QueryType::SEARCH, false, "All fields were denied.");
+
+
+
+        return (false);
+    }
+
+
+
     QString queryString = "SELECT * FROM patients WHERE 1 = 1";
     QSqlQuery query(m_QSqlDatabase);
 
@@ -430,69 +429,36 @@ bool Database::findPatient(const QString &firstName, const QString &lastName, qu
     // NOTE (SAVIZ): I like to use 'std::optional', but QML does not play nice.
     if (!firstName.isEmpty())
     {
-#ifdef QT_DEBUG
-        stream << "first_name : " << firstName << "\n";
-#endif
-
-
-
         queryString += " AND first_name LIKE :first_name";
     }
 
     if (!lastName.isEmpty())
     {
-#ifdef QT_DEBUG
-        stream << "last_name : " << lastName << "\n";
-#endif
-
-
-
         queryString += " AND last_name LIKE :last_name";
     }
 
-    // NOTE (SAVIZ): I use the value of '0' as the sentinel value.
-    if (birthYearStart > 0 && birthYearEnd > 0)
+    if (birthYearStart > 0)
     {
-#ifdef QT_DEBUG
-        stream << "birth_year_start : " << birthYearStart << "\n";
-        stream << "birth_year_end   : " << birthYearEnd   << "\n";
-#endif
+        queryString += " AND birth_year >= :birth_year_start";
+    }
 
-
-
-        queryString += " AND birth_year BETWEEN :birth_year_start AND :birth_year_end";
+    if (birthYearEnd > 0)
+    {
+        queryString += " AND birth_year <= :birth_year_end";
     }
 
     if (!phoneNumber.isEmpty())
     {
-#ifdef QT_DEBUG
-        stream << "phone_number : " << phoneNumber << "\n";
-#endif
-
-
-
         queryString += " AND phone_number LIKE :phone_number";
     }
 
     if (!gender.isEmpty())
     {
-#ifdef QT_DEBUG
-        stream << "gender : " << gender << "\n";
-#endif
-
-
-
         queryString += " AND gender = :gender";
     }
 
     if (!maritalStatus.isEmpty())
     {
-#ifdef QT_DEBUG
-        stream << "marital_status : " << maritalStatus << "\n";
-#endif
-
-
-
         queryString += " AND marital_status = :marital_status";
     }
 
@@ -517,9 +483,13 @@ bool Database::findPatient(const QString &firstName, const QString &lastName, qu
         query.bindValue(":phone_number", phoneNumber + "%");
     }
 
-    if (birthYearStart > 0 && birthYearEnd > 0)
+    if (birthYearStart > 0)
     {
         query.bindValue(":birth_year_start", birthYearStart);
+    }
+
+    if (birthYearEnd > 0)
+    {
         query.bindValue(":birth_year_end", birthYearEnd);
     }
 

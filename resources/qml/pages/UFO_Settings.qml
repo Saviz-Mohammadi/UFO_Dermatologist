@@ -199,7 +199,7 @@ UFO_Page {
 
                 onClicked: {
                     let ipAddress = ipAddressField.text.trim();
-                    let port = parseInt(portField.text.trim());
+                    let port = parseInt(portField.text.trim(), 10);
                     let schema = schemaField.text.trim();
                     let username = usernameField.text.trim();
                     let password = passwordField.text.trim();

@@ -26,43 +26,17 @@ UFO_Page {
         title: qsTr("Personal Information")
         contentSpacing: 0
 
-        Text {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            Layout.topMargin: 20
-            Layout.leftMargin: 15
-            Layout.rightMargin: 15
-
-            text: qsTr("To create a new patient record, ensure all input fields are filled with the required data. Once all information has been verified, click the 'Create' button to proceed. Missing data in any field will trigger a warning message. You can clear the information fields at any time by pressing the 'Clear' button.")
-
-            elide: Text.ElideRight
-            horizontalAlignment: Text.AlignLeft
-            verticalAlignment: Text.AlignVCenter
-            wrapMode: Text.Wrap
-            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-        }
-
-        GridLayout {
+        ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
             Layout.margins: 15
-
-            columns: 2
-            rows: 6
-
-            columnSpacing: 2
-            rowSpacing: 2
 
             UFO_TextField {
                 id: textField_FirstName
 
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
-
-                Layout.column: 0
-                Layout.row: 0
 
                 enabled: (Database.connectionStatus === true) ? true : false
                 placeholderText: qsTr("First name*")
@@ -86,9 +60,6 @@ UFO_Page {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
-                Layout.column: 1
-                Layout.row: 0
-
                 enabled: (Database.connectionStatus === true) ? true : false
                 placeholderText: qsTr("Last name*")
 
@@ -111,14 +82,11 @@ UFO_Page {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
-                Layout.column: 0
-                Layout.row: 1
-
                 enabled: (Database.connectionStatus === true) ? true : false
                 placeholderText: qsTr("Birth year*")
 
                 validator: RegularExpressionValidator {
-                    regularExpression: /^[0-9]*$/
+                    regularExpression: /^[1-9]\d*$/
                 }
 
                 Connections {
@@ -155,19 +123,22 @@ UFO_Page {
                 }
             }
 
-            UFO_SideBar_CheckBox {
-                id: ufo_CheckBox_Gender
-
-                Layout.preferredWidth: 24
-                Layout.preferredHeight: 24
+            Text {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
                 Layout.topMargin: 25
 
-                Layout.column: 0
-                Layout.row: 2
+                text: qsTr("Gender")
 
-                enabled: (Database.connectionStatus === true) ? true : false
-                checked: false
+                elide: Text.ElideRight
+                wrapMode: Text.NoWrap
+
+                horizontalAlignment: Text.AlignLeft
+                verticalAlignment: Text.AlignBottom
+
+                font.pixelSize: Qt.application.font.pixelSize * 1
+                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
             }
 
             UFO_ComboBox {
@@ -176,12 +147,8 @@ UFO_Page {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
-                Layout.column: 0
-                Layout.row: 3
-
                 enabled: (Database.connectionStatus === true) ? true : false
-
-                model: ["Male", "Female"]
+                model: ["Unknown", "Male", "Female"]
 
                 Connections {
                     target: ufo_Button_Clear
@@ -192,19 +159,20 @@ UFO_Page {
                 }
             }
 
-            UFO_SideBar_CheckBox {
-                id: ufo_CheckBox_MaritalStatus
+            Text {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-                Layout.preferredWidth: 24
-                Layout.preferredHeight: 24
+                text: qsTr("Marital status")
 
-                Layout.topMargin: 25
+                elide: Text.ElideRight
+                wrapMode: Text.NoWrap
 
-                Layout.column: 1
-                Layout.row: 2
+                horizontalAlignment: Text.AlignLeft
+                verticalAlignment: Text.AlignBottom
 
-                enabled: (Database.connectionStatus === true) ? true : false
-                checked: false
+                font.pixelSize: Qt.application.font.pixelSize * 1
+                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
             }
 
             UFO_ComboBox {
@@ -213,12 +181,8 @@ UFO_Page {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
-                Layout.column: 1
-                Layout.row: 3
-
                 enabled: (Database.connectionStatus === true) ? true : false
-
-                model: ["Single", "Married", "Divorced", "Widowed"]
+                model: ["Unknown", "Single", "Married"]
 
                 Connections {
                     target: ufo_Button_Clear
@@ -233,7 +197,7 @@ UFO_Page {
 
     RowLayout {
         Layout.fillWidth: true
-        Layout.topMargin: 10
+        Layout.topMargin: 15
 
         Item {
             Layout.fillWidth: true
@@ -260,8 +224,6 @@ UFO_Page {
         UFO_Button {
             id: ufo_Button_Insert
 
-            property var context: ({})
-
             Layout.preferredWidth: 120
             Layout.preferredHeight: 35
 
@@ -270,36 +232,12 @@ UFO_Page {
             text: qsTr("Create")
             svg: "./../../icons/Google icons/person_add.svg"
 
-            function setContextElement(key, value) {
-                ufo_Button_Insert.context[key] = value;
-            }
-
             Connections {
                 target: ufo_Dialog
 
                 function onAccepted() {
-                    if(ufo_Dialog.callbackIdentifier === "<UFO_Create>: Input not provided") {
+                    if(ufo_Dialog.callbackIdentifier === "<UFO_Create>: Required fields not provided") {
                         ufo_Dialog.close();
-
-                        return;
-                    }
-
-                    if(ufo_Dialog.callbackIdentifier === "<UFO_Create>: Potential search matches found") {
-                        ufo_Dialog.close();
-                        Database.createPatient(ufo_Button_Insert.context["first_name"], ufo_Button_Insert.context["last_name"], ufo_Button_Insert.context["age"], ufo_Button_Insert.context["phone_number"], ufo_Button_Insert.context["gender"], ufo_Button_Insert.context["marital_status"]);
-
-                        return;
-                    }
-                }
-            }
-
-            Connections {
-                target: ufo_Dialog
-
-                function onRejected() {
-                    if(ufo_Dialog.callbackIdentifier === "<UFO_Create>: Potential search matches found") {
-                        ufo_Dialog.close();
-                        root.searchMatchedNewPatient();
 
                         return;
                     }
@@ -307,7 +245,7 @@ UFO_Page {
             }
 
             onClicked: {
-                let emptyFieldWasDetected = textField_FirstName.text === "" || textField_LastName.text === "" || textField_PhoneNumber.text === "" || textField_Age.text === "";
+                let emptyFieldWasDetected = textField_FirstName.text.trim() === "" || textField_LastName.text.trim() === "" || textField_PhoneNumber.text.trim() === "" || textField_BirthYear.text.trim() === "";
 
 
                 if(emptyFieldWasDetected) {
@@ -328,8 +266,8 @@ UFO_Page {
                         message += "<li>Phone Number</li>";
                     }
 
-                    if(textField_Age.text === "") {
-                        message += "<li>Age</li>";
+                    if(textField_BirthYear.text === "") {
+                        message += "<li>Birth Year</li>";
                     }
 
                     message += "</ul>";
@@ -337,7 +275,7 @@ UFO_Page {
 
                     ufo_Dialog.titleString = "<b>WARNING! Empty fields detected!<b>";
                     ufo_Dialog.messageString = message;
-                    ufo_Dialog.callbackIdentifier = "<UFO_Create>: Input not provided";
+                    ufo_Dialog.callbackIdentifier = "<UFO_Create>: Required fields not provided";
                     ufo_Dialog.hasAccept = true;
                     ufo_Dialog.hasReject = false;
                     ufo_Dialog.acceptButtonText = qsTr("OK")
@@ -348,34 +286,15 @@ UFO_Page {
                     return;
                 }
 
-
-                // Personal Information:
-                ufo_Button_Insert.setContextElement("first_name", textField_FirstName.text.trim());
-                ufo_Button_Insert.setContextElement("last_name", textField_LastName.text.trim());
-                ufo_Button_Insert.setContextElement("age", parseInt(textField_Age.text.trim()));
-                ufo_Button_Insert.setContextElement("phone_number", textField_PhoneNumber.text.trim());
-                ufo_Button_Insert.setContextElement("gender", comboBox_Gender.currentText.trim());
-                ufo_Button_Insert.setContextElement("marital_status", comboBox_MaritalStatus.currentText.trim());
+                let firstName = textField_FirstName.text.trim();
+                let lastName = textField_LastName.text.trim();
+                let birthYear = parseInt(textField_BirthYear.text.trim(), 10);
+                let phoneNumber = textField_PhoneNumber.text;
+                let gender = comboBox_Gender.currentText;
+                let maritalStatus = comboBox_MaritalStatus.currentText;
 
 
-                // Perform Search:
-                Database.findPatient(ufo_Button_Insert.context["first_name"], ufo_Button_Insert.context["last_name"], ufo_Button_Insert.context["age"], ufo_Button_Insert.context["phone_number"], ufo_Button_Insert.context["gender"], ufo_Button_Insert.context["marital_status"]);
-
-                if(Database.getSearchResultList().length === 0) {
-                    Database.createPatient(ufo_Button_Insert.context["first_name"], ufo_Button_Insert.context["last_name"], ufo_Button_Insert.context["age"], ufo_Button_Insert.context["phone_number"], ufo_Button_Insert.context["gender"], ufo_Button_Insert.context["marital_status"]);
-
-                    return;
-                }
-
-
-                ufo_Dialog.titleString = "<b>WARNING! Potential matches found!<b>";
-                ufo_Dialog.messageString = "The application found potential already existing matches of patients. Please switch to the ";
-                ufo_Dialog.callbackIdentifier = "<UFO_Create>: Potential search matches found";
-                ufo_Dialog.hasAccept = true;
-                ufo_Dialog.hasReject = true;
-                ufo_Dialog.acceptButtonText = qsTr("Create Anyway")
-                ufo_Dialog.rejectButtonText = qsTr("View Search")
-                ufo_Dialog.open();
+                Database.createPatient(firstName, lastName, birthYear, phoneNumber, gender, maritalStatus);
             }
         }
     }
@@ -389,18 +308,28 @@ UFO_Page {
         Connections {
             target: Database
 
-            function onPatientInsertionSuccessful() {
-                ufo_OperationResult.svg = "./../../icons/Google icons/check_circle.svg";
-                ufo_OperationResult.displayMessage("Patient created successfully. You may now proceed to editing the patient.", 3000);
-            }
-        }
+            function onQueryExecuted(type, success, message) {
+                if(type !== Database.QueryType.CREATE) {
+                    return;
+                }
 
-        Connections {
-            target: Database
+                if(success === true) {
+                    ufo_OperationResult.svg = "./../../icons/Google icons/check_box.svg";
+                    ufo_OperationResult.state = true;
+                    ufo_OperationResult.displayMessage(message, 7000);
 
-            function onPatientInsertionFailed() {
-                ufo_OperationResult.svg = "./../../icons/Google icons/error.svg";
-                ufo_OperationResult.displayMessage("Patient creation failed. You may try agian or return at another time.", 3000);
+
+                    return;
+                }
+
+                if(success === false) {
+                    ufo_OperationResult.svg = "./../../icons/Google icons/error.svg";
+                    ufo_OperationResult.state = false;
+                    ufo_OperationResult.displayMessage(message, 7000);
+
+
+                    return;
+                }
             }
         }
     }

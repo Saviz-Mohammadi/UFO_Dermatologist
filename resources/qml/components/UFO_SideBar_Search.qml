@@ -26,10 +26,10 @@ Item {
         ColumnLayout {
             anchors.fill: parent
 
-            anchors.topMargin: 10
-            anchors.bottomMargin: 10
-            anchors.rightMargin: 10
-            anchors.leftMargin: 10
+            anchors.topMargin: 20
+            anchors.bottomMargin: 20
+            anchors.rightMargin: 20
+            anchors.leftMargin: 20
 
             spacing: 10
 
@@ -44,7 +44,7 @@ Item {
                 ColumnLayout {
                     anchors.fill: parent
 
-                    anchors.rightMargin: 10
+                    anchors.rightMargin: 20
 
                     clip: true
                     spacing: 5
@@ -150,7 +150,7 @@ Item {
                             placeholderText: qsTr("Birth year start range (e.g. 1379)")
 
                             validator: RegularExpressionValidator {
-                                regularExpression: /^[0-9]*$/
+                                regularExpression: /^[1-9]\d*$/
                             }
                         }
                     }
@@ -180,7 +180,7 @@ Item {
                             placeholderText: qsTr("Birth year end range (e.g. 1400)")
 
                             validator: RegularExpressionValidator {
-                                regularExpression: /^[0-9]*$/
+                                regularExpression: /^[1-9]\d*$/
                             }
                         }
                     }
@@ -321,18 +321,43 @@ Item {
                 text: qsTr("Search")
                 svg: "./../../icons/Google icons/person_search.svg"
 
-                // For birth years -->> if is enabled && (isnot empty || is not 0)
-
                 onClicked: {
+                    // Grab data:
+                    let patientID = parseInt(textField_PatientID.text.trim(), 10);
                     let firstName = textField_FirstName.text.trim()
                     let lastName = textField_LastName.text.trim()
-                    let birthYearStart = parseInt(textField_BirthYearStart.text.trim());
-                    let birthYearEnd = parseInt(textField_BirthYearEnd.text.trim());
+                    let birthYearStart = parseInt(textField_BirthYearStart.text.trim(), 10);
+                    let birthYearEnd = parseInt(textField_BirthYearEnd.text.trim(), 10);
                     let phoneNumber = textField_PhoneNumber.text
                     let gender = comboBox_Gender.currentText
                     let maritalStatus = comboBox_MaritalStatus.currentText
 
-                    Database.findPatient(firstName, lastName, birthYearStart, birthYearEnd, phoneNumber, "", "");
+
+                    // Perform checks:
+                    if(!isNaN(patientID)) {
+                        Database.findPatient(patientID);
+
+                        return;
+                    }
+
+                    if(ufo_CheckBox_BirthYearStart.checked === false || isNaN(birthYearStart)) {
+                        birthYearStart = 0
+                    }
+
+                    if(ufo_CheckBox_BirthYearEnd.checked === false || isNaN(birthYearEnd)) {
+                        birthYearEnd = 0
+                    }
+
+                    if(ufo_CheckBox_Gender.checked === false) {
+                        gender = ""
+                    }
+
+                    if(ufo_CheckBox_MaritalStatus.checked === false) {
+                        maritalStatus = ""
+                    }
+
+
+                    Database.findPatient(firstName, lastName, birthYearStart, birthYearEnd, phoneNumber, gender, maritalStatus);
                 }
             }
         }

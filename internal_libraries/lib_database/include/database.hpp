@@ -10,6 +10,7 @@
 #include <QSqlRecord>
 #include <QVariant>
 #include <QVariantList>
+#include <QDateTime>
 #include <QFileInfo>
 #include <QTextStream>
 

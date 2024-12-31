@@ -19,8 +19,8 @@ Dialog {
     property alias messageString: text_Message.text
     property string callbackIdentifier: ""
 
-    implicitWidth: columnLayout_Content.implicitWidth
-    implicitHeight: columnLayout_Content.implicitHeight
+    implicitWidth: columnLayout_Content.implicitWidth + 50
+    implicitHeight: columnLayout_Content.implicitHeight + 50
 
     modal: true
     focus: true
