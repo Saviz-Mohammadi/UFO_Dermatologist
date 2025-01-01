@@ -29,14 +29,12 @@ project("Lib_Database"
 
 set(HEADER_FILES
 
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/database.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/patient.hpp")
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/database.hpp")
 	
 
 set(SOURCE_FILES
 
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/database.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/patient.cpp")
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/database.cpp")
 
 # [[ ----------------------------------------------------------------------- ]]
 # [[ ----------------------------------------------------------------------- ]]

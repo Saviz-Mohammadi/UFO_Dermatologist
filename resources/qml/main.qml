@@ -175,14 +175,6 @@ ApplicationWindow {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-
-                Connections {
-                    target: ufo_Search
-
-                    function onPatientSelectedForEdit() {
-                        ufo_Edit.patientSelected = true
-                    }
-                }
             }
 
             UFO_Create {

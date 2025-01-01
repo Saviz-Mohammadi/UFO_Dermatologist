@@ -18,12 +18,10 @@ UFO_Page {
     contentSpacing: 25
 
     UFO_GroupBox {
-        id: ufo_GroupBox_PersonalInformation
-
         Layout.fillWidth: true
         // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
 
-        title: qsTr("Personal Information")
+        title: qsTr("Basic Data")
         contentSpacing: 0
 
         ColumnLayout {

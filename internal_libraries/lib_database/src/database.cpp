@@ -15,8 +15,8 @@ Database::Database(QObject *parent, const QString &name)
     : QObject{parent}
     , m_QSqlDatabase(QSqlDatabase{})
     , m_ConnectionStatus(false)
-    , m_SearchResultList(QVariantList{})
     , m_TreatmentList(QVariantList{})
+    , m_SearchResultList(QVariantList{})
     , m_PatientDataMap(QVariantMap{})
 {
     this->setObjectName(name);
@@ -170,7 +170,7 @@ void Database::establishConnection(const QString &ipAddress, qint16 port, const 
 
 
     // Populate lists:
-    //populateTreatmentList();
+    populateTreatmentList();
 
 
 
@@ -1113,63 +1113,62 @@ bool Database::changeDeletionStatus(bool newStatus)
     return (true);
 }
 
-bool Database::deleteAll()
-{
-    QString queryString = "DELETE FROM patients WHERE mark_for_deletion = TRUE;";
-    QSqlQuery query;
-
-
-
-    query.prepare(queryString);
-
-
-
-    if (!query.exec())
-    {
-
-
-
-        return (false);
-    }
-
-
-
-    return (true);
-}
-
 
 // HELPER
-bool Database::readyPatientData(const quint64 index)
+bool Database::pullPatientData(const quint64 index)
 {
 #ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "The patient_id is: " + QString::number(index));
+    QString message("Pull initiated!\n");
+
+    QTextStream stream(&message);
+
+    stream << "The patient_id is: " + QString::number(index) + "\n";
 #endif
 
 
 
-    QString queryString = "SELECT * FROM patients ";
-    QSqlQuery query;
+    QString queryString = "SELECT * FROM patients";
 
 
 
-    // Treatments:
-    queryString += "LEFT JOIN patient_treatments ON patients.patient_id = patient_treatments.patient_id ";
-    queryString += "LEFT JOIN treatments ON treatments.treatment_id = patient_treatments.treatment_id";
+    // treatments:
+    queryString += " LEFT JOIN patient_treatments ON patients.patient_id = patient_treatments.patient_id";
+    queryString += " LEFT JOIN treatments ON treatments.treatment_id = patient_treatments.treatment_id";
+
+
+
+    // treatment_notes:
+    queryString += " LEFT JOIN treatment_notes ON patients.patient_id = treatment_notes.patient_id";
 
 
 
     // Id:
-    queryString += " WHERE patients.patient_id = " + QString::number(index);
+    queryString += " WHERE patients.patient_id = :patient_id";
 
 
 
+    QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
+
+
+
+    query.bindValue(":patient_id", index);
+
+
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
+        stream << query.lastError().text() << "\n";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
 #endif
+
+
+
+        // Notify QML:
+        emit patientDataPulled(false, query.lastError().text());
+
 
 
         return (false);
@@ -1180,13 +1179,20 @@ bool Database::readyPatientData(const quint64 index)
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Query returned no results.");
+        stream << "Query returned no results.";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
 #endif
+
+
+
+        // Notify QML:
+        emit patientDataPulled(false, "Query returned no results.");
+
 
 
         return (false);
     }
-
 
 
 
@@ -1198,31 +1204,50 @@ bool Database::readyPatientData(const quint64 index)
     {
         QVariantMap treatmentMap;
 
-        // Personal Information:
+
+
+        // Basic Data:
         m_PatientDataMap["patient_id"] = query.value("patient_id").toULongLong();
         m_PatientDataMap["first_name"] = query.value("first_name").toString();
         m_PatientDataMap["last_name"] = query.value("last_name").toString();
-        m_PatientDataMap["age"] = query.value("age").toString();
-        m_PatientDataMap["birth_date"] = query.value("birth_date").toString();
+        m_PatientDataMap["birth_year"] = query.value("birth_year").toString();
         m_PatientDataMap["phone_number"] = query.value("phone_number").toString();
         m_PatientDataMap["gender"] = query.value("gender").toString();
         m_PatientDataMap["marital_status"] = query.value("marital_status").toString();
+        m_PatientDataMap["number_of_previous_visits"] = query.value("number_of_previous_visits").toUInt();
+        m_PatientDataMap["first_visit_date"] = query.value("first_visit_date").toString();
+        m_PatientDataMap["recent_visit_date"] = query.value("recent_visit_date").toString();
+        m_PatientDataMap["service_price"] = query.value("service_price").toReal();
+        m_PatientDataMap["marked_for_deletion"] = query.value("marked_for_deletion").toBool();
 
-        // Treatments:
+
+
+        // treatments:
         treatmentMap["treatment_id"] = query.value("treatment_id").toULongLong();
         treatmentMap["treatment_name"] = query.value("treatments.name").toString();
         treatments.append(treatmentMap);
+
+
+
+        // treatment_notes:
+        m_PatientDataMap["treatment_note"] = query.value("treatment_notes.note").toString();
     }
 
 
 
-    // Assign Treatments:
+    // Assign treatments:
     m_PatientDataMap["treatments"] = treatments;
 
 
 
+#ifdef QT_DEBUG
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
     // Notify QML:
-    emit patientDataChanged();
+    emit patientDataPulled(true, "Pull operation successful");
 
 
 
@@ -1242,18 +1267,26 @@ bool Database::readyPatientData(const quint64 index)
 
 bool Database::populateTreatmentList()
 {
-    QString queryString = "SELECT * FROM treatments";
-    QSqlQuery query;
+    QString queryString = "SELECT * FROM treatments WHERE is_active = TRUE";
 
 
 
+    QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
+
+
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
 #endif
+
+
+
+        // Notify QML:
+        emit treatmentListPopulated(false, query.lastError().text());
+
 
 
         return (false);
@@ -1268,6 +1301,12 @@ bool Database::populateTreatmentList()
 #endif
 
 
+
+        // Notify QML:
+        emit treatmentListPopulated(false, "Query returned no results.");
+
+
+
         return (false);
     }
 
@@ -1277,8 +1316,12 @@ bool Database::populateTreatmentList()
     {
         QVariantMap treatmentMap;
 
+
+
         treatmentMap["treatment_id"] = query.value("treatment_id").toULongLong();
-        treatmentMap["treatment_name"] = query.value("treatments.name").toString();
+        treatmentMap["treatment_name"] = query.value("name").toString();
+
+
 
         m_TreatmentList.append(treatmentMap);
     }
@@ -1286,7 +1329,7 @@ bool Database::populateTreatmentList()
 
 
     // Notify QML:
-    emit treatmentsPopulated();
+    emit treatmentListPopulated(true, "Treatment list successfully acquired.");
 
 
 
@@ -1314,14 +1357,14 @@ QVariantList Database::getSearchResultList() const
     return (m_SearchResultList);
 }
 
-QVariantMap Database::getPatientDataMap() const
-{
-    return (m_PatientDataMap);
-}
-
 QVariantList Database::getTreatmentList() const
 {
     return (m_TreatmentList);
+}
+
+QVariantMap Database::getPatientDataMap() const
+{
+    return (m_PatientDataMap);
 }
 
 // [[------------------------------------------------------------------------]]

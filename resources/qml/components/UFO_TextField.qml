@@ -36,7 +36,7 @@ TextField {
             }
         }
 
-        border.color: root.enabled ? Qt.color(AppTheme.colors["UFO_TextField_Border"]) : Qt.color(AppTheme.colors["UFO_TextField_Border"])
+        border.color: Qt.color(AppTheme.colors["UFO_TextField_Border"])
     }
 
     color: {

@@ -10,342 +10,697 @@ import AppTheme 1.0
 import Database 1.0
 
 UFO_Page {
-    // id: root
+    id: root
 
-    // title: qsTr("Edit Patient")
-    // contentSpacing: 25
+    title: qsTr("Edit Patient")
+    contentSpacing: 25
 
-    // property bool patientSelected: false
+    UFO_GroupBox {
+        id: ufo_GroupBox_PersonalInformation
 
-    // UFO_GroupBox {
-    //     id: ufo_GroupBox_PersonalInformation
+        Layout.fillWidth: true
+        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
 
-    //     Layout.fillWidth: true
-    //     // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
+        title: qsTr("Basic Data")
+        contentSpacing: 3
 
-    //     title: qsTr("Personal Information")
-    //     contentSpacing: 0
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
 
-    //     Text {
-    //         Layout.fillWidth: true
-    //         Layout.fillHeight: true
+            Layout.topMargin: 15
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
 
-    //         Layout.topMargin: 20
-    //         Layout.leftMargin: 15
-    //         Layout.rightMargin: 15
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Background"])
 
-    //         text: qsTr("You can revert the information at any time by pressing the 'Revert' button, provided the changes have not already been applied.")
+            Text {
+                id: text_PatinetID
 
-    //         elide: Text.ElideRight
-    //         horizontalAlignment: Text.AlignLeft
-    //         verticalAlignment: Text.AlignVCenter
-    //         wrapMode: Text.Wrap
-    //         color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-    //     }
+                anchors.fill: parent
 
-    //     RowLayout {
-    //         Layout.fillWidth: true
+                text: qsTr("Patient ID ()")
 
-    //         Layout.topMargin: 7
-    //         Layout.leftMargin: 15
-    //         Layout.rightMargin: 15
+                horizontalAlignment: Text.AlignLeft
+                verticalAlignment: Text.AlignVCenter
 
-    //         spacing: 10
+                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+            }
 
-    //         UFO_TextField {
-    //             id: textField_FirstName
+            Connections {
+                target: Database
 
-    //             Layout.fillWidth: true
-    //             Layout.preferredHeight: 35
+                function onPatientDataPulled(success, message) {
+                    if(success === false) {
+                        return;
+                    }
 
-    //             enabled: (Database.connectionStatus === true) ? true : false
+                    text_PatinetID.text = qsTr("Patient ID (") + Database.getPatientDataMap()["patient_id"] + qsTr(")");
+                }
+            }
+        }
 
-    //             placeholderText: qsTr("First name")
+        Text {
+            Layout.fillWidth: true
 
-    //             Connections {
-    //                 target: Database
+            Layout.topMargin: 20
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
 
-    //                 function onPatientDataChanged() {
-    //                     textField_FirstName.text = Database.getPatientDataMap()["first_name"]
-    //                 }
-    //             }
-    //         }
+            text: qsTr("First Name")
 
-    //         UFO_TextField {
-    //             id: textField_LastName
+            horizontalAlignment: Text.AlignLeft
+            verticalAlignment: Text.AlignBottom
 
-    //             Layout.fillWidth: true
-    //             Layout.preferredHeight: 35
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
 
-    //             enabled: (Database.connectionStatus === true) ? true : false
+        UFO_TextField {
+            id: textField_FirstName
 
-    //             placeholderText: qsTr("Last name")
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
 
-    //             Connections {
-    //                 target: Database
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
 
-    //                 function onPatientDataChanged() {
-    //                     textField_LastName.text = Database.getPatientDataMap()["last_name"]
-    //                 }
-    //             }
-    //         }
+            enabled: (Database.connectionStatus === true) ? true : false
 
-    //         UFO_ComboBox {
-    //             id: comboBox_Gender
+            validator: RegularExpressionValidator {
+                regularExpression: /^[A-Za-z]+$/
+            }
 
-    //             Layout.preferredWidth: 150
-    //             Layout.preferredHeight: 35
+            Connections {
+                target: Database
 
-    //             enabled: (Database.connectionStatus === true) ? true : false
+                function onPatientDataPulled(success, message) {
+                    if(success === false) {
+                        return;
+                    }
 
-    //             model: ["Male", "Female"]
+                    textField_FirstName.text = Database.getPatientDataMap()["first_name"];
+                }
+            }
+        }
 
-    //             Connections {
-    //                 target: Database
+        Text {
+            Layout.fillWidth: true
 
-    //                 function onPatientDataChanged() {
-    //                     switch (Database.getPatientDataMap()["gender"]) {
-    //                         case "Male":
-    //                             comboBox_Gender.currentIndex = 0
-    //                             break
-    //                         default:
-    //                             comboBox_Gender.currentIndex = 1
-    //                     };
-    //                 }
-    //             }
-    //         }
-    //     }
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
 
-    //     RowLayout {
-    //         Layout.fillWidth: true
+            text: qsTr("Last Name")
 
-    //         Layout.topMargin: 7
-    //         Layout.bottomMargin: 15
-    //         Layout.leftMargin: 15
-    //         Layout.rightMargin: 15
+            horizontalAlignment: Text.AlignLeft
+            verticalAlignment: Text.AlignBottom
 
-    //         spacing: 10
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
 
-    //         UFO_TextField {
-    //             id: textField_Age
+        UFO_TextField {
+            id: textField_LastName
 
-    //             Layout.fillWidth: true
-    //             Layout.preferredHeight: 35
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
 
-    //             placeholderText: qsTr("Age")
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
 
-    //             enabled: (Database.connectionStatus === true) ? true : false
+            enabled: (Database.connectionStatus === true) ? true : false
 
-    //             validator: RegularExpressionValidator {
-    //                 regularExpression: /^((1[0-4][0-9])|([1-9][0-9])|[0-9]|150)$/ // Ranges between (0 – 150)
-    //             }
+            validator: RegularExpressionValidator {
+                regularExpression: /^[A-Za-z]+$/
+            }
 
-    //             Connections {
-    //                 target: Database
+            Connections {
+                target: Database
 
-    //                 function onPatientDataChanged() {
-    //                     textField_Age.text = Database.getPatientDataMap()["age"]
-    //                 }
-    //             }
-    //         }
+                function onPatientDataPulled(success, message) {
+                    if(success === false) {
+                        return;
+                    }
 
-    //         UFO_TextField {
-    //             id: textField_PhoneNumber
+                    textField_LastName.text = Database.getPatientDataMap()["last_name"];
+                }
+            }
+        }
 
-    //             Layout.fillWidth: true
-    //             Layout.preferredHeight: 35
+        Text {
+            Layout.fillWidth: true
 
-    //             placeholderText: qsTr("Phone Number")
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
 
-    //             enabled: (Database.connectionStatus === true) ? true : false
+            text: qsTr("Birth Year")
 
-    //             validator: RegularExpressionValidator {
-    //                 regularExpression: /^\+\d{1,3} \(\d{3}\) \d{3}-\d{4}$/ // Format: +1 (555) 921-1222 -> [country code] [(Area code)] [Phone number]
-    //             }
+            horizontalAlignment: Text.AlignLeft
+            verticalAlignment: Text.AlignBottom
 
-    //             Connections {
-    //                 target: Database
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
 
-    //                 function onPatientDataChanged() {
-    //                     textField_PhoneNumber.text = Database.getPatientDataMap()["phone_number"]
-    //                 }
-    //             }
-    //         }
+        UFO_TextField {
+            id: textField_BirthYear
 
-    //         UFO_ComboBox {
-    //             id: comboBox_MaritalStatus
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
 
-    //             Layout.preferredWidth: 150
-    //             Layout.preferredHeight: 35
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
 
-    //             enabled: (Database.connectionStatus === true) ? true : false
+            enabled: (Database.connectionStatus === true) ? true : false
 
-    //             model: ["Single", "Married", "Divorced", "Widowed"]
+            validator: RegularExpressionValidator {
+                regularExpression: /^[1-9]\d*$/
+            }
 
-    //             Connections {
-    //                 target: Database
+            Connections {
+                target: Database
 
-    //                 function onPatientDataChanged() {
-    //                     switch (Database.getPatientDataMap()["marital_status"]) {
-    //                         case "Single":
-    //                             comboBox_MaritalStatus.currentIndex = 0
-    //                             break
-    //                         case "Married":
-    //                             comboBox_MaritalStatus.currentIndex = 1
-    //                             break
-    //                         case "Divorced":
-    //                             comboBox_MaritalStatus.currentIndex = 2
-    //                             break
-    //                         default:
-    //                             comboBox_MaritalStatus.currentIndex = 3
-    //                     };
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
+                function onPatientDataPulled(success, message) {
+                    if(success === false) {
+                        return;
+                    }
 
-    // UFO_GroupBox {
-    //     id: ufo_GroupBox_Treatments
+                    textField_BirthYear.text = Database.getPatientDataMap()["birth_year"];
+                }
+            }
+        }
 
-    //     Layout.fillWidth: true
-    //     // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
+        Text {
+            Layout.fillWidth: true
 
-    //     title: qsTr("Treatments")
-    //     contentSpacing: 0
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
 
-    //     Text {
-    //         Layout.fillWidth: true
-    //         Layout.fillHeight: true
+            text: qsTr("Phone Number")
 
-    //         Layout.topMargin: 20
-    //         Layout.leftMargin: 15
-    //         Layout.rightMargin: 15
+            horizontalAlignment: Text.AlignLeft
+            verticalAlignment: Text.AlignBottom
 
-    //         text: qsTr("The following list represents the results of the search operation.")
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
 
-    //         elide: Text.ElideRight
-    //         horizontalAlignment: Text.AlignLeft
-    //         verticalAlignment: Text.AlignVCenter
-    //         wrapMode: Text.Wrap
-    //         color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-    //     }
+        UFO_TextField {
+            id: textField_PhoneNumber
 
-    //     RowLayout {
-    //         Layout.fillWidth: true
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
 
-    //         Layout.topMargin: 7
-    //         Layout.leftMargin: 15
-    //         Layout.rightMargin: 15
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
 
-    //         spacing: 1
+            enabled: (Database.connectionStatus === true) ? true : false
 
-    //         UFO_ComboBox {
-    //             id: comboBox_Treatments
+            validator: RegularExpressionValidator {
+                regularExpression: /^\+\d{1,3} \(\d{3}\) \d{3}-\d{4}$/
+            }
 
-    //             Layout.fillWidth: true
-    //             Layout.preferredHeight: 35
+            Connections {
+                target: Database
 
-    //             enabled: (Database.connectionStatus === true) ? true : false
+                function onPatientDataPulled(success, message) {
+                    if(success === false) {
+                        return;
+                    }
 
-    //             textRole: "treatment_Name"
+                    textField_PhoneNumber.text = Database.getPatientDataMap()["phone_number"];
+                }
+            }
+        }
 
-    //             model: ListModel { id: listModel_ComboBoxTreatments }
+        Text {
+            Layout.fillWidth: true
 
-    //             Connections {
-    //                 target: Database
+            Layout.topMargin: 30
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
 
-    //                 function onTreatmentsPopulated() {
-    //                     listModel_ComboBoxTreatments.clear();
+            text: qsTr("Gender")
 
-    //                     Database.getTreatmentList().forEach(function (treatment) {
-    //                         listModel_ComboBoxTreatments.append({"treatment_ID": treatment["treatment_id"], "treatment_Name": treatment["treatment_name"]});
-    //                     });
+            elide: Text.ElideRight
+            wrapMode: Text.NoWrap
 
-    //                     // Set default:
-    //                     comboBox_Treatments.currentIndex = 0;
-    //                 }
-    //             }
+            horizontalAlignment: Text.AlignLeft
+            verticalAlignment: Text.AlignBottom
 
-    //             Connections {
-    //                 target: Database
+            font.pixelSize: Qt.application.font.pixelSize * 1
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
 
-    //                 function onPatientDataChanged() {
-    //                     comboBox_Treatments.currentIndex = 0;
-    //                 }
-    //             }
-    //         }
+        UFO_ComboBox {
+            id: comboBox_Gender
 
-    //         UFO_Button {
-    //             Layout.preferredWidth: 120
-    //             Layout.preferredHeight: 35
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
 
-    //             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
 
-    //             enabled: (Database.connectionStatus === true) ? true : false
+            enabled: (Database.connectionStatus === true) ? true : false
+            model: ["Unknown", "Male", "Female"]
 
-    //             text: qsTr("Insert")
-    //             svg: "./../../icons/Google icons/add_circle.svg"
+            Connections {
+                target: Database
 
-    //             onClicked: {
-    //                 let exists = false;
+                function onPatientDataPulled(success, message) {
+                    if(success === false) {
+                        return;
+                    }
 
-    //                 // Search for duplicates.
-    //                 for (let index = 0; index < listModel_ListViewTreatments.count; index++) {
-    //                     if (listView_Treatments.model.get(index)["treatment_ID"] === comboBox_Treatments.model.get(comboBox_Treatments.currentIndex)["treatment_ID"]) {
-    //                         exists = true;
-    //                     }
-    //                 }
+                    switch (Database.getPatientDataMap()["gender"]) {
+                        case "Unknown":
+                            comboBox_Gender.currentIndex = 0;
+                            break;
+                        case "Male":
+                            comboBox_Gender.currentIndex = 1;
+                            break;
+                        default:
+                            comboBox_Gender.currentIndex = 2;
+                    };
+                }
+            }
+        }
 
-    //                 if(exists) {
-    //                     ufo_StatusBar.displayMessage("Cannot add treatment. A treatment of the same type already exists.")
+        Text {
+            Layout.fillWidth: true
 
-    //                     return;
-    //                 }
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
 
-    //                 listModel_ListViewTreatments.append({"treatment_ID": comboBox_Treatments.model.get(comboBox_Treatments.currentIndex)["treatment_ID"], "treatment_Name": comboBox_Treatments.model.get(comboBox_Treatments.currentIndex)["treatment_Name"]});
-    //             }
-    //         }
-    //     }
+            text: qsTr("Marital status")
 
-    //     ListView {
-    //         id: listView_Treatments
+            elide: Text.ElideRight
+            wrapMode: Text.NoWrap
 
-    //         Connections {
-    //             target: Database
+            horizontalAlignment: Text.AlignLeft
+            verticalAlignment: Text.AlignBottom
 
-    //             function onPatientDataChanged() {
-    //                 listModel_ListViewTreatments.clear();
+            font.pixelSize: Qt.application.font.pixelSize * 1
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
 
-    //                 Database.getPatientDataMap()["treatments"].forEach(function (treatment) {
-    //                     listModel_ListViewTreatments.append({"treatment_ID": treatment["treatment_id"], "treatment_Name": treatment["treatment_name"]});
-    //                 });
-    //             }
-    //         }
+        UFO_ComboBox {
+            id: comboBox_MaritalStatus
 
-    //         Layout.fillWidth: true
-    //         Layout.preferredHeight: (root.height * 0.45)
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
 
-    //         Layout.topMargin: 15
-    //         Layout.leftMargin: 15
-    //         Layout.rightMargin: 15
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
 
-    //         spacing: 1
-    //         clip: true
+            enabled: (Database.connectionStatus === true) ? true : false
+            model: ["Unknown", "Single", "Married"]
 
-    //         model: ListModel { id: listModel_ListViewTreatments }
+            Connections {
+                target: Database
 
-    //         delegate: UFO_ListDelegate_Treatments {
-    //             width: listView_Treatments.width
+                function onPatientDataPulled(success, message) {
+                    if(success === false) {
+                        return;
+                    }
 
-    //             treatmentName: model["treatment_Name"]
+                    switch (Database.getPatientDataMap()["marital_status"]) {
+                        case "Unknown":
+                            comboBox_Gender.currentIndex = 0;
+                            break;
+                        case "Single":
+                            comboBox_Gender.currentIndex = 1;
+                            break;
+                        default:
+                            comboBox_Gender.currentIndex = 2;
+                    };
+                }
+            }
+        }
 
-    //             onDeleteClicked: {
-    //                 listModel_ListViewTreatments.remove(index);
-    //             }
-    //         }
-    //     }
-    // }
+        Text {
+            Layout.fillWidth: true
+
+            Layout.topMargin: 30
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            text: qsTr("Previous Visits")
+
+            elide: Text.ElideRight
+            wrapMode: Text.NoWrap
+
+            horizontalAlignment: Text.AlignLeft
+            verticalAlignment: Text.AlignBottom
+
+            font.pixelSize: Qt.application.font.pixelSize * 1
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
+
+        UFO_TextField {
+            id: textField_NumberOfPreviousVisits
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            enabled: (Database.connectionStatus === true) ? true : false
+
+            validator: RegularExpressionValidator {
+                regularExpression: /^[0-9]\d*$/
+            }
+
+            Connections {
+                target: Database
+
+                function onPatientDataPulled(success, message) {
+                    if(success === false) {
+                        return;
+                    }
+
+                    textField_NumberOfPreviousVisits.text = Database.getPatientDataMap()["number_of_previous_visits"];
+                }
+            }
+        }
+
+        Text {
+            Layout.fillWidth: true
+
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            text: qsTr("First Visit Date")
+
+            elide: Text.ElideRight
+            wrapMode: Text.NoWrap
+
+            horizontalAlignment: Text.AlignLeft
+            verticalAlignment: Text.AlignBottom
+
+            font.pixelSize: Qt.application.font.pixelSize * 1
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
+
+        UFO_TextField {
+            id: textField_FirstVisitDate
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            enabled: (Database.connectionStatus === true) ? true : false
+
+            validator: RegularExpressionValidator {
+                regularExpression: /^[12]\d{3}-[01]\d-[0-3]\d$/
+            }
+
+            Connections {
+                target: Database
+
+                function onPatientDataPulled(success, message) {
+                    if(success === false) {
+                        return;
+                    }
+
+                    textField_FirstVisitDate.text = Database.getPatientDataMap()["first_visit_date"];
+                }
+            }
+        }
+
+        Text {
+            Layout.fillWidth: true
+
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            text: qsTr("Recent Visit Date")
+
+            elide: Text.ElideRight
+            wrapMode: Text.NoWrap
+
+            horizontalAlignment: Text.AlignLeft
+            verticalAlignment: Text.AlignBottom
+
+            font.pixelSize: Qt.application.font.pixelSize * 1
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
+
+        UFO_TextField {
+            id: textField_RecentVisitDate
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            enabled: (Database.connectionStatus === true) ? true : false
+
+            validator: RegularExpressionValidator {
+                regularExpression: /^[12]\d{3}-[01]\d-[0-3]\d$/
+            }
+
+            Connections {
+                target: Database
+
+                function onPatientDataPulled(success, message) {
+                    if(success === false) {
+                        return;
+                    }
+
+                    textField_RecentVisitDate.text = Database.getPatientDataMap()["recent_visit_date"];
+                }
+            }
+        }
+
+        Text {
+            Layout.fillWidth: true
+
+            Layout.topMargin: 30
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            text: qsTr("Service Price")
+
+            elide: Text.ElideRight
+            wrapMode: Text.NoWrap
+
+            horizontalAlignment: Text.AlignLeft
+            verticalAlignment: Text.AlignBottom
+
+            font.pixelSize: Qt.application.font.pixelSize * 1
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
+
+        UFO_TextField {
+            id: textField_ServicePrice
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            Layout.bottomMargin: 15
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            enabled: (Database.connectionStatus === true) ? true : false
+
+            validator: RegularExpressionValidator {
+                regularExpression: /^[1-9]\d*$/
+            }
+
+            Connections {
+                target: Database
+
+                function onPatientDataPulled(success, message) {
+                    if(success === false) {
+                        return;
+                    }
+
+                    textField_ServicePrice.text = Database.getPatientDataMap()["service_price"];
+                }
+            }
+        }
+    }
+
+    UFO_GroupBox {
+        id: ufo_GroupBox_Treatments
+
+        Layout.fillWidth: true
+        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
+
+        title: qsTr("Treatments")
+        contentSpacing: 0
+
+        ScrollView {
+            id: scrollView_TreatmentNote
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 200
+
+            Layout.margins: 15
+
+            ScrollBar.vertical: UFO_ScrollBar {
+                parent: scrollView_TreatmentNote
+
+                x: scrollView_TreatmentNote.mirrored ? 0 : scrollView_TreatmentNote.width - width
+                y: scrollView_TreatmentNote.topPadding
+
+                height: scrollView_TreatmentNote.availableHeight
+
+                active: scrollView_TreatmentNote.ScrollBar.horizontal.active
+            }
+
+            UFO_TextArea {
+                id: ufo_TextArea_TreatmentNote
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                Connections {
+                    target: Database
+
+                    function onPatientDataPulled(success, message) {
+                        if(success === false) {
+                            return;
+                        }
+
+                        ufo_TextArea_TreatmentNote.text = Database.getPatientDataMap()["treatment_note"];
+                    }
+                }
+            }
+        }
+
+        // Text {
+        //     Layout.fillWidth: true
+        //     Layout.fillHeight: true
+
+        //     Layout.topMargin: 20
+        //     Layout.leftMargin: 15
+        //     Layout.rightMargin: 15
+
+        //     text: qsTr("The following list represents the results of the search operation.")
+
+        //     elide: Text.ElideRight
+        //     horizontalAlignment: Text.AlignLeft
+        //     verticalAlignment: Text.AlignVCenter
+        //     wrapMode: Text.Wrap
+        //     color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        // }
+
+        // RowLayout {
+        //     Layout.fillWidth: true
+
+        //     Layout.topMargin: 7
+        //     Layout.leftMargin: 15
+        //     Layout.rightMargin: 15
+
+        //     spacing: 1
+
+        //     UFO_ComboBox {
+        //         id: comboBox_Treatments
+
+        //         Layout.fillWidth: true
+        //         Layout.preferredHeight: 35
+
+        //         enabled: (Database.connectionStatus === true) ? true : false
+
+        //         textRole: "treatment_Name"
+
+        //         model: ListModel { id: listModel_ComboBoxTreatments }
+
+        //         Connections {
+        //             target: Database
+
+        //             function onTreatmentsPopulated() {
+        //                 listModel_ComboBoxTreatments.clear();
+
+        //                 Database.getTreatmentList().forEach(function (treatment) {
+        //                     listModel_ComboBoxTreatments.append({"treatment_ID": treatment["treatment_id"], "treatment_Name": treatment["treatment_name"]});
+        //                 });
+
+        //                 // Set default:
+        //                 comboBox_Treatments.currentIndex = 0;
+        //             }
+        //         }
+
+        //         Connections {
+        //             target: Database
+
+        //             function onPatientDataChanged() {
+        //                 comboBox_Treatments.currentIndex = 0;
+        //             }
+        //         }
+        //     }
+
+        //     UFO_Button {
+        //         Layout.preferredWidth: 120
+        //         Layout.preferredHeight: 35
+
+        //         Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+
+        //         enabled: (Database.connectionStatus === true) ? true : false
+
+        //         text: qsTr("Insert")
+        //         svg: "./../../icons/Google icons/add_circle.svg"
+
+        //         onClicked: {
+        //             let exists = false;
+
+        //             // Search for duplicates.
+        //             for (let index = 0; index < listModel_ListViewTreatments.count; index++) {
+        //                 if (listView_Treatments.model.get(index)["treatment_ID"] === comboBox_Treatments.model.get(comboBox_Treatments.currentIndex)["treatment_ID"]) {
+        //                     exists = true;
+        //                 }
+        //             }
+
+        //             if(exists) {
+        //                 ufo_StatusBar.displayMessage("Cannot add treatment. A treatment of the same type already exists.")
+
+        //                 return;
+        //             }
+
+        //             listModel_ListViewTreatments.append({"treatment_ID": comboBox_Treatments.model.get(comboBox_Treatments.currentIndex)["treatment_ID"], "treatment_Name": comboBox_Treatments.model.get(comboBox_Treatments.currentIndex)["treatment_Name"]});
+        //         }
+        //     }
+        // }
+
+        // ListView {
+        //     id: listView_Treatments
+
+        //     Connections {
+        //         target: Database
+
+        //         function onPatientDataChanged() {
+        //             listModel_ListViewTreatments.clear();
+
+        //             Database.getPatientDataMap()["treatments"].forEach(function (treatment) {
+        //                 listModel_ListViewTreatments.append({"treatment_ID": treatment["treatment_id"], "treatment_Name": treatment["treatment_name"]});
+        //             });
+        //         }
+        //     }
+
+        //     Layout.fillWidth: true
+        //     Layout.preferredHeight: (root.height * 0.45)
+
+        //     Layout.topMargin: 15
+        //     Layout.leftMargin: 15
+        //     Layout.rightMargin: 15
+
+        //     spacing: 1
+        //     clip: true
+
+        //     model: ListModel { id: listModel_ListViewTreatments }
+
+        //     delegate: UFO_ListDelegate_Treatments {
+        //         width: listView_Treatments.width
+
+        //         treatmentName: model["treatment_Name"]
+
+        //         onDeleteClicked: {
+        //             listModel_ListViewTreatments.remove(index);
+        //         }
+        //     }
+        // }
+    }
 
     // // Apply and Revert
     // RowLayout {
@@ -392,6 +747,20 @@ UFO_Page {
     //         }
     //     }
 
+    //UFO_Button {
+        //         Layout.preferredWidth: 120
+        //         Layout.preferredHeight: 35
+
+        //         enabled: (Database.connectionStatus && root.patientSelected)
+
+        //         text: qsTr("Close")
+        //         svg: "./../../icons/Google icons/sync.svg"
+
+        //         onClicked: {
+        //             // Just set visibilyt of page to false
+        //         }
+        //     }
+
     //     UFO_Button {
     //         Layout.preferredWidth: 120
     //         Layout.preferredHeight: 35
@@ -437,6 +806,4 @@ UFO_Page {
 }
 
 
-// NOTE (SAVIZ): When a patient is deleted, you can emit a signal that disables the visibily of the entire page and optionally enables the visibly of something that says patien was deleted. Also, have the patientdata map be cleared in the background at the end of the deelte method call in database. this way everything is clean. Of course all of this should only happen if the deleet operation is succesufl.Maybe have a delete signal be emitted from the database instead.
 // NOTE (SAVIZ): Have the page begin with a visibly of false, so that the first time a patinet must be selected before attempting to modify it.
-// NOTE (SAVIZ): I think the best way to deal with deletions is to add a field to patients, which says 'mark_for_deletion', and then have a button that changes to mark and unmark in the edit patient tab. You can then also add a field in search for all people that have been marked for deletion peopel. and then in settings add a button that says deleet all marked patients.

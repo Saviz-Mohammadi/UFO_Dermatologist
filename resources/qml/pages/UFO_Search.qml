@@ -90,16 +90,10 @@ UFO_SplitView {
 
 
                     onEditClicked: {
-                        // var operationStatus = Database.readyPatientData(model.patient_ID)
+                        Database.pullPatientData(model.patient_id)
 
 
-                        // if(operationStatus !== true) {
-                        //     ufo_StatusBar.displayMessage("Could not make patient ready for editting!");
-
-                        //     return;
-                        // }
-
-                        // root.patientSelectedForEdit()
+                        root.patientSelectedForEdit()
                     }
                 }
 
