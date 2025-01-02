@@ -320,6 +320,34 @@ UFO_Page {
                     Database.disconnect();
                 }
             }
+
+            BusyIndicator {
+                id: busyIndicator
+
+                Layout.preferredWidth: 35
+                Layout.preferredHeight: 35
+
+                visible: false
+
+                Connections {
+                    target: Database
+
+                    function onConnectionRequestInitiated() {
+                        busyIndicator.running = true
+                        busyIndicator.visible = true
+                    }
+                }
+
+                Connections {
+                    target: Database
+
+                    // NOTE (SAVIZ): Regardless of the status, stop the indicator from displaying:
+                    function onConnectionStatusChanged() {
+                        busyIndicator.running = false
+                        busyIndicator.visible = false
+                    }
+                }
+            }
         }
     }
 

@@ -11,7 +11,7 @@ Item {
 
     property alias treatmentName: text_TreatmentName.text
 
-    signal deleteClicked
+    signal removeClicked
 
     implicitWidth: 200
     implicitHeight: 35
@@ -25,7 +25,7 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 35
 
-            color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Background"])
+            color: Qt.color(AppTheme.colors["UFO_Delegate_Background"])
 
             Text {
                 id: text_TreatmentName
@@ -36,13 +36,13 @@ Item {
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
 
-                color: Qt.color(AppTheme.colors["UFO_ListDelegate_Column_Text"])
+                color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
                 font.pointSize: Qt.application.font.pointSize * 1
                 elide: Text.ElideRight
             }
         }
 
-        UFO_Delegate_Button {
+        UFO_Button {
             Layout.preferredWidth: 120
             Layout.preferredHeight: 35
 
@@ -51,10 +51,10 @@ Item {
             enabled: (Database.connectionStatus === true) ? true : false
 
             text: qsTr("Remove")
-            svg: "./../../icons/Google icons/edit.svg"
+            svg: "./../../icons/Google icons/delete.svg"
 
             onClicked: {
-                root.deleteClicked()
+                root.removeClicked()
             }
         }
     }

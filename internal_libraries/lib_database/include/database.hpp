@@ -50,17 +50,22 @@ private:
 private:
     QSqlDatabase m_QSqlDatabase;
     bool m_ConnectionStatus;
+    QVariantList m_DiagnosisList;
     QVariantList m_TreatmentList;
+    QVariantList m_MedicalDrugList;
     QVariantList m_SearchResultList;
     QVariantMap m_PatientDataMap;
 
     // Signals
 signals:
     void connectionStatusChanged(const QString &message);
+    void connectionRequestInitiated();
+    void diagnosisListPopulated(bool success, const QString &message);
     void treatmentListPopulated(bool success, const QString &message);
+    void medicalDrugListPopulated(bool success, const QString &message);
     void queryExecuted(QueryType type, bool success, const QString &message);
     void patientDataPulled(bool success, const QString &message);
-    void updatesApplied();
+    void patientDataPushed(bool success, const QString &message);
 
     // PUBLIC Methods
 public:
@@ -77,26 +82,35 @@ public:
     Q_INVOKABLE bool findFirstXPatients(const quint64 count);
     Q_INVOKABLE bool findLastXPatients(const quint64 count);
 
+    // SELECT
+    Q_INVOKABLE bool pullPatientData(const quint64 index);
+
     // UPDATE
-    bool updatePersonalInformation(const QString &newFirstName, const QString &newLastName, quint8 newAge, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus);
+    Q_INVOKABLE bool updatePatientData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice, const QVariantList &newDiagnoses, const QString &newDiagnosisNote, const QVariantList &newTreatments, const QString &newTreatmentNote, const QVariantList &newMedicalDrugs, const QString &newMedicalDrugNote);
+    bool updateBasicData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice);
+    bool updateDiagnoses(const QVariantList &newDiagnoses);
+    bool updateDiagnosisNote(const QString &newNote);
     bool updateTreatments(const QVariantList &newTreatments);
-    Q_INVOKABLE bool updatePatientData(const QString &newFirstName, const QString &newLastName, quint8 newAge, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, const QVariantList &newTreatments);
+    bool updateTreatmentNote(const QString &newNote);
+    bool updateMedicalDrugs(const QVariantList &newMedicalDrugs);
+    bool updateMedicalDrugNote(const QString &newNote);
 
     // DELETION
     Q_INVOKABLE bool changeDeletionStatus(bool newStatus);
 
-    // HELPER
-    Q_INVOKABLE bool pullPatientData(const quint64 index);
-
     // PRIVATE Methods
 private:
+    bool populateDiagnosisList();
     bool populateTreatmentList();
+    bool populateMedicalDrugList();
 
     // PUBLIC Getters
 public:
     bool getConnectionStatus() const;
-    Q_INVOKABLE QVariantList getSearchResultList() const;
+    Q_INVOKABLE QVariantList getDiagnosisList() const;
     Q_INVOKABLE QVariantList getTreatmentList() const;
+    Q_INVOKABLE QVariantList getMedicalDrugList() const;
+    Q_INVOKABLE QVariantList getSearchResultList() const;
     Q_INVOKABLE QVariantMap getPatientDataMap() const;
 
     // PRIVATE Setters
