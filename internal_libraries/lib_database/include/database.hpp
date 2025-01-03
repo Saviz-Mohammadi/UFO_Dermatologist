@@ -84,6 +84,13 @@ public:
 
     // SELECT
     Q_INVOKABLE bool pullPatientData(const quint64 index);
+    bool pullPatientBasicData(const quint64 index);
+    bool pullPatientDiagnoses(const quint64 index);
+    bool pullPatientTreatments(const quint64 index);
+    bool pullPatientMedicalDrugs(const quint64 index);
+    bool pullDiagnosisNote(const quint64 index);
+    bool pullTreatmentNote(const quint64 index);
+    bool pullMedicalDrugNote(const quint64 index);
 
     // UPDATE
     Q_INVOKABLE bool updatePatientData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice, const QVariantList &newDiagnoses, const QString &newDiagnosisNote, const QVariantList &newTreatments, const QString &newTreatmentNote, const QVariantList &newMedicalDrugs, const QString &newMedicalDrugNote);
