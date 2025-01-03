@@ -862,7 +862,7 @@ bool Database::pullPatientData(const quint64 index)
 
 
         // Notify QML:
-        emit patientDataPushed(true, "Errors occured while pulling patient data. Please retry later.");
+        emit patientDataPushed(false, "Errors occured while pulling patient data. Please retry later.");
 
 
 
@@ -878,7 +878,7 @@ bool Database::pullPatientData(const quint64 index)
 
 
     // Notify QML:
-    emit patientDataPushed(true, "Patient data successfully pulled from database.");
+    emit patientDataPulled(true, "Patient data successfully pulled from database.");
 
 
 
@@ -1315,7 +1315,7 @@ bool Database::pullDiagnosisNote(const quint64 index)
 
     while (query.next())
     {
-        m_PatientDataMap["diagnosis_note"] = query.value("diagnosis_note").toString();
+        m_PatientDataMap["diagnosis_note"] = query.value("note").toString();
     }
 
 
@@ -1390,7 +1390,7 @@ bool Database::pullTreatmentNote(const quint64 index)
 
     while (query.next())
     {
-        m_PatientDataMap["treatment_note"] = query.value("treatment_note").toString();
+        m_PatientDataMap["treatment_note"] = query.value("note").toString();
     }
 
 
@@ -1465,7 +1465,7 @@ bool Database::pullMedicalDrugNote(const quint64 index)
 
     while (query.next())
     {
-        m_PatientDataMap["medical_drug_note"] = query.value("medical_drug_note").toString();
+        m_PatientDataMap["medical_drug_note"] = query.value("note").toString();
     }
 
 
@@ -1504,30 +1504,54 @@ bool Database::updatePatientData(const QString &newFirstName, const QString &new
 
     bool diagnosesUpdateOutcome = updateDiagnoses(newDiagnoses);
 
+    bool treatmentsUpdateOutcome = updateTreatments(newTreatments);
+
+    bool medicalDrugsUpdateOutcome = updateMedicalDrugs(newMedicalDrugs);
+
     bool diagnosisNoteUpdateOutcome = updateDiagnosisNote(newDiagnosisNote);
 
-//     if(diagnosisNoteUpdateOutcome == false)
-//     {
-// #ifdef QT_DEBUG
-//         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Diagnosis note update failed!");
-// #endif
+    bool treatmentNoteUpdateOutcome = updateTreatmentNote(newTreatmentNote);
+
+    bool medicalDrugNoteUpdateOutcome = updateMedicalDrugNote(newMedicalDrugNote);
+
+
+    if(basicDataUpdateOutcome == false)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Basic Data update failed!");
+#endif
 
 
 
-//         emit patientDataPushed(false, "Diagnosis note update failed!");
+        emit patientDataPushed(false, "Basic Data update failed!");
 
 
 
-//         m_QSqlDatabase.rollback();
+        m_QSqlDatabase.rollback();
 
 
 
-//         return (false);
-//     }
+        return (false);
+    }
+
+    if(diagnosesUpdateOutcome == false)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Diagnoses update failed!");
+#endif
 
 
 
-    bool treatmentsUpdateOutcome = updateTreatments(newTreatments);
+        emit patientDataPushed(false, "Diagnoses update failed!");
+
+
+
+        m_QSqlDatabase.rollback();
+
+
+
+        return (false);
+    }
 
     if(treatmentsUpdateOutcome == false)
     {
@@ -1548,33 +1572,6 @@ bool Database::updatePatientData(const QString &newFirstName, const QString &new
         return (false);
     }
 
-
-
-//     bool treatmentNoteUpdateOutcome = updateTreatmentNote(newTreatmentNote);
-
-//     if(treatmentNoteUpdateOutcome == false)
-//     {
-// #ifdef QT_DEBUG
-//         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Treatment note update failed!");
-// #endif
-
-
-
-//         emit patientDataPushed(false, "Treatment note update failed!");
-
-
-
-//         m_QSqlDatabase.rollback();
-
-
-
-//         return (false);
-//     }
-
-
-
-    bool medicalDrugsUpdateOutcome = updateMedicalDrugs(newMedicalDrugs);
-
     if(medicalDrugsUpdateOutcome == false)
     {
 #ifdef QT_DEBUG
@@ -1594,61 +1591,15 @@ bool Database::updatePatientData(const QString &newFirstName, const QString &new
         return (false);
     }
 
-
-
-    bool medicalDrugNoteUpdateOutcome = updateMedicalDrugNote(newMedicalDrugNote);
-
-//     if(medicalDrugNoteUpdateOutcome == false)
-//     {
-// #ifdef QT_DEBUG
-//         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Medical Drug note update failed!");
-// #endif
-
-
-
-//         emit patientDataPushed(false, "Medical Drug note update failed!");
-
-
-
-//         m_QSqlDatabase.rollback();
-
-
-
-//         return (false);
-//     }
-
-
-
-    bool commitSuccessful = m_QSqlDatabase.commit();
-
-    //     if(basicDataUpdateOutcome == false)
-    //     {
-    // #ifdef QT_DEBUG
-    //         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Basic data update failed!");
-    // #endif
-
-
-
-    //         m_QSqlDatabase.rollback();
-
-
-
-    //         emit patientDataPushed(false, "Basic data update failed!");
-
-
-
-    //         return (false);
-    //     }
-
-    if(diagnosesUpdateOutcome == false)
+    if(diagnosisNoteUpdateOutcome == false)
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Diagnoses update failed!");
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Diagnosis note update failed!");
 #endif
 
 
 
-        emit patientDataPushed(false, "Diagnoses update failed!");
+        emit patientDataPushed(false, "Diagnosis note update failed!");
 
 
 
@@ -1658,6 +1609,48 @@ bool Database::updatePatientData(const QString &newFirstName, const QString &new
 
         return (false);
     }
+
+    if(treatmentNoteUpdateOutcome == false)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Treatment note update failed!");
+#endif
+
+
+
+        emit patientDataPushed(false, "Treatment note update failed!");
+
+
+
+        m_QSqlDatabase.rollback();
+
+
+
+        return (false);
+    }
+
+    if(medicalDrugNoteUpdateOutcome == false)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Medical Drug note update failed!");
+#endif
+
+
+
+        emit patientDataPushed(false, "Medical Drug note update failed!");
+
+
+
+        m_QSqlDatabase.rollback();
+
+
+
+        return (false);
+    }
+
+
+
+    bool commitSuccessful = m_QSqlDatabase.commit();
 
     if(!commitSuccessful)
     {
