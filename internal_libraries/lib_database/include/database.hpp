@@ -11,7 +11,6 @@
 #include <QVariant>
 #include <QVariantList>
 #include <QDateTime>
-#include <QFileInfo>
 #include <QTextStream>
 
 // NOTE (SAVIZ): The combination of 'QVariantMap' and 'QVariantList' enbales us to replicate any type of data structure and exposed it easilly to QML. For this reason I don't use any intermidiate objects or strcuts for data transfer.
@@ -53,6 +52,7 @@ private:
     QVariantList m_DiagnosisList;
     QVariantList m_TreatmentList;
     QVariantList m_MedicalDrugList;
+    QVariantList m_ConsultantList;
     QVariantList m_SearchResultList;
     QVariantMap m_PatientDataMap;
 
@@ -62,6 +62,7 @@ signals:
     void connectionRequestInitiated();
     void diagnosisListPopulated(bool success, const QString &message);
     void treatmentListPopulated(bool success, const QString &message);
+    void consultantListPopulated(bool success, const QString &message);
     void medicalDrugListPopulated(bool success, const QString &message);
     void queryExecuted(QueryType type, bool success, const QString &message);
     void patientDataPulled(bool success, const QString &message);
@@ -91,9 +92,10 @@ public:
     bool pullDiagnosisNote(const quint64 index);
     bool pullTreatmentNote(const quint64 index);
     bool pullMedicalDrugNote(const quint64 index);
+    bool pullConsultations(const quint64 index);
 
     // UPDATE
-    Q_INVOKABLE bool updatePatientData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice, const QVariantList &newDiagnoses, const QString &newDiagnosisNote, const QVariantList &newTreatments, const QString &newTreatmentNote, const QVariantList &newMedicalDrugs, const QString &newMedicalDrugNote);
+    Q_INVOKABLE bool updatePatientData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice, const QVariantList &newDiagnoses, const QString &newDiagnosisNote, const QVariantList &newTreatments, const QString &newTreatmentNote, const QVariantList &newMedicalDrugs, const QString &newMedicalDrugNote, const QVariantList &newConsultations);
     bool updateBasicData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice);
     bool updateDiagnoses(const QVariantList &newDiagnoses);
     bool updateDiagnosisNote(const QString &newNote);
@@ -101,6 +103,7 @@ public:
     bool updateTreatmentNote(const QString &newNote);
     bool updateMedicalDrugs(const QVariantList &newMedicalDrugs);
     bool updateMedicalDrugNote(const QString &newNote);
+    bool updateConsultations(const QVariantList &newConsultations);
 
     // DELETION
     Q_INVOKABLE bool changeDeletionStatus(bool newStatus);
@@ -110,6 +113,7 @@ private:
     bool populateDiagnosisList();
     bool populateTreatmentList();
     bool populateMedicalDrugList();
+    bool populateConsultantList();
 
     // PUBLIC Getters
 public:
@@ -117,6 +121,7 @@ public:
     Q_INVOKABLE QVariantList getDiagnosisList() const;
     Q_INVOKABLE QVariantList getTreatmentList() const;
     Q_INVOKABLE QVariantList getMedicalDrugList() const;
+    Q_INVOKABLE QVariantList getConsultantList() const;
     Q_INVOKABLE QVariantList getSearchResultList() const;
     Q_INVOKABLE QVariantMap getPatientDataMap() const;
 

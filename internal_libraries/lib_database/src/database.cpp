@@ -21,6 +21,7 @@ Database::Database(QObject *parent, const QString &name)
     , m_DiagnosisList(QVariantList{})
     , m_TreatmentList(QVariantList{})
     , m_MedicalDrugList(QVariantList{})
+    , m_ConsultantList(QVariantList{})
     , m_SearchResultList(QVariantList{})
     , m_PatientDataMap(QVariantMap{})
 {
@@ -183,6 +184,7 @@ void Database::establishConnection(const QString &ipAddress, qint16 port, const 
     populateDiagnosisList();
     populateTreatmentList();
     populateMedicalDrugList();
+    populateConsultantList();
 
 
 
@@ -851,9 +853,11 @@ bool Database::pullPatientData(const quint64 index)
 
     bool medicalDrugNotePullOutcome = pullMedicalDrugNote(index);
 
+    bool consultationsPullOutcome = pullConsultations(index);
 
 
-    if(basicDataPullOutcome == false || diagnosesPullOutcome == false || treatmentsPullOutcome == false || medicalDrugsPullOutcome == false || diagnosisNotePullOutcome == false || treatmentNotePullOutcome == false || medicalDrugNotePullOutcome == false)
+
+    if(basicDataPullOutcome == false || diagnosesPullOutcome == false || treatmentsPullOutcome == false || medicalDrugsPullOutcome == false || diagnosisNotePullOutcome == false || treatmentNotePullOutcome == false || medicalDrugNotePullOutcome == false || consultationsPullOutcome == false)
     {
 #ifdef QT_DEBUG
         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Errors occured while pulling patient data!");
@@ -1479,8 +1483,106 @@ bool Database::pullMedicalDrugNote(const quint64 index)
     return (true);
 }
 
+bool Database::pullConsultations(const quint64 index)
+{
+#ifdef QT_DEBUG
+    QString message("Consultations pull initiated!\n");
+
+    QTextStream stream(&message);
+
+    stream << "The patient_id is: " + QString::number(index) + "\n";
+#endif
+
+
+
+    QString queryString = R"(
+        SELECT * FROM patients
+
+        LEFT JOIN patient_consultations ON patients.patient_id = patient_consultations.patient_id
+        LEFT JOIN consultants ON consultants.consultant_id = patient_consultations.consultant_id
+
+        WHERE patients.patient_id = :patient_id
+    )";
+
+
+
+    QSqlQuery query(m_QSqlDatabase);
+    query.prepare(queryString);
+
+
+
+    query.bindValue(":patient_id", index);
+
+
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        stream << query.lastError().text() << "\n";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        return (false);
+    }
+
+
+
+    if (query.size() == 0)
+    {
+#ifdef QT_DEBUG
+        stream << "Query returned no results.";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        return (false);
+    }
+
+
+
+    QVariantList consultations;
+
+
+
+    while (query.next())
+    {
+        if (!query.value("consultant_id").isNull() && !query.value("consultant_name").isNull())
+        {
+            QVariantMap consultantMap;
+
+            consultantMap["consultant_id"] = query.value("consultant_id").toULongLong();
+            consultantMap["consultant_name"] = query.value("consultant_name").toString().trimmed();
+            consultantMap["consultant_speciality"] = query.value("consultant_speciality").toString().trimmed();
+            consultantMap["consultation_date"] = query.value("consultation_date").toString().trimmed();
+            consultantMap["consultation_outcome"] = query.value("consultation_outcome").toString().trimmed();
+
+
+            consultations.append(consultantMap);
+        }
+    }
+
+
+
+    m_PatientDataMap["consultations"] = consultations;
+
+
+
+#ifdef QT_DEBUG
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+    return (true);
+}
+
 // UPDATE
-bool Database::updatePatientData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice, const QVariantList &newDiagnoses, const QString &newDiagnosisNote, const QVariantList &newTreatments, const QString &newTreatmentNote, const QVariantList &newMedicalDrugs, const QString &newMedicalDrugNote)
+bool Database::updatePatientData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice, const QVariantList &newDiagnoses, const QString &newDiagnosisNote, const QVariantList &newTreatments, const QString &newTreatmentNote, const QVariantList &newMedicalDrugs, const QString &newMedicalDrugNote, const QVariantList &newConsultations)
 {
     if(!m_QSqlDatabase.transaction())
     {
@@ -1513,6 +1615,8 @@ bool Database::updatePatientData(const QString &newFirstName, const QString &new
     bool treatmentNoteUpdateOutcome = updateTreatmentNote(newTreatmentNote);
 
     bool medicalDrugNoteUpdateOutcome = updateMedicalDrugNote(newMedicalDrugNote);
+
+    bool consultationsUpdateOutcome = updateConsultations(newConsultations);
 
 
     if(basicDataUpdateOutcome == false)
@@ -1638,6 +1742,25 @@ bool Database::updatePatientData(const QString &newFirstName, const QString &new
 
 
         emit patientDataPushed(false, "Medical Drug note update failed!");
+
+
+
+        m_QSqlDatabase.rollback();
+
+
+
+        return (false);
+    }
+
+    if(consultationsUpdateOutcome == false)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Consultations update failed!");
+#endif
+
+
+
+        emit patientDataPushed(false, "Consultations update failed!");
 
 
 
@@ -2213,6 +2336,122 @@ bool Database::updateMedicalDrugNote(const QString &newNote)
     return (true);
 }
 
+bool Database::updateConsultations(const QVariantList &newConsultations)
+{
+#ifdef QT_DEBUG
+    QString message("Consultations List update requested!\n");
+
+    QTextStream stream(&message);
+
+    for (const QVariant &item : newConsultations)
+    {
+        QVariantMap map = item.toMap();
+
+        stream << "consultant_id: " << map["consultant_id"].toString() << "\n";
+        stream << "consultation_date: " << map["consultation_date"].toString() << "\n";
+        stream << "consultation_outcome: " << map["consultation_outcome"].toString() << "\n";
+    }
+#endif
+
+
+
+    QSqlQuery queryDelete(m_QSqlDatabase);
+    queryDelete.prepare("DELETE FROM patient_consultations WHERE patient_id = :patient_id");
+
+
+
+    queryDelete.bindValue(":patient_id", m_PatientDataMap["patient_id"].toULongLong());
+
+
+
+    if (!queryDelete.exec())
+    {
+#ifdef QT_DEBUG
+        stream << queryDelete.lastError().text();
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        return (false);
+    }
+
+
+
+    if (newConsultations.isEmpty())
+    {
+#ifdef QT_DEBUG
+        stream << "Consultation list received is empty! Patient requires no treatments.";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        return (true); // If the list is empty, then the doctor decided to assign no treatments to the current patient. Technically, the operation is not a failure.
+    }
+
+
+
+    QString queryString = "INSERT INTO patient_consultations (patient_id, consultant_id, consultation_date, consultation_outcome) VALUES (?, ?, ?, ?)";
+    QSqlQuery queryInsert(m_QSqlDatabase);
+
+
+    queryInsert.prepare(queryString);
+
+
+
+    QVariantList patientIDs;
+    QVariantList consultationIDs;
+    QVariantList consultationDates;
+    QVariantList consultationOutcomes;
+
+    for (const QVariant &item : newConsultations)
+    {
+        QVariantMap map = item.toMap();
+
+        patientIDs.append(m_PatientDataMap["patient_id"].toULongLong());
+        consultationIDs.append(map["consultant_id"].toULongLong());
+        consultationDates.append(map["consultation_date"].toDate());
+        consultationOutcomes.append(map["consultation_outcome"].toString());
+    }
+
+
+
+    queryInsert.addBindValue(patientIDs);
+    queryInsert.addBindValue(consultationIDs);
+    queryInsert.addBindValue(consultationDates);
+    queryInsert.addBindValue(consultationOutcomes);
+
+
+
+    if (!queryInsert.execBatch())
+    {
+#ifdef QT_DEBUG
+        stream << queryInsert.lastError().text();
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        return false;
+    }
+
+
+
+#ifdef QT_DEBUG
+    stream << "Consultation List updated successfully!";
+
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+    return (true);
+}
+
 // DELETION
 bool Database::changeDeletionStatus(bool newStatus)
 {
@@ -2508,6 +2747,82 @@ bool Database::populateMedicalDrugList()
     return (true);
 }
 
+bool Database::populateConsultantList()
+{
+    QString queryString = "SELECT * FROM consultants WHERE is_active = TRUE";
+
+
+
+    QSqlQuery query(m_QSqlDatabase);
+    query.prepare(queryString);
+
+
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
+#endif
+
+
+
+        // Notify QML:
+        emit consultantListPopulated(false, query.lastError().text());
+
+
+
+        return (false);
+    }
+
+
+
+    if (query.size() == 0)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Query returned no results.");
+#endif
+
+
+
+        // Notify QML:
+        emit consultantListPopulated(false, "Query returned no results.");
+
+
+
+        return (false);
+    }
+
+
+
+    m_ConsultantList.clear();
+
+
+
+    while (query.next())
+    {
+        QVariantMap consultantMap;
+
+
+
+        consultantMap["consultant_id"] = query.value("consultant_id").toULongLong();
+        consultantMap["consultant_name"] = query.value("consultant_name").toString();
+        consultantMap["consultant_speciality"] = query.value("consultant_speciality").toString();
+
+
+
+        m_ConsultantList.append(consultantMap);
+    }
+
+
+
+    // Notify QML:
+    emit consultantListPopulated(true, "Consultant list successfully acquired.");
+
+
+
+    return (true);
+}
+
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 
@@ -2537,6 +2852,11 @@ QVariantList Database::getTreatmentList() const
 QVariantList Database::getMedicalDrugList() const
 {
     return (m_MedicalDrugList);
+}
+
+QVariantList Database::getConsultantList() const
+{
+    return (m_ConsultantList);
 }
 
 QVariantList Database::getSearchResultList() const

@@ -1210,6 +1210,211 @@ UFO_Page {
         }
     }
 
+    // TODO (SAVIZ): Have the default on populates be set and then have a onCurrentChangedfor the type combo where every time it changes it will filter the model of the other one based on type selected directly here in qml by looking at teh origin list from C++.
+    UFO_GroupBox {
+        id: ufo_GroupBox_Consultations
+
+        Layout.fillWidth: true
+        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
+
+        title: qsTr("Consultations")
+        contentSpacing: 0
+
+        Text {
+            Layout.fillWidth: true
+
+            Layout.topMargin: 15
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            text: qsTr("The following represents the list of consultations assigned to the patient")
+
+            elide: Text.ElideRight
+            wrapMode: Text.NoWrap
+
+            horizontalAlignment: Text.AlignLeft
+            verticalAlignment: Text.AlignVCenter
+
+            font.pixelSize: Qt.application.font.pixelSize * 1
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+
+            Layout.topMargin: 15
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            spacing: 2
+
+            UFO_ComboBox {
+                id: ufo_ComboBox_ConsultantName
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                textRole: "consultant_name"
+
+                model: ListModel { id: listModel_UFO_ComboBox_ConsultantName }
+
+                Connections {
+                    target: Database
+
+                    function onConsultantListPopulated() {
+                        listModel_UFO_ComboBox_ConsultantName.clear();
+
+                        Database.getConsultantList().forEach(function (consultant) {
+                            listModel_UFO_ComboBox_ConsultantName.append({"consultant_id": consultant["consultant_id"], "consultant_name": consultant["consultant_name"]});
+                        });
+
+                        // Set default:
+                        ufo_ComboBox_ConsultantName.currentIndex = 0;
+                    }
+                }
+
+                Connections {
+                    target: Database
+
+                    function onPatientDataPulled() {
+                        ufo_ComboBox_ConsultantName.currentIndex = 0;
+                    }
+                }
+            }
+
+            UFO_ComboBox {
+                id: ufo_ComboBox_ConsultantSpeciality
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                textRole: "speciality"
+
+                model: ListModel {
+                    id: listModel_UFO_ComboBox_ConsultantSpeciality
+
+                    ListElement { speciality: "All" }
+                    ListElement { speciality: "Optometrist" }
+                    ListElement { speciality: "Dentist" }
+                }
+
+                Connections {
+                    target: Database
+
+                    function onPatientDataPulled() {
+                        ufo_ComboBox_ConsultantSpeciality.currentIndex = 0;
+                    }
+                }
+
+                onActivated:  {
+                    listModel_UFO_ComboBox_ConsultantName.clear();
+
+                    if(ufo_ComboBox_ConsultantSpeciality.currentText === "All") {
+                        Database.getConsultantList().forEach(function (consultant) {
+                            listModel_UFO_ComboBox_ConsultantName.append({"consultant_id": consultant["consultant_id"], "consultant_name": consultant["consultant_name"]});
+                        });
+                    }
+
+                    else {
+                        Database.getConsultantList().forEach(function (consultant) {
+                            if(consultant["consultant_speciality"] === ufo_ComboBox_ConsultantSpeciality.currentText) {
+                                listModel_UFO_ComboBox_ConsultantName.append({"consultant_id": consultant["consultant_id"], "consultant_name": consultant["consultant_name"]});
+                            }
+                        });
+                    }
+
+                    ufo_ComboBox_ConsultantName.currentIndex = 0
+                }
+            }
+
+            UFO_Button {
+                Layout.preferredWidth: 120
+                Layout.preferredHeight: 35
+
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+
+                enabled: (Database.connectionStatus === true) ? true : false
+                text: qsTr("Insert")
+                svg: "./../../icons/Google icons/add_box.svg"
+
+                onClicked: {
+                    listModel_ListView_Consultations.append({"consultant_id": ufo_ComboBox_ConsultantName.model.get(ufo_ComboBox_ConsultantName.currentIndex)["consultant_id"], "consultant_name": ufo_ComboBox_ConsultantName.model.get(ufo_ComboBox_ConsultantName.currentIndex)["consultant_name"], "consultation_date": "", "consultation_outcome": ""});
+                }
+            }
+
+            // TODO (SAVIZ): The combobox is only in charge of adding a new consultant id and name. the actual data like outcome text and date are the responsibilyt of eth patient pull and push to sync with teh delegate.
+        }
+
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 300
+
+            Layout.topMargin: 2
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            radius: 0
+
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_ListView_Background"])
+
+            ListView {
+                id: listView_Consultations
+
+                anchors.fill: parent
+
+                anchors.margins: 15
+
+                spacing: 2
+                clip: true
+
+                model: ListModel { id: listModel_ListView_Consultations }
+
+                ScrollBar.vertical: ScrollBar {
+                    id: scrollBar_Consultations
+
+                    width: 10
+                    policy: ScrollBar.AsNeeded
+                }
+
+                delegate: UFO_Delegate_Consultation {
+                    width: listView_Consultations.width - scrollBar_Consultations.width / 2
+
+                    consultantName: model["consultant_name"]
+                    consultationConductedDate: model["consultation_date"]
+                    consultationOutcome: model["consultation_outcome"]
+
+                    onRemoveClicked: {
+                        listModel_ListView_Consultations.remove(index);
+                    }
+
+                    onDateChanged: {
+                        model["consultation_date"] = consultationConductedDate.trim();
+                    }
+
+                    onOutcomeChanged: {
+                        model["consultation_outcome"] = consultationOutcome.trim();
+                    }
+                }
+
+                Connections {
+                    target: Database
+
+                    function onPatientDataPulled() {
+                        listModel_ListView_Consultations.clear();
+
+                        Database.getPatientDataMap()["consultations"].forEach(function (consultation) {
+                            listModel_ListView_Consultations.append({"consultant_id": consultation["consultant_id"], "consultant_name": consultation["consultant_name"], "consultation_date": consultation["consultation_date"], "consultation_outcome": consultation["consultation_outcome"]});
+                        });
+                    }
+                }
+            }
+        }
+    }
+
     // Pull and Push
     RowLayout {
         Layout.fillWidth: true
@@ -1284,9 +1489,22 @@ UFO_Page {
                 console.log("Medical Drugs:", JSON.stringify(medicalDrugs));
 
 
+                let consultations = [];
+
+                for (let a = 0; a < listModel_ListView_Consultations.count; a++) {
+                    let item = listModel_ListView_Consultations.get(a);
+
+                    consultations.push({
+                        consultant_id: item.consultant_id,
+                        consultation_date: item.consultation_date,
+                        consultation_outcome: item.consultation_outcome
+                    });
+                }
+
+                console.log("Consultations:", JSON.stringify(consultations));
 
                 // Push:
-                Database.updatePatientData(first_name, last_name, birthYear, phone_number, gender, marital_status, numberOfPreviousVisits, firstVisitDate, recentVisitDate, servicePrice, diagnoses, diagnosisNote, treatments, treatmentNote, medicalDrugs, medicalDrugNote);
+                Database.updatePatientData(first_name, last_name, birthYear, phone_number, gender, marital_status, numberOfPreviousVisits, firstVisitDate, recentVisitDate, servicePrice, diagnoses, diagnosisNote, treatments, treatmentNote, medicalDrugs, medicalDrugNote, consultations);
             }
         }
     }
