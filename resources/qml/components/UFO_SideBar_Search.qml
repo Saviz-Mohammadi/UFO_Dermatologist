@@ -263,7 +263,7 @@ Item {
 
                 enabled: (Database.connectionStatus === true) ? true : false
                 text: qsTr("Clear")
-                svg: "./../../icons/Google icons/delete.svg"
+                icon.source: "./../../icons/Google icons/delete.svg"
 
                 onClicked: {
                     textField_PatientID.clear();
@@ -293,7 +293,7 @@ Item {
 
                 enabled: (Database.connectionStatus === true) ? true : false
                 text: qsTr("First 10")
-                svg: "./../../icons/Google icons/list.svg"
+                icon.source: "./../../icons/Google icons/list.svg"
 
                 onClicked: {
                     Database.findFirstXPatients(10)
@@ -306,7 +306,7 @@ Item {
 
                 enabled: (Database.connectionStatus === true) ? true : false
                 text: qsTr("Last 10")
-                svg: "./../../icons/Google icons/list.svg"
+                icon.source: "./../../icons/Google icons/list.svg"
 
                 onClicked: {
                     Database.findLastXPatients(10)
@@ -319,7 +319,7 @@ Item {
 
                 enabled: (Database.connectionStatus === true) ? true : false
                 text: qsTr("Search")
-                svg: "./../../icons/Google icons/person_search.svg"
+                icon.source: "./../../icons/Google icons/person_search.svg"
 
                 onClicked: {
                     // Grab data:

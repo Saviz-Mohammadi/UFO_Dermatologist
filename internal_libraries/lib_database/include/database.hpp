@@ -59,7 +59,6 @@ private:
     // Signals
 signals:
     void connectionStatusChanged(const QString &message);
-    void connectionRequestInitiated();
     void diagnosisListPopulated(bool success, const QString &message);
     void treatmentListPopulated(bool success, const QString &message);
     void consultantListPopulated(bool success, const QString &message);
@@ -71,8 +70,8 @@ signals:
     // PUBLIC Methods
 public:
     // CONNECTIONS
-    Q_INVOKABLE void establishConnection(const QString &ipAddress, qint16 port, const QString &schema, const QString &username, const QString &password);
-    Q_INVOKABLE void disconnect();
+    Q_INVOKABLE bool establishConnection(const QString &ipAddress, qint16 port, const QString &schema, const QString &username, const QString &password);
+    Q_INVOKABLE bool disconnect();
 
     // INSERT
     Q_INVOKABLE bool createPatient(const QString &firstName, const QString &lastName, quint32 birthYear, const QString &phoneNumber, const QString &gender, const QString &maritalStatus);
@@ -124,10 +123,6 @@ public:
     Q_INVOKABLE QVariantList getConsultantList() const;
     Q_INVOKABLE QVariantList getSearchResultList() const;
     Q_INVOKABLE QVariantMap getPatientDataMap() const;
-
-    // PRIVATE Setters
-private:
-    void setConnectionStatus(const bool newStatus, const QString &newMessage);
 };
 
 #endif // DATABASE_H

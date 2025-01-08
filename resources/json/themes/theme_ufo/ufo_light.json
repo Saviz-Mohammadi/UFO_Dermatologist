@@ -39,16 +39,6 @@
     "UFO_Button_Background_Normal": "Color_Light_8",
     "UFO_Button_Border": "Color_Blue_8",
 
-    "UFO_SideBar_TabButton_Icon_Checked": "Color_Dark_3",
-    "UFO_SideBar_TabButton_Icon_Hovered": "Color_Dark_3",
-    "UFO_SideBar_TabButton_Icon_Normal": "Color_Dark_3",
-    "UFO_SideBar_TabButton_Text_Checked": "Color_Dark_3",
-    "UFO_SideBar_TabButton_Text_Hovered": "Color_Dark_3",
-    "UFO_SideBar_TabButton_Text_Normal": "Color_Dark_3",
-    "UFO_SideBar_TabButton_Background_Checked": "Color_Blue_3",
-    "UFO_SideBar_TabButton_Background_Hovered": "Color_Light_5",
-    "UFO_SideBar_TabButton_Background_Normal": "Color_Light_4",
-
     "UFO_GroupBox_Title_Text": "Color_Light_3",
     "UFO_GroupBox_Title_Background":"Color_Light_8",
     "UFO_GroupBox_Separator": "Color_Light_4",
@@ -61,39 +51,30 @@
     "UFO_ComboBox_Background": "Color_Light_8",
     "UFO_ComboBox_Border_Normal": "Color_Light_8",
     "UFO_ComboBox_Border_Pressed": "Color_Light_8",
-
     "UFO_ComboBox_Item_Text_Normal": "Color_Light_3",
     "UFO_ComboBox_Item_Text_Highlighted": "Color_Dark_4",
     "UFO_ComboBox_Item_Background_Normal": "Color_Light_8",
     "UFO_ComboBox_Item_Background_Highlighted": "Color_Blue_3",
-
     "UFO_ComboBox_Arrow_Background_Normal": "Color_Light_3",
     "UFO_ComboBox_Arrow_Background_Pressed": "Color_Light_3",
-
     "UFO_ComboBox_DropBox_Border": "Color_Dark_3",
     "UFO_ComboBox_Popup_Background": "Color_Dark_3",
 
     "UFO_TextField_Background_Normal": "Color_Light_8",
     "UFO_TextField_Background_Hovered": "Color_Light_8",
     "UFO_TextField_Background_Active": "Color_Blue_3",
-
     "UFO_TextField_Border": "Color_Light_8",
-
     "UFO_TextField_Text_Normal": "Color_Light_3",
     "UFO_TextField_Text_Hovered": "Color_Light_3",
     "UFO_TextField_Text_Active": "Color_Dark_4",
-
     "UFO_TextField_SelectedText": "Color_Light_3",
-
     "UFO_TextField_Placeholder_Normal": "Color_Light_3",
     "UFO_TextField_Placeholder_Hovered": "Color_Light_3",
     "UFO_TextField_Placeholder_Active": "Color_Dark_4",
 
-    "UFO_ProgressBar_Text": "Color_Light_4",
-    "UFO_ProgressBar_Background": "Color_Dark_2",
-    "UFO_ProgressBar_ProgressIndicator": "Color_Light_4",
-
-    "UFO_StopTimer_Background": "Color_Light_7",
+    "UFO_ListView_Background": "Color_Light_4",
+    "UFO_ListView_Title_Background": "Color_Light_8",
+    "UFO_ListView_Title_Text": "Color_Light_3",
 
     "UFO_SplitView_Handle_Normal": "Color_Light_8",
     "UFO_SplitView_Handle_Hovered": "Color_Light_8",
@@ -104,18 +85,39 @@
     "UFO_CheckBox_Indicator_Filler_Checked": "Color_Blue_3",
     "UFO_CheckBox_Text": "Color_Dark_4",
 
+    "UFO_TextArea_Background_Normal": "Color_Light_8",
+    "UFO_TextArea_Background_Hovered": "Color_Light_8",
+    "UFO_TextArea_Background_Active": "Color_Blue_3",
+    "UFO_TextArea_Border": "Color_Light_8",
+    "UFO_TextArea_Text_Normal": "Color_Light_3",
+    "UFO_TextArea_Text_Hovered": "Color_Light_3",
+    "UFO_TextArea_Text_Active": "Color_Dark_4",
+    "UFO_TextArea_SelectedText": "Color_Light_3",
+    "UFO_TextArea_Placeholder_Normal": "Color_Light_3",
+    "UFO_TextArea_Placeholder_Hovered": "Color_Light_3",
+    "UFO_TextArea_Placeholder_Active": "Color_Dark_4",
+
+    "UFO_ScrollBar_Normal": "Color_Dark_4",
+    "UFO_ScrollBar_Pressed": "Color_Dark_4",
+
+    "UFO_SideBar_TabButton_Icon_Checked": "Color_Dark_3",
+    "UFO_SideBar_TabButton_Icon_Hovered": "Color_Dark_3",
+    "UFO_SideBar_TabButton_Icon_Normal": "Color_Dark_3",
+    "UFO_SideBar_TabButton_Text_Checked": "Color_Dark_3",
+    "UFO_SideBar_TabButton_Text_Hovered": "Color_Dark_3",
+    "UFO_SideBar_TabButton_Text_Normal": "Color_Dark_3",
+    "UFO_SideBar_TabButton_Background_Checked": "Color_Blue_3",
+    "UFO_SideBar_TabButton_Background_Hovered": "Color_Light_5",
+    "UFO_SideBar_TabButton_Background_Normal": "Color_Light_4",
+
     "UFO_SideBar_TextField_Background_Normal": "Color_Dark_3",
     "UFO_SideBar_TextField_Background_Hovered": "Color_Dark_3",
     "UFO_SideBar_TextField_Background_Active": "Color_Blue_3",
-
     "UFO_SideBar_TextField_Border": "Color_Dark_2",
-
     "UFO_SideBar_TextField_Text_Normal": "Color_Light_3",
     "UFO_SideBar_TextField_Text_Hovered": "Color_Light_3",
     "UFO_SideBar_TextField_Text_Active": "Color_Dark_4",
-
     "UFO_SideBar_TextField_SelectedText": "Color_Light_3",
-
     "UFO_SideBar_TextField_Placeholder_Normal": "Color_Light_3",
     "UFO_SideBar_TextField_Placeholder_Hovered": "Color_Light_3",
     "UFO_SideBar_TextField_Placeholder_Active": "Color_Dark_4",
@@ -125,15 +127,12 @@
     "UFO_SideBar_ComboBox_Background": "Color_Dark_4",
     "UFO_SideBar_ComboBox_Border_Normal": "Color_Dark_4",
     "UFO_SideBar_ComboBox_Border_Pressed": "Color_Dark_4",
-
     "UFO_SideBar_ComboBox_Item_Text_Normal": "Color_Light_3",
     "UFO_SideBar_ComboBox_Item_Text_Highlighted": "Color_Dark_4",
     "UFO_SideBar_ComboBox_Item_Background_Normal": "Color_Dark_4",
     "UFO_SideBar_ComboBox_Item_Background_Highlighted": "Color_Blue_3",
-
     "UFO_SideBar_ComboBox_Arrow_Background_Normal": "Color_Light_3",
     "UFO_SideBar_ComboBox_Arrow_Background_Pressed": "Color_Light_3",
-
     "UFO_SideBar_ComboBox_DropBox_Border": "Color_Dark_3",
     "UFO_SideBar_ComboBox_Popup_Background": "Color_Dark_3",
 
@@ -145,40 +144,15 @@
     "UFO_SideBar_Button_Icon_Checked": "Color_Dark_4",
     "UFO_SideBar_Button_Icon_Hovered": "Color_Dark_4",
     "UFO_SideBar_Button_Icon_Normal": "Color_Light_2",
-
     "UFO_SideBar_Button_Text_Checked": "Color_Dark_4",
     "UFO_SideBar_Button_Text_Hovered": "Color_Dark_4",
     "UFO_SideBar_Button_Text_Normal": "Color_Light_2",
-
     "UFO_SideBar_Button_Background_Checked": "Color_Blue_3",
     "UFO_SideBar_Button_Background_Hovered": "Color_Blue_3",
     "UFO_SideBar_Button_Background_Normal": "Color_Dark_3",
 
-    "UFO_ListView_Background": "Color_Light_4",
-    "UFO_ListView_Title_Background": "Color_Light_8",
-    "UFO_ListView_Title_Text": "Color_Light_3",
-
     "UFO_Delegate_Background": "Color_Dark_3",
     "UFO_Delegate_Icon": "Color_Light_4",
     "UFO_Delegate_Field_Background": "Color_Light_8",
-    "UFO_Delegate_Field_Text": "Color_Light_3",
-
-    "UFO_TextArea_Background_Normal": "Color_Light_8",
-    "UFO_TextArea_Background_Hovered": "Color_Light_8",
-    "UFO_TextArea_Background_Active": "Color_Blue_3",
-
-    "UFO_TextArea_Border": "Color_Light_8",
-
-    "UFO_TextArea_Text_Normal": "Color_Light_3",
-    "UFO_TextArea_Text_Hovered": "Color_Light_3",
-    "UFO_TextArea_Text_Active": "Color_Dark_4",
-
-    "UFO_TextArea_SelectedText": "Color_Light_3",
-
-    "UFO_TextArea_Placeholder_Normal": "Color_Light_3",
-    "UFO_TextArea_Placeholder_Hovered": "Color_Light_3",
-    "UFO_TextArea_Placeholder_Active": "Color_Dark_4",
-
-    "UFO_ScrollBar_Normal": "Color_Dark_4",
-    "UFO_ScrollBar_Pressed": "Color_Dark_4"
+    "UFO_Delegate_Field_Text": "Color_Light_3"
 }

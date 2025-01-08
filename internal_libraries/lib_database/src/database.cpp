@@ -91,7 +91,7 @@ Database *Database::cppInstance(QObject *parent)
 // [[------------------------------------------------------------------------]]
 
 // CONNECTIONS
-void Database::establishConnection(const QString &ipAddress, qint16 port, const QString &schema, const QString &username, const QString &password)
+bool Database::establishConnection(const QString &ipAddress, qint16 port, const QString &schema, const QString &username, const QString &password)
 {
 #ifdef QT_DEBUG
     QString message("Connection request initiated!\n");
@@ -101,13 +101,8 @@ void Database::establishConnection(const QString &ipAddress, qint16 port, const 
 
 
 
-    // Notify QML:
-    emit connectionRequestInitiated();
-
-
-
     // Connection exists, abort operation.
-    if (m_ConnectionStatus)
+    if (m_ConnectionStatus == true)
     {
 #ifdef QT_DEBUG
         stream << "Connection exists. Aborting operation.";
@@ -117,12 +112,16 @@ void Database::establishConnection(const QString &ipAddress, qint16 port, const 
 
 
 
+        m_ConnectionStatus = true;
+
+
+
         // Notify QML:
-        setConnectionStatus(true, "Connection exists. Aborting operation.");
+        emit connectionStatusChanged("Connection exists. Aborting operation.");
 
 
 
-        return;
+        return (true);
     }
 
 
@@ -144,8 +143,9 @@ void Database::establishConnection(const QString &ipAddress, qint16 port, const 
 #ifdef QT_DEBUG
         stream  << "Connection failed!\n";
 
-        stream  << "Error     : " << m_QSqlDatabase.lastError().text() << "\n"
-                << "IpAddress : " << ipAddress << "\n"
+        stream  << m_QSqlDatabase.lastError().text() << "\n\n";
+
+        stream  << "IpAddress : " << ipAddress << "\n"
                 << "Port      : " << port << "\n"
                 << "Schema    : " << schema << "\n"
                 << "Username  : " << username << "\n"
@@ -156,12 +156,16 @@ void Database::establishConnection(const QString &ipAddress, qint16 port, const 
 
 
 
+        m_ConnectionStatus = false;
+
+
+
         // Notify QML:
-        setConnectionStatus(false, "Unable to establish a connection to the database.");
+        emit connectionStatusChanged("Connection failed: " + m_QSqlDatabase.lastError().text());
 
 
 
-        return;
+        return (false);
     }
 
 
@@ -181,22 +185,57 @@ void Database::establishConnection(const QString &ipAddress, qint16 port, const 
 
 
     // Populate lists:
-    populateDiagnosisList();
-    populateTreatmentList();
-    populateMedicalDrugList();
-    populateConsultantList();
+    //populateDiagnosisList();
+    //populateTreatmentList();
+    //populateMedicalDrugList();
+    //populateConsultantList();
+
+
+
+    m_ConnectionStatus = true;
 
 
 
     // Notify QML:
-    setConnectionStatus(true, "Successfully connected to the database.");
+    emit connectionStatusChanged("Successfully connected to the database.");
+
+
+
+    return (true);
 }
 
-void Database::disconnect()
+bool Database::disconnect()
 {
 #ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Closing the database connection...\n");
+    QString message("Disconnect request initiated!\n");
+
+    QTextStream stream(&message);
 #endif
+
+
+
+    // Connection does not exist, abort operation.
+    if (m_ConnectionStatus == false)
+    {
+#ifdef QT_DEBUG
+        stream << "Connection does not exist. Aborting operation.";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        m_ConnectionStatus = false;
+
+
+
+        // Notify QML:
+        emit connectionStatusChanged("Connection does not exist. Aborting operation.");
+
+
+
+        return (true);
+    }
 
 
 
@@ -204,8 +243,24 @@ void Database::disconnect()
 
 
 
+#ifdef QT_DEBUG
+    stream << "Closing the database connection...\n";
+
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+    m_ConnectionStatus = false;
+
+
+
     // Notify QML:
-    setConnectionStatus(false, "Disconnected from database.");
+    emit connectionStatusChanged("Disconnected from database.");
+
+
+
+    return (true);
 }
 
 // INSERT
@@ -2867,28 +2922,6 @@ QVariantList Database::getSearchResultList() const
 QVariantMap Database::getPatientDataMap() const
 {
     return (m_PatientDataMap);
-}
-
-// [[------------------------------------------------------------------------]]
-// [[------------------------------------------------------------------------]]
-
-
-
-
-
-// PRIVATE Setters
-// [[------------------------------------------------------------------------]]
-// [[------------------------------------------------------------------------]]
-
-void Database::setConnectionStatus(const bool newStatus, const QString &newMessage)
-{
-    if (m_ConnectionStatus == newStatus)
-    {
-        return;
-    }
-
-    m_ConnectionStatus = newStatus;
-    emit connectionStatusChanged(newMessage);
 }
 
 // [[------------------------------------------------------------------------]]

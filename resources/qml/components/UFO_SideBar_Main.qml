@@ -15,19 +15,19 @@ Item {
         // TODO (SAVIZ): I like to replace these with an enum, but currently I don't know how in QML.
         switch (targetButton) {
             case "Search Page":
-                ufo_SideBar_TabButton_Search.checked = true
+                ufo_SideBar_Button_Search.checked = true
                 break
             case "Edit Page":
-                ufo_SideBar_TabButton_Edit.checked = true
+                ufo_SideBar_Button_Edit.checked = true
                 break
             case "Create Page":
-                ufo_SideBar_TabButton_Create.checked = true
+                ufo_SideBar_Button_Create.checked = true
                 break
             case "Settings Page":
-                ufo_SideBar_TabButton_Settings.checked = true
+                ufo_SideBar_Button_Settings.checked = true
                 break
             case "About Page":
-                ufo_SideBar_TabButton_About.checked = true
+                ufo_SideBar_Button_About.checked = true
                 break
             default:
                 console.log("No valid value");
@@ -68,8 +68,8 @@ Item {
                     clip: true
                     spacing: 10
 
-                    UFO_SideBar_TabButton {
-                        id: ufo_SideBar_TabButton_Search
+                    UFO_SideBar_Button {
+                        id: ufo_SideBar_Button_Search
 
                         Layout.fillWidth: true
                         Layout.preferredHeight: 40
@@ -84,15 +84,15 @@ Item {
                         checked: false
 
                         text: qsTr("Search")
-                        svg: "./../../icons/Google icons/person_search.svg"
+                        icon.source: "./../../icons/Google icons/person_search.svg"
 
                         onClicked: {
                             root.tabChanged("Search Page")
                         }
                     }
 
-                    UFO_SideBar_TabButton {
-                        id: ufo_SideBar_TabButton_Edit
+                    UFO_SideBar_Button {
+                        id: ufo_SideBar_Button_Edit
 
                         Layout.fillWidth: true
                         Layout.preferredHeight: 40
@@ -107,15 +107,15 @@ Item {
                         checked: false
 
                         text: qsTr("Edit")
-                        svg: "./../../icons/Google icons/person_edit.svg"
+                        icon.source: "./../../icons/Google icons/person_edit.svg"
 
                         onClicked: {
                             root.tabChanged("Edit Page")
                         }
                     }
 
-                    UFO_SideBar_TabButton {
-                        id: ufo_SideBar_TabButton_Create
+                    UFO_SideBar_Button {
+                        id: ufo_SideBar_Button_Create
 
                         Layout.fillWidth: true
                         Layout.preferredHeight: 40
@@ -130,7 +130,7 @@ Item {
                         checked: false
 
                         text: qsTr("Create")
-                        svg: "./../../icons/Google icons/person_add.svg"
+                        icon.source: "./../../icons/Google icons/person_add.svg"
 
                         onClicked: {
                             root.tabChanged("Create Page")
@@ -155,8 +155,8 @@ Item {
                 Layout.rightMargin: 4
             }
 
-            UFO_SideBar_TabButton {
-                id: ufo_SideBar_TabButton_Settings
+            UFO_SideBar_Button {
+                id: ufo_SideBar_Button_Settings
 
                 Layout.fillWidth: true
                 Layout.preferredHeight: 40
@@ -172,15 +172,15 @@ Item {
                 checked: false
 
                 text: qsTr("Settings")
-                svg: "./../../icons/Google icons/settings.svg"
+                icon.source: "./../../icons/Google icons/settings.svg"
 
                 onClicked: {
                     root.tabChanged("Settings Page")
                 }
             }
 
-            UFO_SideBar_TabButton {
-                id: ufo_SideBar_TabButton_About
+            UFO_SideBar_Button {
+                id: ufo_SideBar_Button_About
 
                 Layout.fillWidth: true
                 Layout.preferredHeight: 40
@@ -195,7 +195,7 @@ Item {
                 checked: true
 
                 text: qsTr("About")
-                svg: "./../../icons/Google icons/help.svg"
+                icon.source: "./../../icons/Google icons/help.svg"
 
                 onClicked: {
                     root.tabChanged("About Page")

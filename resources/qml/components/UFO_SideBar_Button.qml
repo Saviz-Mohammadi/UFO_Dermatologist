@@ -6,71 +6,56 @@ import QtQuick.Layouts
 import AppTheme 1.0
 
 Button {
-    id: root
+    id: control
 
-    property alias borderRadius: rectangle_Background.radius
-    property alias svg: iconImage.source
-    property int svgWidth: 24
-    property int svgHeight: 24
+    property real radius: 0
 
-    implicitWidth: 120
-    implicitHeight: 35
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset, implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset, implicitContentHeight + topPadding + bottomPadding)
 
-    opacity: enabled ? 1.0 : 0.5
-    hoverEnabled: enabled ? true : false
+    opacity: control.enabled ? 1 : 0.5
+
+    padding: 6
+    spacing: 6
+
+    icon.width: 24
+    icon.height: 24
+
+    icon.color: {
+        if (control.checked) {
+            return Qt.color(AppTheme.colors["UFO_SideBar_Button_Icon_Checked"]);
+        }
+
+        if (control.hovered && control.enabled) {
+            return Qt.color(AppTheme.colors["UFO_SideBar_Button_Icon_Hovered"]);
+        }
+
+        return Qt.color(AppTheme.colors["UFO_SideBar_Button_Icon_Normal"]);
+    }
 
     contentItem: RowLayout {
 
-        IconImage {
-            id: iconImage
+        IconLabel {
+            id: iconLabel_Content
 
-            Layout.preferredWidth: svgWidth
-            Layout.preferredHeight: svgHeight
+            spacing: control.spacing
+            mirrored: control.mirrored
+            display: control.display
 
-            Layout.leftMargin: 10
-            Layout.rightMargin: 5
-
-            source: ""
-            verticalAlignment: Image.AlignVCenter
-
-            color: {
-                if (root.checked) {
-                    Qt.color(AppTheme.colors["UFO_SideBar_Button_Icon_Checked"])
-                }
-
-                else if (root.hovered) {
-                    Qt.color(AppTheme.colors["UFO_SideBar_Button_Icon_Hovered"])
-                }
-
-                else {
-                    Qt.color(AppTheme.colors["UFO_SideBar_Button_Icon_Normal"])
-                }
-            }
-        }
-
-        Text {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            text: root.text
-            font: root.font
-            elide: Text.ElideRight
-
-            horizontalAlignment: Text.AlignLeft
-            verticalAlignment: Text.AlignVCenter
+            icon: control.icon
+            text: control.text
+            font: control.font
 
             color: {
-                if (root.checked) {
-                    Qt.color(AppTheme.colors["UFO_SideBar_Button_Text_Checked"])
+                if (control.checked) {
+                    return Qt.color(AppTheme.colors["UFO_SideBar_Button_Text_Checked"]);
                 }
 
-                else if (root.hovered) {
-                    Qt.color(AppTheme.colors["UFO_SideBar_Button_Text_Hovered"])
+                if (control.hovered && control.enabled) {
+                    return Qt.color(AppTheme.colors["UFO_SideBar_Button_Text_Hovered"]);
                 }
 
-                else {
-                    Qt.color(AppTheme.colors["UFO_SideBar_Button_Text_Normal"])
-                }
+                return Qt.color(AppTheme.colors["UFO_SideBar_Button_Text_Normal"]);
             }
         }
 
@@ -80,25 +65,24 @@ Button {
         }
     }
 
-
-
     background: Rectangle {
         id: rectangle_Background
 
-        radius: 0
+        implicitWidth: 100
+        implicitHeight: 35
+
+        radius: control.radius
 
         color: {
-            if (root.checked) {
-                Qt.color(AppTheme.colors["UFO_SideBar_Button_Background_Checked"])
+            if (control.checked) {
+                return Qt.color(AppTheme.colors["UFO_SideBar_Button_Background_Checked"]);
             }
 
-            else if (root.hovered) {
-                Qt.color(AppTheme.colors["UFO_SideBar_Button_Background_Hovered"])
+            if (control.hovered && control.enabled) {
+                return Qt.color(AppTheme.colors["UFO_SideBar_Button_Background_Hovered"]);
             }
 
-            else {
-                Qt.color(AppTheme.colors["UFO_SideBar_Button_Background_Normal"])
-            }
+            return Qt.color(AppTheme.colors["UFO_SideBar_Button_Background_Normal"]);
         }
     }
 }
