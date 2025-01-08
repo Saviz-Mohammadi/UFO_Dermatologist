@@ -190,12 +190,10 @@ UFO_Page {
             Layout.rightMargin: 15
 
             UFO_Button {
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 35
-
                 enabled: (Database.connectionStatus === true) ? false : true
+
                 text: qsTr("Connect")
-                svg: "./../../icons/Google icons/wifi_on.svg"
+                icon.source: "./../../icons/Google icons/wifi_on.svg"
 
                 onClicked: {
                     let ipAddress = ipAddressField.text.trim();
@@ -309,43 +307,13 @@ UFO_Page {
             }
 
             UFO_Button {
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 35
-
                 enabled: (Database.connectionStatus === true) ? true : false
+
                 text: qsTr("Disconnect")
-                svg: "./../../icons/Google icons/wifi_off.svg"
+                icon.source: "./../../icons/Google icons/wifi_off.svg"
 
                 onClicked: {
                     Database.disconnect();
-                }
-            }
-
-            BusyIndicator {
-                id: busyIndicator
-
-                Layout.preferredWidth: 35
-                Layout.preferredHeight: 35
-
-                visible: false
-
-                Connections {
-                    target: Database
-
-                    function onConnectionRequestInitiated() {
-                        busyIndicator.running = true
-                        busyIndicator.visible = true
-                    }
-                }
-
-                Connections {
-                    target: Database
-
-                    // NOTE (SAVIZ): Regardless of the status, stop the indicator from displaying:
-                    function onConnectionStatusChanged() {
-                        busyIndicator.running = false
-                        busyIndicator.visible = false
-                    }
                 }
             }
         }

@@ -5,100 +5,94 @@ import QtQuick.Layouts
 // Custom CPP Registered Types
 import AppTheme 1.0
 
+// NOTE (SAVIZ): Setting 'enabled' property to 'false' does not affect 'hovered'. Because hover events are only affected by 'hoverEnabled'.
+
 Button {
-    id: root
+    id: control
 
-    property alias borderRadius: rectangle_Background.radius
-    property alias svg: iconImage.source
-    property int svgWidth: 24
-    property int svgHeight: 24
+    property real radius: 0
 
-    implicitWidth: 120
-    implicitHeight: 35
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset, implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset, implicitContentHeight + topPadding + bottomPadding)
 
-    opacity: enabled ? 1.0 : 0.5
-    hoverEnabled: enabled ? true : false
+    opacity: control.enabled ? 1 : 0.5
 
-    contentItem: RowLayout {
+    padding: 6
+    spacing: 6
 
-        IconImage {
-            id: iconImage
+    icon.width: 24
+    icon.height: 24
 
-            Layout.preferredWidth: svgWidth
-            Layout.preferredHeight: svgHeight
-
-            Layout.leftMargin: 10
-            Layout.rightMargin: 5
-
-            source: ""
-            verticalAlignment: Image.AlignVCenter
-
-            color: {
-                if (root.checked) {
-                    Qt.color(AppTheme.colors["UFO_Button_Icon_Checked"])
-                }
-
-                else if (root.hovered) {
-                    Qt.color(AppTheme.colors["UFO_Button_Icon_Hovered"])
-                }
-
-                else {
-                    Qt.color(AppTheme.colors["UFO_Button_Icon_Normal"])
-                }
-            }
+    icon.color: {
+        if (control.down) {
+            return Qt.color(AppTheme.colors["UFO_Button_Icon_Down"]);
         }
 
-        Text {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            text: root.text
-            font: root.font
-            elide: Text.ElideRight
-
-            horizontalAlignment: Text.AlignLeft
-            verticalAlignment: Text.AlignVCenter
-
-            color: {
-                if (root.checked) {
-                    Qt.color(AppTheme.colors["UFO_Button_Text_Checked"])
-                }
-
-                else if (root.hovered) {
-                    Qt.color(AppTheme.colors["UFO_Button_Text_Hovered"])
-                }
-
-                else {
-                    Qt.color(AppTheme.colors["UFO_Button_Text_Normal"])
-                }
-            }
+        if (control.checked) {
+            return Qt.color(AppTheme.colors["UFO_Button_Icon_Checked"]);
         }
 
-        Item {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+        if (control.hovered && control.enabled) {
+            return Qt.color(AppTheme.colors["UFO_Button_Icon_Hovered"]);
         }
+
+        return Qt.color(AppTheme.colors["UFO_Button_Icon_Normal"]);
     }
 
+    contentItem: IconLabel {
+        id: iconLabel_Content
 
+        spacing: control.spacing
+        mirrored: control.mirrored
+        display: control.display
+
+        icon: control.icon
+        text: control.text
+        font: control.font
+
+        color: {
+            if (control.down) {
+                return Qt.color(AppTheme.colors["UFO_Button_Text_Down"]);
+            }
+
+            if (control.checked) {
+                return Qt.color(AppTheme.colors["UFO_Button_Text_Checked"]);
+            }
+
+            if (control.hovered && control.enabled) {
+                return Qt.color(AppTheme.colors["UFO_Button_Text_Hovered"]);
+            }
+
+            return Qt.color(AppTheme.colors["UFO_Button_Text_Normal"]);
+        }
+    }
 
     background: Rectangle {
         id: rectangle_Background
 
-        radius: 0
+        implicitWidth: 100
+        implicitHeight: 35
+
+        radius: control.radius
+        visible: !control.flat
 
         color: {
-            if (root.checked) {
-                Qt.color(AppTheme.colors["UFO_Button_Background_Checked"])
+            if (control.down) {
+                return Qt.color(AppTheme.colors["UFO_Button_Background_Down"]);
             }
 
-            else if (root.hovered) {
-                Qt.color(AppTheme.colors["UFO_Button_Background_Hovered"])
+            if (control.checked) {
+                return Qt.color(AppTheme.colors["UFO_Button_Background_Checked"]);
             }
 
-            else {
-                Qt.color(AppTheme.colors["UFO_Button_Background_Normal"])
+            if (control.hovered && control.enabled) {
+                return Qt.color(AppTheme.colors["UFO_Button_Background_Hovered"]);
             }
+
+            return Qt.color(AppTheme.colors["UFO_Button_Background_Normal"]);
         }
+
+        border.color: Qt.color(AppTheme.colors["UFO_Button_Border"]);
+        border.width: control.visualFocus ? 2 : 0
     }
 }

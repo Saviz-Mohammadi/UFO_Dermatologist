@@ -84,16 +84,13 @@ UFO_Page {
         }
 
         UFO_Button {
-            Layout.preferredWidth: 120
-            Layout.preferredHeight: 35
-
             Layout.topMargin: 15
             Layout.bottomMargin: 20
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
             text: "GitHub"
-            svg: "./../../icons/Google icons/globe.svg"
+            icon.source: "./../../icons/Google icons/globe.svg"
 
             onClicked: {
                 Qt.openUrlExternally("https://github.com/Saviz-Mohammadi/UFO_Dermatologist")

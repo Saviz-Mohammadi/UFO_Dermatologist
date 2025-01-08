@@ -1,113 +1,115 @@
 import QtQuick
-import QtQuick.Controls.Basic
-import QtQuick.Layouts
+// import QtQuick.Controls.Basic
+// import QtQuick.Layouts
 
-// Custom CPP Registered Types
-import AppTheme 1.0
-import Database 1.0
+// // Custom CPP Registered Types
+// import AppTheme 1.0
+// import Database 1.0
 
-Item {
-    id: root
+// Item {
+//     id: root
 
-    property alias consultantName: text_ConsultantName.text
-    property alias consultationConductedDate: ufo_TextField_ConsultationConductDate.text
-    property alias consultationOutcome: ufo_TextArea_Outcome.text
+//     property alias consultantName: text_ConsultantName.text
+//     property alias consultationConductedDate: ufo_TextField_ConsultationConductDate.text
+//     property alias consultationOutcome: ufo_TextArea_Outcome.text
 
-    signal removeClicked
-    signal dateChanged
-    signal outcomeChanged
+//     signal removeClicked
+//     signal dateChanged
+//     signal outcomeChanged
 
-    implicitWidth: 200
-    implicitHeight: 200
+//     implicitWidth: 200
+//     implicitHeight: 200
 
-    ColumnLayout {
-        anchors.fill: parent
+//     ColumnLayout {
+//         anchors.fill: parent
 
-        spacing: 10
+//         spacing: 10
 
-        RowLayout {
-            Layout.fillWidth: true
+//         RowLayout {
+//             Layout.fillWidth: true
 
-            spacing: 1
+//             spacing: 1
 
-            Rectangle {
-                Layout.preferredWidth: 100
-                Layout.preferredHeight: 35
+//             Rectangle {
+//                 Layout.preferredWidth: 100
+//                 Layout.preferredHeight: 35
 
-                color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Background"])
+//                 color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Background"])
 
-                Text {
-                    id: text_ConsultantName
+//                 Text {
+//                     id: text_ConsultantName
 
-                    anchors.fill: parent
-                    anchors.leftMargin: 10
+//                     anchors.fill: parent
+//                     anchors.leftMargin: 10
 
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
+//                     horizontalAlignment: Text.AlignLeft
+//                     verticalAlignment: Text.AlignVCenter
 
-                    color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
-                    font.pointSize: Qt.application.font.pointSize * 1
-                    elide: Text.ElideRight
-                }
-            }
+//                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
+//                     font.pointSize: Qt.application.font.pointSize * 1
+//                     elide: Text.ElideRight
+//                 }
+//             }
 
-            UFO_TextField {
-                id: ufo_TextField_ConsultationConductDate
+//             UFO_TextField {
+//                 id: ufo_TextField_ConsultationConductDate
 
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
+//                 Layout.fillWidth: true
+//                 Layout.preferredHeight: 35
 
-                onTextEdited: {
-                    // Notify Model:
-                    root.dateChanged()
-                }
-            }
+//                 onTextEdited: {
+//                     // Notify Model:
+//                     root.dateChanged()
+//                 }
+//             }
 
-            UFO_Button {
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 35
+//             UFO_Button {
+//                 Layout.preferredWidth: 120
+//                 Layout.preferredHeight: 35
 
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+//                 Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
 
-                enabled: (Database.connectionStatus === true) ? true : false
+//                 enabled: (Database.connectionStatus === true) ? true : false
 
-                text: qsTr("Remove")
-                svg: "./../../icons/Google icons/delete.svg"
+//                 text: qsTr("Remove")
+//                 svg: "./../../icons/Google icons/delete.svg"
 
-                onClicked: {
-                    // Notify Model:
-                    root.removeClicked()
-                }
-            }
-        }
+//                 onClicked: {
+//                     // Notify Model:
+//                     root.removeClicked()
+//                 }
+//             }
+//         }
 
-        ScrollView {
-            id: scrollView
+//         ScrollView {
+//             id: scrollView
 
-            Layout.fillWidth: true
-            Layout.preferredHeight: 150
+//             Layout.fillWidth: true
+//             Layout.preferredHeight: 150
 
-            ScrollBar.vertical: UFO_ScrollBar {
-                parent: scrollView
+//             ScrollBar.vertical: UFO_ScrollBar {
+//                 parent: scrollView
 
-                x: scrollView.mirrored ? 0 : scrollView.width - width
-                y: scrollView.topPadding
+//                 x: scrollView.mirrored ? 0 : scrollView.width - width
+//                 y: scrollView.topPadding
 
-                height: scrollView.availableHeight
+//                 height: scrollView.availableHeight
 
-                active: scrollView.ScrollBar.horizontal.active
-            }
+//                 active: scrollView.ScrollBar.horizontal.active
+//             }
 
-            UFO_TextArea {
-                id: ufo_TextArea_Outcome
+//             UFO_TextArea {
+//                 id: ufo_TextArea_Outcome
 
-                enabled: (Database.connectionStatus === true) ? true : false
+//                 enabled: (Database.connectionStatus === true) ? true : false
 
-                onEditingFinished: {
-                    // Notify Model:
-                    root.outcomeChanged()
-                }
-            }
-        }
-    }
-}
+//                 onEditingFinished: {
+//                     // Notify Model:
+//                     root.outcomeChanged()
+//                 }
+//             }
+//         }
+//     }
+// }
+
+Item{}
