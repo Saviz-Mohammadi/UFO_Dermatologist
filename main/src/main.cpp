@@ -10,7 +10,10 @@ int main(int argc, char *argv[])
     QGuiApplication application(argc, argv);
     QQmlApplicationEngine engine;
 
+    QTranslator tranlator;
+
     registerTypes();
+    registerTranslations(tranlator, application);
     setupThemeSystem();
     chooseFirstTheme();
     readCustomFonts(application);
@@ -28,6 +31,13 @@ void registerTypes()
 {
     qmlRegisterSingletonType<AppTheme>("AppTheme", 1, 0, "AppTheme", &AppTheme::qmlInstance);
     qmlRegisterSingletonType<Database>("Database", 1, 0, "Database", &Database::qmlInstance);
+}
+
+void registerTranslations(QTranslator &translator, QGuiApplication &application)
+{
+    translator.load("./resources/translations/qm/persian.qm");
+
+    application.installTranslator(&translator);
 }
 
 void setupThemeSystem()

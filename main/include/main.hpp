@@ -4,6 +4,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QTranslator>
 #include <QFontDatabase>
 #include <QIcon>
 #include "app_theme.hpp"
@@ -11,6 +12,7 @@
 
 
 void registerTypes();
+void registerTranslations(QTranslator &translator, QGuiApplication &application);
 void setupThemeSystem();
 void chooseFirstTheme();
 void readCustomFonts(const QGuiApplication &application);

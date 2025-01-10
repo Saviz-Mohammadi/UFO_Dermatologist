@@ -37,9 +37,7 @@ Item {
     implicitWidth: 200
     implicitHeight: 200
 
-    ButtonGroup {
-        id: buttonGroup
-    }
+    ButtonGroup { id: buttonGroup }
 
     Rectangle {
         anchors.fill: parent
@@ -83,7 +81,7 @@ Item {
                         autoExclusive: true
                         checked: false
 
-                        text: qsTr("Search")
+                        text: qsTr("جستجو")
                         icon.source: "./../../icons/Google icons/person_search.svg"
 
                         onClicked: {
@@ -106,7 +104,7 @@ Item {
                         autoExclusive: true
                         checked: false
 
-                        text: qsTr("Edit")
+                        text: qsTr("ویرایش")
                         icon.source: "./../../icons/Google icons/person_edit.svg"
 
                         onClicked: {
@@ -129,7 +127,7 @@ Item {
                         autoExclusive: true
                         checked: false
 
-                        text: qsTr("Create")
+                        text: qsTr("ایجاد")
                         icon.source: "./../../icons/Google icons/person_add.svg"
 
                         onClicked: {
@@ -171,7 +169,7 @@ Item {
                 autoExclusive: true
                 checked: false
 
-                text: qsTr("Settings")
+                text: qsTr("تنظیمات برنامه")
                 icon.source: "./../../icons/Google icons/settings.svg"
 
                 onClicked: {
@@ -194,7 +192,7 @@ Item {
                 autoExclusive: true
                 checked: true
 
-                text: qsTr("About")
+                text: qsTr("درباره برنامه")
                 icon.source: "./../../icons/Google icons/help.svg"
 
                 onClicked: {

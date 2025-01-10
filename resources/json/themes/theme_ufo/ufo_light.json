@@ -100,6 +100,8 @@
     "UFO_ScrollBar_Normal": "Color_Dark_4",
     "UFO_ScrollBar_Pressed": "Color_Dark_4",
 
+    "UFO_SideBar_Text": "Color_Light_3",
+
     "UFO_SideBar_TabButton_Icon_Checked": "Color_Dark_3",
     "UFO_SideBar_TabButton_Icon_Hovered": "Color_Dark_3",
     "UFO_SideBar_TabButton_Icon_Normal": "Color_Dark_3",

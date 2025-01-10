@@ -45,7 +45,8 @@ find_package(Qt6 6.7.2 COMPONENTS
     QuickControls2
     Network
     Sql
-    Multimedia)
+    Multimedia
+    LinguistTools)
 
 # Add more Qt Components as needed...
 

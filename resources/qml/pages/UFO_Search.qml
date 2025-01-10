@@ -18,7 +18,7 @@ UFO_SplitView {
         Layout.fillWidth: true
         Layout.fillHeight: true
 
-        title: qsTr("Search Patients")
+        title: qsTr("جستوجو")
         contentSpacing: 25
 
         Rectangle {

@@ -49,84 +49,136 @@ Item {
                     clip: true
                     spacing: 5
 
-                    UFO_SideBar_TextField {
-                        id: textField_PatientID
-
+                    RowLayout {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 35
 
-                        enabled: (Database.connectionStatus === true) ? true : false
-                        placeholderText: qsTr("Patient ID (e.g., 277)")
+                        spacing: 5
 
-                        validator: RegularExpressionValidator {
-                            regularExpression: /^[0-9]*$/
+                        UFO_SideBar_TextField {
+                            id: textField_PatientID
+
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 35
+
+                            enabled: (Database.connectionStatus === true) ? true : false
+
+                            validator: RegularExpressionValidator {
+                                regularExpression: /^\p{Nd}+$/
+                            }
                         }
-                    }
 
-                    UFO_SideBar_TextField {
-                        id: textField_PhoneNumber
+                        Text {
+                            Layout.preferredWidth: 100
+                            Layout.preferredHeight: 35
 
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 35
+                            color: Qt.color(AppTheme.colors["UFO_SideBar_Text"])
+                            text: qsTr("شماره پرونده")
 
-                        enabled: (Database.connectionStatus === true) ? true : false
-                        placeholderText: qsTr("Phone number (e.g., +1 (250) 800-1234)")
-
-                        validator: RegularExpressionValidator {
-                            regularExpression: /^\+\d{1,3} \(\d{3}\) \d{3}-\d{4}$/
+                            verticalAlignment: Text.AlignVCenter
+                            wrapMode: Text.NoWrap
+                            elide: Text.ElideRight
                         }
-                    }
-
-                    UFO_SideBar_Separator {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 1
-
-                        Layout.topMargin: 15
-                        Layout.leftMargin: 4
-                        Layout.rightMargin: 4
-                        Layout.bottomMargin: 15
-                    }
-
-                    UFO_SideBar_TextField {
-                        id: textField_FirstName
-
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 35
-
-                        enabled: (Database.connectionStatus === true) ? true : false
-                        placeholderText: qsTr("First name (e.g., Hank)")
-
-                        validator: RegularExpressionValidator {
-                            regularExpression: /^[A-Za-z]+$/
-                        }
-                    }
-
-                    UFO_SideBar_TextField {
-                        id: textField_LastName
-
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 35
-
-                        enabled: (Database.connectionStatus === true) ? true : false
-                        placeholderText: qsTr("Last name (e.g. Miller)")
-
-                        validator: RegularExpressionValidator {
-                            regularExpression: /^[A-Za-z]+$/
-                        }
-                    }
-
-                    UFO_SideBar_Separator {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 1
-
-                        Layout.topMargin: 15
-                        Layout.leftMargin: 4
-                        Layout.rightMargin: 4
-                        Layout.bottomMargin: 15
                     }
 
                     RowLayout {
                         Layout.fillWidth: true
+
+                        spacing: 5
+
+                        UFO_SideBar_TextField {
+                            id: textField_PhoneNumber
+
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 35
+
+                            enabled: (Database.connectionStatus === true) ? true : false
+
+                            validator: RegularExpressionValidator {
+                                regularExpression: /^\+\d{1,3} \(\d{3}\) \d{3}-\d{4}$/
+                            }
+                        }
+
+                        Text {
+                            Layout.preferredWidth: 100
+                            Layout.preferredHeight: 35
+
+                            color: Qt.color(AppTheme.colors["UFO_SideBar_Text"])
+                            text: qsTr("شماره تلفن")
+
+                            verticalAlignment: Text.AlignVCenter
+                            wrapMode: Text.NoWrap
+                            elide: Text.ElideRight
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+
+                        spacing: 5
+
+                        UFO_SideBar_TextField {
+                            id: textField_FirstName
+
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 35
+
+                            Layout.topMargin: 20
+
+                            enabled: (Database.connectionStatus === true) ? true : false
+
+                            validator: RegularExpressionValidator {
+                                regularExpression: /^[\p{L}]+$/u
+                            }
+                        }
+
+                        Text {
+                            Layout.preferredWidth: 100
+                            Layout.preferredHeight: 35
+
+                            color: Qt.color(AppTheme.colors["UFO_SideBar_Text"])
+                            text: qsTr("نام اول")
+
+                            verticalAlignment: Text.AlignVCenter
+                            wrapMode: Text.NoWrap
+                            elide: Text.ElideRight
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+
+                        spacing: 5
+
+                        UFO_SideBar_TextField {
+                            id: textField_LastName
+
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 35
+
+                            enabled: (Database.connectionStatus === true) ? true : false
+
+                            validator: RegularExpressionValidator {
+                                regularExpression: /^[A-Za-z]+$/
+                            }
+                        }
+
+                        Text {
+                            Layout.preferredWidth: 100
+                            Layout.preferredHeight: 35
+
+                            color: Qt.color(AppTheme.colors["UFO_SideBar_Text"])
+                            text: qsTr("نام خانوادگی")
+
+                            verticalAlignment: Text.AlignVCenter
+                            wrapMode: Text.NoWrap
+                            elide: Text.ElideRight
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+
+                        Layout.topMargin: 20
 
                         spacing: 3
 
@@ -147,11 +199,22 @@ Item {
                             Layout.preferredHeight: 35
 
                             enabled: (Database.connectionStatus && ufo_CheckBox_BirthYearStart.checked)
-                            placeholderText: qsTr("Birth year start range (e.g. 1379)")
 
                             validator: RegularExpressionValidator {
                                 regularExpression: /^[1-9]\d*$/
                             }
+                        }
+
+                        Text {
+                            Layout.preferredWidth: 100
+                            Layout.preferredHeight: 35
+
+                            color: Qt.color(AppTheme.colors["UFO_SideBar_Text"])
+                            text: qsTr("شروع سال تولد")
+
+                            verticalAlignment: Text.AlignVCenter
+                            wrapMode: Text.NoWrap
+                            elide: Text.ElideRight
                         }
                     }
 
@@ -177,26 +240,29 @@ Item {
                             Layout.preferredHeight: 35
 
                             enabled: (Database.connectionStatus && ufo_CheckBox_BirthYearEnd.checked)
-                            placeholderText: qsTr("Birth year end range (e.g. 1400)")
 
                             validator: RegularExpressionValidator {
                                 regularExpression: /^[1-9]\d*$/
                             }
                         }
-                    }
 
-                    UFO_SideBar_Separator {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 1
+                        Text {
+                            Layout.preferredWidth: 100
+                            Layout.preferredHeight: 35
 
-                        Layout.topMargin: 15
-                        Layout.leftMargin: 4
-                        Layout.rightMargin: 4
-                        Layout.bottomMargin: 15
+                            color: Qt.color(AppTheme.colors["UFO_SideBar_Text"])
+                            text: qsTr("پایان سال تولد")
+
+                            verticalAlignment: Text.AlignVCenter
+                            wrapMode: Text.NoWrap
+                            elide: Text.ElideRight
+                        }
                     }
 
                     RowLayout {
                         Layout.fillWidth: true
+
+                        Layout.topMargin: 20
 
                         spacing: 3
 
@@ -218,6 +284,18 @@ Item {
 
                             enabled: (Database.connectionStatus && ufo_CheckBox_Gender.checked)
                             model: ["Unknown", "Male", "Female"]
+                        }
+
+                        Text {
+                            Layout.preferredWidth: 100
+                            Layout.preferredHeight: 35
+
+                            color: Qt.color(AppTheme.colors["UFO_SideBar_Text"])
+                            text: qsTr("جنسیت")
+
+                            verticalAlignment: Text.AlignVCenter
+                            wrapMode: Text.NoWrap
+                            elide: Text.ElideRight
                         }
                     }
 
@@ -245,6 +323,18 @@ Item {
                             enabled: (Database.connectionStatus && ufo_CheckBox_MaritalStatus.checked)
                             model: ["Unknown", "Single", "Married"]
                         }
+
+                        Text {
+                            Layout.preferredWidth: 100
+                            Layout.preferredHeight: 35
+
+                            color: Qt.color(AppTheme.colors["UFO_SideBar_Text"])
+                            text: qsTr("وضعیت تأهل")
+
+                            verticalAlignment: Text.AlignVCenter
+                            wrapMode: Text.NoWrap
+                            elide: Text.ElideRight
+                        }
                     }
                 }
             }
@@ -261,8 +351,10 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 40
 
+                Layout.topMargin: 10
+
                 enabled: (Database.connectionStatus === true) ? true : false
-                text: qsTr("Clear")
+                text: qsTr("پاک")
                 icon.source: "./../../icons/Google icons/delete.svg"
 
                 onClicked: {
@@ -292,7 +384,7 @@ Item {
                 Layout.preferredHeight: 40
 
                 enabled: (Database.connectionStatus === true) ? true : false
-                text: qsTr("First 10")
+                text: qsTr("اول ۱۰")
                 icon.source: "./../../icons/Google icons/list.svg"
 
                 onClicked: {
@@ -305,7 +397,7 @@ Item {
                 Layout.preferredHeight: 40
 
                 enabled: (Database.connectionStatus === true) ? true : false
-                text: qsTr("Last 10")
+                text: qsTr("اخر ۱۰")
                 icon.source: "./../../icons/Google icons/list.svg"
 
                 onClicked: {
@@ -318,12 +410,12 @@ Item {
                 Layout.preferredHeight: 40
 
                 enabled: (Database.connectionStatus === true) ? true : false
-                text: qsTr("Search")
+                text: qsTr("جستوجو")
                 icon.source: "./../../icons/Google icons/person_search.svg"
 
                 onClicked: {
                     // Grab data:
-                    let patientID = parseInt(textField_PatientID.text.trim(), 10);
+                    let patientID = Number(textField_PatientID.text.trim().replace(/[۰۱۲۳۴۵۶۷۸۹]/g, d => d.charCodeAt(0) - 1776));
                     let firstName = textField_FirstName.text.trim()
                     let lastName = textField_LastName.text.trim()
                     let birthYearStart = parseInt(textField_BirthYearStart.text.trim(), 10);
@@ -332,6 +424,7 @@ Item {
                     let gender = comboBox_Gender.currentText
                     let maritalStatus = comboBox_MaritalStatus.currentText
 
+                    console.log(patientID)
 
                     // Perform checks:
                     if(!isNaN(patientID)) {

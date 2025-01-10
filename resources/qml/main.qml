@@ -25,13 +25,13 @@ ApplicationWindow {
             topMargin: 0
             leftMargin: 0
 
-            title: qsTr("File")
+            title: qsTr("فایل")
 
             UFO_MenuItem {
                 leftPadding: 10
                 rightPadding: 10
 
-                text: qsTr("Quit")
+                text: qsTr("خروج")
 
                 onTriggered: {
                     Qt.quit()
@@ -43,13 +43,13 @@ ApplicationWindow {
             topMargin: 0
             leftMargin: 0
 
-            title: qsTr("View")
+            title: qsTr("نمایش")
 
             UFO_MenuItem {
                 leftPadding: 10
                 rightPadding: 10
 
-                text: qsTr("Search Page")
+                text: qsTr("صفحه جستجو")
 
                 onTriggered: {
                     stackLayout.currentIndex = ufo_Search.StackLayout.index
@@ -62,7 +62,7 @@ ApplicationWindow {
                 leftPadding: 10
                 rightPadding: 10
 
-                text: qsTr("Edit Page")
+                text: qsTr("صفحه ویرایش")
 
                 onTriggered: {
                     stackLayout.currentIndex = ufo_Edit.StackLayout.index
@@ -75,7 +75,7 @@ ApplicationWindow {
                 leftPadding: 10
                 rightPadding: 10
 
-                text: qsTr("Create Page")
+                text: qsTr("صفحه ایجاد")
 
                 onTriggered: {
                     stackLayout.currentIndex = ufo_Create.StackLayout.index
@@ -88,7 +88,7 @@ ApplicationWindow {
                 leftPadding: 10
                 rightPadding: 10
 
-                text: qsTr("Settings Page")
+                text: qsTr("صفحه تنظیمات")
 
                 onTriggered: {
                     stackLayout.currentIndex = ufo_Settings.StackLayout.index
@@ -101,7 +101,7 @@ ApplicationWindow {
                 leftPadding: 10
                 rightPadding: 10
 
-                text: qsTr("About Page")
+                text: qsTr("صفحه درباره برنامه")
 
                 onTriggered: {
                     stackLayout.currentIndex = ufo_About.StackLayout.index
@@ -115,13 +115,13 @@ ApplicationWindow {
             topMargin: 0
             leftMargin: 0
 
-            title: qsTr("Help")
+            title: qsTr("راهنما")
 
             UFO_MenuItem {
                 leftPadding: 10
                 rightPadding: 10
 
-                text: qsTr("About UFO_Dermatologist")
+                text: qsTr("درباره برنامه")
 
                 onTriggered: {
                     stackLayout.currentIndex = ufo_About.StackLayout.index
@@ -135,7 +135,7 @@ ApplicationWindow {
     footer: UFO_StatusBar {
         id: ufo_StatusBar
 
-        text: qsTr("Application is ready")
+        text: qsTr("برنامه آماده است")
     }
 
     UFO_Dialog {
