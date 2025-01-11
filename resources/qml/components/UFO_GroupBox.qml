@@ -45,7 +45,6 @@ Item {
             anchors.rightMargin: root.titleRightMargin
 
             text: qsTr("")
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignVCenter
             color: Qt.color(AppTheme.colors["UFO_GroupBox_Title_Text"])
             font.pixelSize: Qt.application.font.pixelSize * titleFontSize // Read-only property. Holds the default application font returned by QGuiApplication::font()

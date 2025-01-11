@@ -11,14 +11,14 @@ import AppTheme 1.0
 UFO_Page {
     id: root
 
-    title: qsTr("About Application")
+    title: qsTr("درباره برنامه")
     contentSpacing: 25
 
     UFO_GroupBox {
         Layout.fillWidth: true
         // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
 
-        title: qsTr("Overview")
+        title: qsTr("اطلاعات کلی")
         contentSpacing: 7
 
         Text {
@@ -30,7 +30,7 @@ UFO_Page {
             Layout.rightMargin: 15
 
             color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-            text: qsTr("Name: UFO_Dermatologist") + "     " + qsTr("Version: 0.0.1")
+            text: qsTr("نام برنامه: مطب") + "     " + qsTr("نسخه برنامه: 0.0.1")
             wrapMode: Text.Wrap
             elide: Text.ElideRight
         }
@@ -40,7 +40,7 @@ UFO_Page {
         Layout.fillWidth: true
         // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
 
-        title: qsTr("Software License")
+        title: qsTr("مجوز نرم‌افزار")
         contentSpacing: 7
 
         Text {
@@ -66,7 +66,7 @@ UFO_Page {
         Layout.fillWidth: true
         // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
 
-        title: qsTr("Contributing")
+        title: qsTr("مشارکت")
         contentSpacing: 7
 
         Text {
@@ -77,7 +77,7 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: qsTr("We welcome contributions to the UFO_QML template! Please visit our GitHub page by clicking the button below for more information.")
+            text: qsTr("ما از پشتیبانی در این برنامه استقبال می‌کنیم! لطفاً برای اطلاعات بیشتر با کلیک روی دکمه زیر به صفحه گیت‌هاب ما مراجعه کنید.")
             color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
             wrapMode: Text.WordWrap
             elide: Text.ElideRight
@@ -89,7 +89,7 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: "GitHub"
+            text: "گیت‌هاب"
             icon.source: "./../../icons/Google icons/globe.svg"
 
             onClicked: {

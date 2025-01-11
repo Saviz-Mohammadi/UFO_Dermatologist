@@ -14,21 +14,49 @@ UFO_Page {
 
     signal searchMatchedNewPatient
 
-    title: qsTr("Create Patient")
+    title: qsTr("ایجاد")
     contentSpacing: 25
 
     UFO_GroupBox {
         Layout.fillWidth: true
         // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
 
-        title: qsTr("Basic Data")
+        title: qsTr("اطلاعات بیمار")
         contentSpacing: 0
+
+        Text {
+            Layout.fillWidth: true
+
+            Layout.topMargin: 20
+            Layout.bottomMargin: 0
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+            text: qsTr("اطلاعات ضروری را وارد کرده و روی «ایجاد» کلیک کنید تا بیمار جدیدی را به پایگاه داده وارد کنید. فیلدهای علامت‌گذاری شده با نماد ستاره الزامی هستند.")
+            wrapMode: Text.WordWrap
+            elide: Text.ElideRight
+        }
 
         ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
             Layout.margins: 15
+
+            Text {
+                Layout.fillWidth: true
+
+                text: qsTr("نام*")
+
+                elide: Text.ElideRight
+                wrapMode: Text.NoWrap
+
+                verticalAlignment: Text.AlignBottom
+
+                font.pixelSize: Qt.application.font.pixelSize * 1
+                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+            }
 
             UFO_TextField {
                 id: textField_FirstName
@@ -37,10 +65,9 @@ UFO_Page {
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
-                placeholderText: qsTr("First name*")
 
                 validator: RegularExpressionValidator {
-                    regularExpression: /^[A-Za-z]+$/
+                    regularExpression: /^[\p{L}]+$/u
                 }
 
                 Connections {
@@ -52,6 +79,20 @@ UFO_Page {
                 }
             }
 
+            Text {
+                Layout.fillWidth: true
+
+                text: qsTr("نام خانوادگی*")
+
+                elide: Text.ElideRight
+                wrapMode: Text.NoWrap
+
+                verticalAlignment: Text.AlignBottom
+
+                font.pixelSize: Qt.application.font.pixelSize * 1
+                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+            }
+
             UFO_TextField {
                 id: textField_LastName
 
@@ -59,10 +100,9 @@ UFO_Page {
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
-                placeholderText: qsTr("Last name*")
 
                 validator: RegularExpressionValidator {
-                    regularExpression: /^[A-Za-z]+$/
+                    regularExpression: /^[\p{L}]+$/u
                 }
 
                 Connections {
@@ -74,6 +114,20 @@ UFO_Page {
                 }
             }
 
+            Text {
+                Layout.fillWidth: true
+
+                text: qsTr("سال تولد*")
+
+                elide: Text.ElideRight
+                wrapMode: Text.NoWrap
+
+                verticalAlignment: Text.AlignBottom
+
+                font.pixelSize: Qt.application.font.pixelSize * 1
+                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+            }
+
             UFO_TextField {
                 id: textField_BirthYear
 
@@ -81,7 +135,6 @@ UFO_Page {
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
-                placeholderText: qsTr("Birth year*")
 
                 validator: RegularExpressionValidator {
                     regularExpression: /^[1-9]\d*$/
@@ -96,6 +149,20 @@ UFO_Page {
                 }
             }
 
+            Text {
+                Layout.fillWidth: true
+
+                text: qsTr("شماره تلفن*")
+
+                elide: Text.ElideRight
+                wrapMode: Text.NoWrap
+
+                verticalAlignment: Text.AlignBottom
+
+                font.pixelSize: Qt.application.font.pixelSize * 1
+                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+            }
+
             UFO_TextField {
                 id: textField_PhoneNumber
 
@@ -106,7 +173,6 @@ UFO_Page {
                 Layout.row: 1
 
                 enabled: (Database.connectionStatus === true) ? true : false
-                placeholderText: qsTr("Phone Number*")
 
                 validator: RegularExpressionValidator {
                     regularExpression: /^\+\d{1,3} \(\d{3}\) \d{3}-\d{4}$/
@@ -121,18 +187,24 @@ UFO_Page {
                 }
             }
 
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 1
+
+                Layout.topMargin: 35
+                Layout.bottomMargin: 25
+
+                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Separator"])
+            }
+
             Text {
                 Layout.fillWidth: true
-                Layout.fillHeight: true
 
-                Layout.topMargin: 25
-
-                text: qsTr("Gender")
+                text: qsTr("جنسیت")
 
                 elide: Text.ElideRight
                 wrapMode: Text.NoWrap
 
-                horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignBottom
 
                 font.pixelSize: Qt.application.font.pixelSize * 1
@@ -146,7 +218,7 @@ UFO_Page {
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
-                model: ["Unknown", "Male", "Female"]
+                model: ["نامشخص", "مرد", "زن"]
 
                 Connections {
                     target: ufo_Button_Clear
@@ -159,14 +231,12 @@ UFO_Page {
 
             Text {
                 Layout.fillWidth: true
-                Layout.fillHeight: true
 
-                text: qsTr("Marital status")
+                text: qsTr("وضعیت تأهل")
 
                 elide: Text.ElideRight
                 wrapMode: Text.NoWrap
 
-                horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignBottom
 
                 font.pixelSize: Qt.application.font.pixelSize * 1
@@ -180,7 +250,7 @@ UFO_Page {
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
-                model: ["Unknown", "Single", "Married"]
+                model: ["نامشخص", "مجرد", "متاهل"]
 
                 Connections {
                     target: ufo_Button_Clear
@@ -211,7 +281,7 @@ UFO_Page {
 
             enabled: (Database.connectionStatus === true) ? true : false
 
-            text: qsTr("Clear")
+            text: qsTr("پاک کردن")
             icon.source: "./../../icons/Google icons/delete.svg"
 
             onClicked: {
@@ -227,7 +297,7 @@ UFO_Page {
 
             enabled: (Database.connectionStatus === true) ? true : false
 
-            text: qsTr("Create")
+            text: qsTr("ایجاد")
             icon.source: "./../../icons/Google icons/person_add.svg"
 
             Connections {
@@ -247,31 +317,31 @@ UFO_Page {
 
 
                 if(emptyFieldWasDetected) {
-                    let message = "Please ensure the following fields have valid inputs before prcoceeding to add a new patient:<br>";
+                    let message = "لطفاً قبل از ادامه برای اضافه کردن بیمار جدید، اطمینان حاصل کنید که فیلدهای زیر دارای ورودی معتبر هستند:<br>";
 
                     message += "<ul>";
 
 
                     if(textField_FirstName.text === "") {
-                        message += "<li>First Name</li>";
+                        message += "<li>نام</li>";
                     }
 
                     if(textField_LastName.text === "") {
-                        message += "<li>Last Name</li>";
+                        message += "<li>نام خانوادگی</li>";
                     }
 
                     if(textField_PhoneNumber.text === "") {
-                        message += "<li>Phone Number</li>";
+                        message += "<li>شماره تلفن</li>";
                     }
 
                     if(textField_BirthYear.text === "") {
-                        message += "<li>Birth Year</li>";
+                        message += "<li>سال تولد</li>";
                     }
 
                     message += "</ul>";
 
 
-                    ufo_Dialog.titleString = "<b>WARNING! Empty fields detected!<b>";
+                    ufo_Dialog.titleString = "<b>هشدار! فیلدهای خالی شناسایی شدند!<b>";
                     ufo_Dialog.messageString = message;
                     ufo_Dialog.callbackIdentifier = "<UFO_Create>: Required fields not provided";
                     ufo_Dialog.hasAccept = true;

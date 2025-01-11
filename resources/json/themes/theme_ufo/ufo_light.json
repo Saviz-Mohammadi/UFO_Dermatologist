@@ -44,6 +44,7 @@
     "UFO_GroupBox_Separator": "Color_Light_4",
     "UFO_GroupBox_Content_Text": "Color_Dark_3",
     "UFO_GroupBox_Content_Background": "Color_Light_4",
+    "UFO_GroupBox_Content_Separator": "Color_Light_8",
     "UFO_GroupBox_ListView_Background": "Color_Light_6",
 
     "UFO_ComboBox_Text_Normal": "Color_Light_3",

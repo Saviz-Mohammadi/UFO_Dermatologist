@@ -161,7 +161,7 @@ bool Database::establishConnection(const QString &ipAddress, qint16 port, const 
 
 
         // Notify QML:
-        emit connectionStatusChanged("Connection failed: " + m_QSqlDatabase.lastError().text());
+        emit connectionStatusChanged("اتصال برقرار نشد: " + m_QSqlDatabase.lastError().text());
 
 
 
@@ -197,7 +197,7 @@ bool Database::establishConnection(const QString &ipAddress, qint16 port, const 
 
 
     // Notify QML:
-    emit connectionStatusChanged("Successfully connected to the database.");
+    emit connectionStatusChanged("با موفقیت به پایگاه داده متصل شد.");
 
 
 
@@ -230,7 +230,7 @@ bool Database::disconnect()
 
 
         // Notify QML:
-        emit connectionStatusChanged("Connection does not exist. Aborting operation.");
+        emit connectionStatusChanged("اتصال وجود ندارد. عملیات متوقف می‌شود.");
 
 
 
@@ -256,7 +256,7 @@ bool Database::disconnect()
 
 
     // Notify QML:
-    emit connectionStatusChanged("Disconnected from database.");
+    emit connectionStatusChanged("از پایگاه داده قطع ارتباط شد.");
 
 
 
@@ -314,7 +314,7 @@ bool Database::createPatient(const QString &firstName, const QString &lastName, 
 
 
 
-        emit queryExecuted(QueryType::CREATE, false, query.lastError().text());
+        emit queryExecuted(QueryType::CREATE, false, "در حین عملیات مشکلی پیش آمد: " + query.lastError().text());
 
 
 
@@ -332,7 +332,7 @@ bool Database::createPatient(const QString &firstName, const QString &lastName, 
 
 
         // Notify QML:
-        emit queryExecuted(QueryType::CREATE, false, "The record already exists and was not inserted.");
+        emit queryExecuted(QueryType::CREATE, false, "بیمار قبلاً وجود دارد و وارد نشد.");
 
 
 
@@ -348,7 +348,7 @@ bool Database::createPatient(const QString &firstName, const QString &lastName, 
 
 
     // Notify QML:
-    emit queryExecuted(QueryType::CREATE, true, "The patient record was inserted successfully.");
+    emit queryExecuted(QueryType::CREATE, true, "رکورد بیمار با موفقیت وارد شد.");
 
 
 

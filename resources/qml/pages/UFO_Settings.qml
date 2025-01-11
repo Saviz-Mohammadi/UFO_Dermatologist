@@ -12,14 +12,14 @@ import Database 1.0
 UFO_Page {
     id: root
 
-    title: qsTr("Application Settings")
+    title: qsTr("تنظیمات برنامه")
     contentSpacing: 25
 
     UFO_GroupBox {
         Layout.fillWidth: true
         // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
 
-        title: qsTr("Style")
+        title: qsTr("سبک ظاهری")
         contentSpacing: 7
 
         Text {
@@ -31,7 +31,7 @@ UFO_Page {
             Layout.rightMargin: 15
 
             color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-            text: qsTr("The theme will be cached and loaded on application launch.")
+            text: qsTr("سبک ظاهری در حافظه ذخیره شده و هنگام راه‌اندازی برنامه بارگذاری می‌شود")
             wrapMode: Text.WordWrap
             elide: Text.ElideRight
         }
@@ -79,7 +79,7 @@ UFO_Page {
         Layout.fillWidth: true
         // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
 
-        title: qsTr("Database")
+        title: qsTr("پایگاه داده")
         contentSpacing: 1
 
         Text {
@@ -92,7 +92,7 @@ UFO_Page {
 
             color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
 
-            text: qsTr("Enter the required information and press 'Connect' to establish connection to database.")
+            text: qsTr("اطلاعات مورد نیاز را وارد کرده و روی «اتصال» کلیک کنید تا ارتباط با پایگاه داده برقرار شود")
 
             wrapMode: Text.WordWrap
             elide: Text.ElideRight
@@ -113,7 +113,7 @@ UFO_Page {
                 regularExpression: /^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$/
             }
 
-            placeholderText: qsTr("IP address")
+            placeholderText: qsTr("آدرس IP")
             text: "192.168.1.66"
         }
 
@@ -132,7 +132,7 @@ UFO_Page {
                 regularExpression: /^[0-9]{1,5}$/ // Ranges between (0 – 65535)
             }
 
-            placeholderText: qsTr("port")
+            placeholderText: qsTr("پورت")
             text: "3306"
         }
 
@@ -147,7 +147,7 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            placeholderText: qsTr("schema")
+            placeholderText: qsTr("نام پایگاه داده")
             text: "ufo_dermatologist"
         }
 
@@ -162,7 +162,7 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            placeholderText: qsTr("username")
+            placeholderText: qsTr("نام کاربری")
             text: "UFO_Dermatologist"
         }
 
@@ -177,7 +177,7 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            placeholderText: qsTr("password")
+            placeholderText: qsTr("رمز عبور")
             text: "1345750"
         }
 
@@ -192,7 +192,7 @@ UFO_Page {
             UFO_Button {
                 enabled: (Database.connectionStatus === true) ? false : true
 
-                text: qsTr("Connect")
+                text: qsTr("اتصال")
                 icon.source: "./../../icons/Google icons/wifi_on.svg"
 
                 onClicked: {
@@ -204,85 +204,70 @@ UFO_Page {
 
 
                     if (ipAddress === "") {
-                        ufo_Dialog.titleString = "<b>WARNING!<b>";
-                        ufo_Dialog.messageString = "IP Address field cannot be empty.";
+                        ufo_Dialog.titleString = qsTr("<b>هشدار!<b>");
+                        ufo_Dialog.messageString = qsTr("فیلد آدرس IP نمی‌تواند خالی باشد");
                         ufo_Dialog.callbackIdentifier = "<UFO_Settings>: Connect";
                         ufo_Dialog.hasAccept = true;
                         ufo_Dialog.hasReject = false;
                         ufo_Dialog.acceptButtonText = qsTr("OK");
                         ufo_Dialog.rejectButtonText = qsTr("Cancel");
                         ufo_Dialog.open();
-
-
-                        ufo_StatusBar.displayMessage("IP Address is a required field!");
 
 
                         return;
                     }
 
                     if (isNaN(port)) {
-                        ufo_Dialog.titleString = "<b>WARNING!<b>";
-                        ufo_Dialog.messageString = "Port field cannot be empty.";
+                        ufo_Dialog.titleString = qsTr("<b>هشدار!<b>");
+                        ufo_Dialog.messageString = qsTr("فیلد پورت نمی‌تواند خالی باشد");
                         ufo_Dialog.callbackIdentifier = "<UFO_Settings>: Connect";
                         ufo_Dialog.hasAccept = true;
                         ufo_Dialog.hasReject = false;
                         ufo_Dialog.acceptButtonText = qsTr("OK");
                         ufo_Dialog.rejectButtonText = qsTr("Cancel");
                         ufo_Dialog.open();
-
-
-                        ufo_StatusBar.displayMessage("Port is a required field!");
 
 
                         return;
                     }
 
                     if (schema === "") {
-                        ufo_Dialog.titleString = "<b>WARNING!<b>";
-                        ufo_Dialog.messageString = "Schema field cannot be empty.";
+                        ufo_Dialog.titleString = qsTr("<b>هشدار!<b>");
+                        ufo_Dialog.messageString = qsTr("فیلد نام پایگاه داده نمی‌تواند خالی باشد");
                         ufo_Dialog.callbackIdentifier = "<UFO_Settings>: Connect";
                         ufo_Dialog.hasAccept = true;
                         ufo_Dialog.hasReject = false;
                         ufo_Dialog.acceptButtonText = qsTr("OK");
                         ufo_Dialog.rejectButtonText = qsTr("Cancel");
                         ufo_Dialog.open();
-
-
-                        ufo_StatusBar.displayMessage("Schema is a required field!");
 
 
                         return;
                     }
 
                     if (username === "") {
-                        ufo_Dialog.titleString = "<b>WARNING!<b>";
-                        ufo_Dialog.messageString = "Port field cannot be empty.";
+                        ufo_Dialog.titleString = qsTr("<b>هشدار!<b>");
+                        ufo_Dialog.messageString = qsTr("فیلد نام کاربری نمی‌تواند خالی باشد");
                         ufo_Dialog.callbackIdentifier = "<UFO_Settings>: Connect";
                         ufo_Dialog.hasAccept = true;
                         ufo_Dialog.hasReject = false;
                         ufo_Dialog.acceptButtonText = qsTr("OK");
                         ufo_Dialog.rejectButtonText = qsTr("Cancel");
                         ufo_Dialog.open();
-
-
-                        ufo_StatusBar.displayMessage("Username is a required field!");
 
 
                         return;
                     }
 
                     if (password === "") {
-                        ufo_Dialog.titleString = "<b>WARNING!<b>";
-                        ufo_Dialog.messageString = "Password field cannot be empty.";
+                        ufo_Dialog.titleString = qsTr("<b>هشدار!<b>");
+                        ufo_Dialog.messageString = qsTr("فیلد رمز عبور نمی‌تواند خالی باشد");
                         ufo_Dialog.callbackIdentifier = "<UFO_Settings>: Connect";
                         ufo_Dialog.hasAccept = true;
                         ufo_Dialog.hasReject = false;
                         ufo_Dialog.acceptButtonText = qsTr("OK");
                         ufo_Dialog.rejectButtonText = qsTr("Cancel");
                         ufo_Dialog.open();
-
-
-                        ufo_StatusBar.displayMessage("Password is a required field!");
 
 
                         return;
@@ -309,7 +294,7 @@ UFO_Page {
             UFO_Button {
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                text: qsTr("Disconnect")
+                text: qsTr("قطع اتصال")
                 icon.source: "./../../icons/Google icons/wifi_off.svg"
 
                 onClicked: {
