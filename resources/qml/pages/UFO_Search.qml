@@ -18,7 +18,7 @@ UFO_SplitView {
         Layout.fillWidth: true
         Layout.fillHeight: true
 
-        title: qsTr("جستوجو")
+        title: qsTr("جستجو")
         contentSpacing: 25
 
         Rectangle {
@@ -46,11 +46,10 @@ UFO_SplitView {
 
                     Text {
                         Layout.fillWidth: true
-                        Layout.fillHeight: true
 
                         Layout.margins: 15
 
-                        text: qsTr("Search Results : ") + listView_SearchResults.count
+                        text: qsTr("نتایج جستجو: ") + listView_SearchResults.count
                         color: Qt.color(AppTheme.colors["UFO_ListView_Title_Text"])
                     }
                 }

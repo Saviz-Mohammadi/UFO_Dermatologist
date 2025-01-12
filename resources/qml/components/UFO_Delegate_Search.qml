@@ -43,17 +43,19 @@ Item {
 
                 spacing: 15
 
-                IconImage {
-                    Layout.preferredWidth: 64
-                    Layout.preferredHeight: 64
+                UFO_Button {
+                    Layout.preferredHeight: 35
 
-                    sourceSize.width: width
-                    sourceSize.height: height
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
 
-                    source: "./../../icons/Google icons/person.svg"
-                    verticalAlignment: Image.AlignVCenter
+                    enabled: (Database.connectionStatus === true) ? true : false
 
-                    color: Qt.color(AppTheme.colors["UFO_Delegate_Icon"])
+                    text: qsTr("ویرایش")
+                    icon.source: "./../../icons/Google icons/person_edit.svg"
+
+                    onClicked: {
+                        root.editClicked()
+                    }
                 }
 
                 Text {
@@ -65,27 +67,21 @@ Item {
                     elide: Text.ElideRight
                     wrapMode: Text.NoWrap
 
-                    horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignVCenter
 
                     font.pixelSize: Qt.application.font.pixelSize * 1.45
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
                 }
 
-                UFO_Button {
-                    Layout.preferredWidth: 120
-                    Layout.preferredHeight: 35
+                IconLabel {
+                    Layout.preferredWidth: 64
+                    Layout.preferredHeight: 64
 
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+                    icon.source: "./../../icons/Google icons/person.svg"
+                    icon.width: 64
+                    icon.height: 64
 
-                    enabled: (Database.connectionStatus === true) ? true : false
-
-                    text: qsTr("Edit")
-                    icon.source: "./../../icons/Google icons/person_edit.svg"
-
-                    onClicked: {
-                        root.editClicked()
-                    }
+                    icon.color: Qt.color(AppTheme.colors["UFO_Delegate_Icon"])
                 }
             }
 
@@ -101,12 +97,13 @@ Item {
                 rows: 4
 
                 Text {
-                    Layout.column: 0
+                    Layout.fillWidth: true
+
+                    Layout.column: 2
                     Layout.row: 0
 
-                    text: qsTr("Patient ID")
+                    text: qsTr("شماره پرونده")
 
-                    horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignBottom
 
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
@@ -116,7 +113,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 35
 
-                    Layout.column: 0
+                    Layout.column: 2
                     Layout.row: 1
 
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Background"])
@@ -127,7 +124,6 @@ Item {
                         anchors.fill: parent
                         anchors.leftMargin: 10
 
-                        horizontalAlignment: Text.AlignLeft
                         verticalAlignment: Text.AlignVCenter
 
                         color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
@@ -137,12 +133,13 @@ Item {
                 }
 
                 Text {
+                    Layout.fillWidth: true
+
                     Layout.column: 1
                     Layout.row: 0
 
-                    text: qsTr("Birth year")
+                    text: qsTr("سال تولد")
 
-                    horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignBottom
 
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
@@ -163,7 +160,6 @@ Item {
                         anchors.fill: parent
                         anchors.leftMargin: 10
 
-                        horizontalAlignment: Text.AlignLeft
                         verticalAlignment: Text.AlignVCenter
 
                         color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
@@ -173,12 +169,13 @@ Item {
                 }
 
                 Text {
-                    Layout.column: 2
+                    Layout.fillWidth: true
+
+                    Layout.column: 0
                     Layout.row: 0
 
-                    text: qsTr("Phone number")
+                    text: qsTr("شماره تلفن")
 
-                    horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignBottom
 
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
@@ -188,7 +185,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 35
 
-                    Layout.column: 2
+                    Layout.column: 0
                     Layout.row: 1
 
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Background"])
@@ -199,7 +196,6 @@ Item {
                         anchors.fill: parent
                         anchors.leftMargin: 10
 
-                        horizontalAlignment: Text.AlignLeft
                         verticalAlignment: Text.AlignVCenter
 
                         color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
@@ -209,12 +205,13 @@ Item {
                 }
 
                 Text {
-                    Layout.column: 0
+                    Layout.fillWidth: true
+
+                    Layout.column: 2
                     Layout.row: 2
 
-                    text: qsTr("Gender")
+                    text: qsTr("جنسیت")
 
-                    horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignBottom
 
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
@@ -224,7 +221,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 35
 
-                    Layout.column: 0
+                    Layout.column: 2
                     Layout.row: 3
 
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Background"])
@@ -235,7 +232,6 @@ Item {
                         anchors.fill: parent
                         anchors.leftMargin: 10
 
-                        horizontalAlignment: Text.AlignLeft
                         verticalAlignment: Text.AlignVCenter
 
                         color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
@@ -245,12 +241,13 @@ Item {
                 }
 
                 Text {
+                    Layout.fillWidth: true
+
                     Layout.column: 1
                     Layout.row: 2
 
-                    text: qsTr("Marital status")
+                    text: qsTr("وضعیت تأهل")
 
-                    horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignBottom
 
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
@@ -271,7 +268,6 @@ Item {
                         anchors.fill: parent
                         anchors.leftMargin: 10
 
-                        horizontalAlignment: Text.AlignLeft
                         verticalAlignment: Text.AlignVCenter
 
                         color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
@@ -281,12 +277,13 @@ Item {
                 }
 
                 Text {
-                    Layout.column: 2
+                    Layout.fillWidth: true
+
+                    Layout.column: 0
                     Layout.row: 2
 
-                    text: qsTr("Service price")
+                    text: qsTr("قیمت خدمات")
 
-                    horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignBottom
 
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
@@ -296,7 +293,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 35
 
-                    Layout.column: 2
+                    Layout.column: 0
                     Layout.row: 3
 
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Background"])
@@ -307,7 +304,6 @@ Item {
                         anchors.fill: parent
                         anchors.leftMargin: 10
 
-                        horizontalAlignment: Text.AlignLeft
                         verticalAlignment: Text.AlignVCenter
 
                         color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])

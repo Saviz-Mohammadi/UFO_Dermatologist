@@ -445,7 +445,7 @@ bool Database::findPatient(const quint64 patientID)
         patientMap["phone_number"] = query.value("phone_number").toString();
         patientMap["gender"] = query.value("gender").toString();
         patientMap["marital_status"] = query.value("marital_status").toString();
-        patientMap["service_price"] = query.value("service_price").toString();
+        patientMap["service_price"] = query.value("service_price").toDouble();
 
 
 
@@ -662,7 +662,7 @@ bool Database::findPatient(const QString &firstName, const QString &lastName, qu
         patientMap["phone_number"] = query.value("phone_number").toString();
         patientMap["gender"] = query.value("gender").toString();
         patientMap["marital_status"] = query.value("marital_status").toString();
-        patientMap["service_price"] = query.value("service_price").toString();
+        patientMap["service_price"] = query.value("service_price").toDouble();
 
 
 
@@ -768,7 +768,7 @@ bool Database::findFirstXPatients(const quint64 count)
         patientMap["phone_number"] = query.value("phone_number").toString();
         patientMap["gender"] = query.value("gender").toString();
         patientMap["marital_status"] = query.value("marital_status").toString();
-        patientMap["service_price"] = query.value("service_price").toString();
+        patientMap["service_price"] = query.value("service_price").toDouble();
 
 
 
@@ -874,7 +874,7 @@ bool Database::findLastXPatients(const quint64 count)
         patientMap["phone_number"] = query.value("phone_number").toString();
         patientMap["gender"] = query.value("gender").toString();
         patientMap["marital_status"] = query.value("marital_status").toString();
-        patientMap["service_price"] = query.value("service_price").toString();
+        patientMap["service_price"] = query.value("service_price").toDouble();
 
 
 
