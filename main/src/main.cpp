@@ -10,14 +10,25 @@ int main(int argc, char *argv[])
     QGuiApplication application(argc, argv);
     QQmlApplicationEngine engine;
 
-    QTranslator tranlator;
-
     registerTypes();
-    registerTranslations(tranlator, application);
     setupThemeSystem();
     chooseFirstTheme();
     readCustomFonts(application);
     setGlobalFont(application);
+
+    QCalendar::YearMonthDay gregorianYMD(QDate::currentDate().year(), QDate::currentDate().month(), QDate::currentDate().day());
+    QCalendar::YearMonthDay jalaliYMD(1379, 1, 20);
+
+
+    QCalendar::YearMonthDay newJalili = Date::cppInstance()->gregorianToJalali(gregorianYMD);
+    QCalendar::YearMonthDay newGregorian = Date::cppInstance()->jalaliToGregorian(jalaliYMD);
+
+    QDate gregorianDate(newGregorian.year, newGregorian.month, newGregorian.day);
+    QDate jaliliDate(newJalili.year, newJalili.month, newJalili.day);
+
+
+    qDebug() << gregorianDate.toString("dd.MM.yyyy");
+    qDebug() << jaliliDate.toString("dd.MM.yyyy");
 
     // WARNING (SAVIZ): This function does not work correctly under Wayland.
     QGuiApplication::setWindowIcon(QIcon("./resources/icons/Application icons/ufo.png"));
@@ -31,13 +42,7 @@ void registerTypes()
 {
     qmlRegisterSingletonType<AppTheme>("AppTheme", 1, 0, "AppTheme", &AppTheme::qmlInstance);
     qmlRegisterSingletonType<Database>("Database", 1, 0, "Database", &Database::qmlInstance);
-}
-
-void registerTranslations(QTranslator &translator, QGuiApplication &application)
-{
-    translator.load("./resources/translations/qm/persian.qm");
-
-    application.installTranslator(&translator);
+    qmlRegisterSingletonType<Date>("Date", 1, 0, "Date", &Date::qmlInstance);
 }
 
 void setupThemeSystem()
