@@ -112,4 +112,26 @@ import QtQuick
 //     }
 // }
 
-Item{}
+Item{
+
+    Button {
+        id: toggleButton
+        text: contentContainer.visible ? "Collapse" : "Expand"
+        onClicked: {
+          contentContainer.visible = !contentContainer.visible
+        }
+      }
+
+      Rectangle {
+                id: contentContainer
+                visible: false
+                color: "#d3d3d3"
+                Layout.fillWidth: true
+                Layout.preferredHeight: 100
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "This is the collapsible content."
+                }
+      }
+}

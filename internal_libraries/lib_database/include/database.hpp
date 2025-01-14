@@ -53,6 +53,7 @@ private:
     QVariantList m_TreatmentList;
     QVariantList m_MedicalDrugList;
     QVariantList m_ConsultantList;
+    QVariantList m_LabList;
     QVariantList m_SearchResultList;
     QVariantMap m_PatientDataMap;
 
@@ -62,6 +63,7 @@ signals:
     void diagnosisListPopulated(bool success, const QString &message);
     void treatmentListPopulated(bool success, const QString &message);
     void consultantListPopulated(bool success, const QString &message);
+    void labListPopulated(bool success, const QString &message);
     void medicalDrugListPopulated(bool success, const QString &message);
     void queryExecuted(QueryType type, bool success, const QString &message);
     void patientDataPulled(bool success, const QString &message);
@@ -113,6 +115,7 @@ private:
     bool populateTreatmentList();
     bool populateMedicalDrugList();
     bool populateConsultantList();
+    bool populateLabList();
 
     // PUBLIC Getters
 public:
@@ -121,6 +124,7 @@ public:
     Q_INVOKABLE QVariantList getTreatmentList() const;
     Q_INVOKABLE QVariantList getMedicalDrugList() const;
     Q_INVOKABLE QVariantList getConsultantList() const;
+    Q_INVOKABLE QVariantList getLabList() const;
     Q_INVOKABLE QVariantList getSearchResultList() const;
     Q_INVOKABLE QVariantMap getPatientDataMap() const;
 };

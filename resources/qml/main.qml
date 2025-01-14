@@ -199,19 +199,11 @@ ApplicationWindow {
             }
 
             Connections {
-                target: ufo_Create
-
-                function onSearchMatchedNewPatient() {
-                    stackLayout.currentIndex = ufo_Search.StackLayout.index
-
-                    ufo_SideBar_Main.checkTabButton("Search Page")
-                }
-            }
-
-            Connections {
                 target: ufo_Search
 
                 function onPatientSelectedForEdit() {
+                    ufo_Edit.contentVisible = true
+
                     stackLayout.currentIndex = ufo_Edit.StackLayout.index
 
                     ufo_SideBar_Main.checkTabButton("Edit Page")

@@ -12,8 +12,6 @@ import Database 1.0
 UFO_Page {
     id: root
 
-    signal searchMatchedNewPatient
-
     title: qsTr("ایجاد")
     contentSpacing: 25
 

@@ -22,6 +22,7 @@ Database::Database(QObject *parent, const QString &name)
     , m_TreatmentList(QVariantList{})
     , m_MedicalDrugList(QVariantList{})
     , m_ConsultantList(QVariantList{})
+    , m_LabList(QVariantList{})
     , m_SearchResultList(QVariantList{})
     , m_PatientDataMap(QVariantMap{})
 {
@@ -185,10 +186,11 @@ bool Database::establishConnection(const QString &ipAddress, qint16 port, const 
 
 
     // Populate lists:
-    //populateDiagnosisList();
-    //populateTreatmentList();
-    //populateMedicalDrugList();
-    //populateConsultantList();
+    populateDiagnosisList();
+    populateTreatmentList();
+    populateMedicalDrugList();
+    populateConsultantList();
+    populateLabList();
 
 
 
@@ -266,8 +268,6 @@ bool Database::disconnect()
 // INSERT
 bool Database::createPatient(const QString &firstName, const QString &lastName, quint32 birthYear, const QString &phoneNumber, const QString &gender, const QString &maritalStatus)
 {
-    // NOTE (SAVIZ): The application assumes that 'Creating a patient for the first time' corresponds to their 'First visit.' As a result, certain fields, such as first_visit_date and recent_visit_date, are automatically populated.
-
 #ifdef QT_DEBUG
     QString message("Insert initiated!\n");
 
@@ -292,17 +292,12 @@ bool Database::createPatient(const QString &firstName, const QString &lastName, 
 
 
 
-    // First bind required fields:
     query.bindValue(":first_name", firstName);
     query.bindValue(":last_name", lastName);
     query.bindValue(":birth_year", birthYear);
     query.bindValue(":phone_number", phoneNumber);
     query.bindValue(":gender", gender);
     query.bindValue(":marital_status", maritalStatus);
-
-    // Now bind automatic fields:
-    query.bindValue(":first_visit_date", QDate::currentDate());
-    query.bindValue(":recent_visit_date", QDate::currentDate());
 
 
 
@@ -2635,7 +2630,7 @@ bool Database::populateDiagnosisList()
 
 
         diagnosisMap["diagnosis_id"] = query.value("diagnosis_id").toULongLong();
-        diagnosisMap["diagnosis_name"] = query.value("name").toString();
+        diagnosisMap["name"] = query.value("name").toString();
 
 
 
@@ -2710,7 +2705,7 @@ bool Database::populateTreatmentList()
 
 
         treatmentMap["treatment_id"] = query.value("treatment_id").toULongLong();
-        treatmentMap["treatment_name"] = query.value("name").toString();
+        treatmentMap["name"] = query.value("name").toString();
 
 
 
@@ -2785,7 +2780,7 @@ bool Database::populateMedicalDrugList()
 
 
         medicalDrugMap["medical_drug_id"] = query.value("medical_drug_id").toULongLong();
-        medicalDrugMap["medical_drug_name"] = query.value("name").toString();
+        medicalDrugMap["name"] = query.value("name").toString();
 
 
 
@@ -2860,8 +2855,8 @@ bool Database::populateConsultantList()
 
 
         consultantMap["consultant_id"] = query.value("consultant_id").toULongLong();
-        consultantMap["consultant_name"] = query.value("consultant_name").toString();
-        consultantMap["consultant_speciality"] = query.value("consultant_speciality").toString();
+        consultantMap["name"] = query.value("name").toString();
+        consultantMap["specialization"] = query.value("specialization").toString();
 
 
 
@@ -2872,6 +2867,82 @@ bool Database::populateConsultantList()
 
     // Notify QML:
     emit consultantListPopulated(true, "Consultant list successfully acquired.");
+
+
+
+    return (true);
+}
+
+bool Database::populateLabList()
+{
+    QString queryString = "SELECT * FROM labs WHERE is_active = TRUE";
+
+
+
+    QSqlQuery query(m_QSqlDatabase);
+    query.prepare(queryString);
+
+
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
+#endif
+
+
+
+        // Notify QML:
+        emit labListPopulated(false, query.lastError().text());
+
+
+
+        return (false);
+    }
+
+
+
+    if (query.size() == 0)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Query returned no results.");
+#endif
+
+
+
+        // Notify QML:
+        emit labListPopulated(false, "Query returned no results.");
+
+
+
+        return (false);
+    }
+
+
+
+    m_LabList.clear();
+
+
+
+    while (query.next())
+    {
+        QVariantMap labMap;
+
+
+
+        labMap["lab_id"] = query.value("lab_id").toULongLong();
+        labMap["name"] = query.value("name").toString();
+        labMap["specialization"] = query.value("specialization").toString();
+
+
+
+        m_LabList.append(labMap);
+    }
+
+
+
+    // Notify QML:
+    emit labListPopulated(true, "Lab list successfully acquired.");
 
 
 
@@ -2912,6 +2983,11 @@ QVariantList Database::getMedicalDrugList() const
 QVariantList Database::getConsultantList() const
 {
     return (m_ConsultantList);
+}
+
+QVariantList Database::getLabList() const
+{
+    return (m_LabList);
 }
 
 QVariantList Database::getSearchResultList() const
