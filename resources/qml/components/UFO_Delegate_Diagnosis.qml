@@ -9,7 +9,7 @@ import Database 1.0
 Item {
     id: root
 
-    property alias treatmentName: text_TreatmentName.text
+    property alias diagnosisName: text_DiagnosisName.text
 
     signal removeClicked
 
@@ -28,7 +28,7 @@ Item {
             color: Qt.color(AppTheme.colors["UFO_Delegate_Background"])
 
             Text {
-                id: text_TreatmentName
+                id: text_DiagnosisName
 
                 anchors.fill: parent
                 anchors.leftMargin: 10

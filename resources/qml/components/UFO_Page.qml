@@ -11,7 +11,7 @@ Item {
     default property alias content: columnLayout.data
     property int contentSpacing: 7
     property int contentTopMargin: 20
-    property int contentBottomMargin: 35
+    property int contentBottomMargin: 65
     property int contentLeftMargin: 20
     property int contentRightMargin: 20
     property alias pageRadius: rectangle_Background.radius

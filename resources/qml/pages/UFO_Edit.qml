@@ -20,7 +20,6 @@ UFO_Page {
     UFO_Button {
         id: ufo_Button_MarkedForDeletion
 
-        Layout.preferredWidth: 165
         Layout.preferredHeight: 40
 
         enabled: (Database.connectionStatus === true) ? true : false
@@ -52,7 +51,7 @@ UFO_Page {
         Layout.fillWidth: true
         // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
 
-        title: qsTr("Basic Data")
+        title: qsTr("اطلاعات پایه")
         contentSpacing: 2
 
         Rectangle {
@@ -70,9 +69,8 @@ UFO_Page {
 
                 anchors.fill: parent
 
-                text: qsTr("Patient ID ()")
+                text: qsTr("شماره پرونده ()")
 
-                horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
 
                 color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
@@ -86,7 +84,7 @@ UFO_Page {
                         return;
                     }
 
-                    text_PatinetID.text = qsTr("Patient ID (") + Database.getPatientDataMap()["patient_id"] + qsTr(")");
+                    text_PatinetID.text = qsTr("شماره پرونده (") + Database.getPatientDataMap()["patient_id"] + qsTr(")");
                 }
             }
         }
@@ -98,9 +96,8 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: qsTr("First Name")
+            text: qsTr("نام")
 
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
 
             color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
@@ -140,9 +137,8 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: qsTr("Last Name")
+            text: qsTr("نام خانوادگی")
 
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
 
             color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
@@ -182,9 +178,8 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: qsTr("Birth Year")
+            text: qsTr("سال تولد")
 
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
 
             color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
@@ -224,9 +219,8 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: qsTr("Phone Number")
+            text: qsTr("شماره تلفن")
 
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
 
             color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
@@ -267,12 +261,11 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: qsTr("Gender")
+            text: qsTr("جنسیت")
 
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
 
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
 
             font.pixelSize: Qt.application.font.pixelSize * 1
@@ -289,7 +282,7 @@ UFO_Page {
             Layout.rightMargin: 15
 
             enabled: (Database.connectionStatus === true) ? true : false
-            model: ["Unknown", "Male", "Female"]
+            model: ["نامشخص", "مرد", "زن"]
 
             Connections {
                 target: Database
@@ -300,10 +293,10 @@ UFO_Page {
                     }
 
                     switch (Database.getPatientDataMap()["gender"]) {
-                        case "Unknown":
+                        case "نامشخص":
                             comboBox_Gender.currentIndex = 0;
                             break;
-                        case "Male":
+                        case "مرد":
                             comboBox_Gender.currentIndex = 1;
                             break;
                         default:
@@ -319,12 +312,11 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: qsTr("Marital status")
+            text: qsTr("وضعیت تأهل")
 
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
 
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
 
             font.pixelSize: Qt.application.font.pixelSize * 1
@@ -341,7 +333,7 @@ UFO_Page {
             Layout.rightMargin: 15
 
             enabled: (Database.connectionStatus === true) ? true : false
-            model: ["Unknown", "Single", "Married"]
+            model: ["نامشخص", "مجرد", "متاهل"]
 
             Connections {
                 target: Database
@@ -352,10 +344,10 @@ UFO_Page {
                     }
 
                     switch (Database.getPatientDataMap()["marital_status"]) {
-                        case "Unknown":
+                        case "نامشخص":
                             comboBox_Gender.currentIndex = 0;
                             break;
-                        case "Single":
+                        case "مجرد":
                             comboBox_Gender.currentIndex = 1;
                             break;
                         default:
@@ -372,12 +364,11 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: qsTr("Previous Visits")
+            text: qsTr("تعداد بازدیدهای قبلی")
 
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
 
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
 
             font.pixelSize: Qt.application.font.pixelSize * 1
@@ -418,12 +409,11 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: qsTr("First Visit Date")
+            text: qsTr("تاریخ اولین بازدید")
 
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
 
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
 
             font.pixelSize: Qt.application.font.pixelSize * 1
@@ -464,12 +454,11 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: qsTr("Recent Visit Date")
+            text: qsTr("تاریخ آخرین بازدید")
 
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
 
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
 
             font.pixelSize: Qt.application.font.pixelSize * 1
@@ -511,12 +500,11 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: qsTr("Service Price")
+            text: qsTr("قیمت خدمات")
 
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
 
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
 
             font.pixelSize: Qt.application.font.pixelSize * 1
@@ -569,12 +557,11 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: qsTr("The following represents the list of diagnoses assigned to the patient")
+            text: qsTr("موارد زیر نشان‌دهنده فهرست تشخیص‌هایی است که به بیمار اختصاص داده شده‌اند.")
 
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
 
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignVCenter
 
             font.pixelSize: Qt.application.font.pixelSize * 1
@@ -598,7 +585,7 @@ UFO_Page {
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                textRole: "diagnosis_name"
+                textRole: "name"
 
                 model: ListModel { id: listModel_ComboBoxDiagnoses }
 
@@ -609,7 +596,7 @@ UFO_Page {
                         listModel_ComboBoxDiagnoses.clear();
 
                         Database.getDiagnosisList().forEach(function (diagnosis) {
-                            listModel_ComboBoxDiagnoses.append({"diagnosis_id": diagnosis["diagnosis_id"], "diagnosis_name": diagnosis["diagnosis_name"]});
+                            listModel_ComboBoxDiagnoses.append({"diagnosis_id": diagnosis["diagnosis_id"], "name": diagnosis["name"]});
                         });
 
                         // Set default:
@@ -633,7 +620,8 @@ UFO_Page {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
 
                 enabled: (Database.connectionStatus === true) ? true : false
-                text: qsTr("Insert")
+
+                text: qsTr("اضافه کردن")
                 icon.source: "./../../icons/Google icons/add_box.svg"
 
                 onClicked: {
@@ -689,15 +677,15 @@ UFO_Page {
                     policy: ScrollBar.AsNeeded
                 }
 
-                // delegate: UFO_Delegate_Treatment {
-                //     width: listView_Diagnoses.width - scrollBar_Diagnoses.width / 2
+                delegate: UFO_Delegate_Diagnosis {
+                    width: listView_Diagnoses.width - scrollBar_Diagnoses.width / 2
 
-                //     treatmentName: model["diagnosis_name"]
+                    diagnosisName: model["diagnosis_name"]
 
-                //     onRemoveClicked: {
-                //         listModel_ListViewDiagnoses.remove(index);
-                //     }
-                // }
+                    onRemoveClicked: {
+                        listModel_ListViewDiagnoses.remove(index);
+                    }
+                }
 
                 Connections {
                     target: Database
@@ -725,7 +713,6 @@ UFO_Page {
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
 
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
 
             font.pixelSize: Qt.application.font.pixelSize * 1
@@ -789,12 +776,11 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: qsTr("The following represents the list of treatments assigned to the patient")
+            text: qsTr("موارد زیر نشان‌دهنده فهرست درمان‌هایی است که به بیمار اختصاص داده شده‌اند.")
 
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
 
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignVCenter
 
             font.pixelSize: Qt.application.font.pixelSize * 1
@@ -818,7 +804,7 @@ UFO_Page {
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                textRole: "treatment_name"
+                textRole: "name"
 
                 model: ListModel { id: listModel_ComboBoxTreatments }
 
@@ -829,7 +815,7 @@ UFO_Page {
                         listModel_ComboBoxTreatments.clear();
 
                         Database.getTreatmentList().forEach(function (treatment) {
-                            listModel_ComboBoxTreatments.append({"treatment_id": treatment["treatment_id"], "treatment_name": treatment["treatment_name"]});
+                            listModel_ComboBoxTreatments.append({"treatment_id": treatment["treatment_id"], "name": treatment["name"]});
                         });
 
                         // Set default:
@@ -853,7 +839,7 @@ UFO_Page {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
 
                 enabled: (Database.connectionStatus === true) ? true : false
-                text: qsTr("Insert")
+                text: qsTr("اضافه کردن")
                 icon.source: "./../../icons/Google icons/add_box.svg"
 
                 onClicked: {
@@ -909,15 +895,15 @@ UFO_Page {
                     policy: ScrollBar.AsNeeded
                 }
 
-                // delegate: UFO_Delegate_Treatment {
-                //     width: listView_Treatments.width - scrollBar_Treatments.width / 2
+                delegate: UFO_Delegate_Treatment {
+                    width: listView_Treatments.width - scrollBar_Treatments.width / 2
 
-                //     treatmentName: model["treatment_name"]
+                    treatmentName: model["treatment_name"]
 
-                //     onRemoveClicked: {
-                //         listModel_ListViewTreatments.remove(index);
-                //     }
-                // }
+                    onRemoveClicked: {
+                        listModel_ListViewTreatments.remove(index);
+                    }
+                }
 
                 Connections {
                     target: Database
@@ -945,7 +931,6 @@ UFO_Page {
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
 
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
 
             font.pixelSize: Qt.application.font.pixelSize * 1
@@ -1009,12 +994,11 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: qsTr("The following represents the list of medical drugs assigned to the patient")
+            text: qsTr("موارد زیر نشان‌دهنده فهرست داروهای پزشکی است که به بیمار اختصاص داده شده‌اند.")
 
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
 
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignVCenter
 
             font.pixelSize: Qt.application.font.pixelSize * 1
@@ -1038,7 +1022,7 @@ UFO_Page {
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                textRole: "medical_drug_name"
+                textRole: "name"
 
                 model: ListModel { id: listModel_ComboBoxMedicalDrugs }
 
@@ -1049,7 +1033,7 @@ UFO_Page {
                         listModel_ComboBoxMedicalDrugs.clear();
 
                         Database.getMedicalDrugList().forEach(function (medicalDrug) {
-                            listModel_ComboBoxMedicalDrugs.append({"medical_drug_id": medicalDrug["medical_drug_id"], "medical_drug_name": medicalDrug["medical_drug_name"]});
+                            listModel_ComboBoxMedicalDrugs.append({"medical_drug_id": medicalDrug["medical_drug_id"], "name": medicalDrug["name"]});
                         });
 
                         // Set default:
@@ -1073,7 +1057,8 @@ UFO_Page {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
 
                 enabled: (Database.connectionStatus === true) ? true : false
-                text: qsTr("Insert")
+
+                text: qsTr("اضافه کردن")
                 icon.source: "./../../icons/Google icons/add_box.svg"
 
                 onClicked: {
@@ -1129,15 +1114,15 @@ UFO_Page {
                     policy: ScrollBar.AsNeeded
                 }
 
-                // delegate: UFO_Delegate_Treatment {
-                //     width: listView_MedicalDrugs.width - scrollBar_MedicalDrugs.width / 2
+                delegate: UFO_Delegate_MedicalDrug {
+                    width: listView_MedicalDrugs.width - scrollBar_MedicalDrugs.width / 2
 
-                //     treatmentName: model["medical_drug_name"]
+                    medicalDrugName: model["medical_drug_name"]
 
-                //     onRemoveClicked: {
-                //         listModel_ListViewMedicalDrugs.remove(index);
-                //     }
-                // }
+                    onRemoveClicked: {
+                        listModel_ListViewMedicalDrugs.remove(index);
+                    }
+                }
 
                 Connections {
                     target: Database
@@ -1165,7 +1150,6 @@ UFO_Page {
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
 
-            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
 
             font.pixelSize: Qt.application.font.pixelSize * 1
@@ -1341,7 +1325,8 @@ UFO_Page {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
 
                 enabled: (Database.connectionStatus === true) ? true : false
-                text: qsTr("Insert")
+
+                text: qsTr("اضافه کردن")
                 icon.source: "./../../icons/Google icons/add_box.svg"
 
                 onClicked: {
