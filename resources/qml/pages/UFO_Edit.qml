@@ -8,6 +8,7 @@ import "./../components"
 // Custom CPP Registered Types
 import AppTheme 1.0
 import Database 1.0
+import Date 1.0
 
 UFO_Page {
     id: root
@@ -211,6 +212,34 @@ UFO_Page {
                     textField_BirthYear.text = Database.getPatientDataMap()["birth_year"];
                 }
             }
+        }
+
+        Text {
+            Layout.fillWidth: true
+
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            text: qsTr("سن")
+
+            verticalAlignment: Text.AlignBottom
+
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
+
+        UFO_TextField {
+            id: textField_Age
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            enabled: (Database.connectionStatus === true) ? true : false
+
+            readOnly: true
+            text: (textField_BirthYear.text.trim() === "") ? "0" : Date.calculateJalaliAge(parseInt(textField_BirthYear.text.trim(), 10))
         }
 
         Text {

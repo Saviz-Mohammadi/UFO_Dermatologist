@@ -99,5 +99,15 @@ QCalendar::YearMonthDay Date::jalaliToGregorian(QCalendar::YearMonthDay jalaliYM
     return (ymd);
 }
 
+QString Date::calculateJalaliAge(quint32 birthYear)
+{
+    QCalendar::YearMonthDay gregorianYMD(QDate::currentDate().year(), QDate::currentDate().month(), QDate::currentDate().day());
+    QCalendar::YearMonthDay newJalili = gregorianToJalali(gregorianYMD);
+
+    QString result = QString::number(newJalili.year - birthYear);
+
+    return (result);
+}
+
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
