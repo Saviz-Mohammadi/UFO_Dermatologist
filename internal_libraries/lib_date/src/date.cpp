@@ -109,5 +109,39 @@ QString Date::calculateJalaliAge(quint32 birthYear)
     return (result);
 }
 
+QString Date::differenceToDateJalali(int year, int month, int day)
+{
+    QCalendar::YearMonthDay gregorianYMD(QDate::currentDate().year(), QDate::currentDate().month(), QDate::currentDate().day());
+    QCalendar::YearMonthDay newJalili = gregorianToJalali(gregorianYMD);
+    QDate currentDate(newJalili.year, newJalili.month, newJalili.day);
+
+    QString result;
+
+
+
+    int years = currentDate.year() - year;
+    int months = currentDate.month() - month;
+    int days = currentDate.day() - day;
+
+    // Adjust for negative days
+    if (days < 0) {
+        QDate prevMonth = currentDate.addMonths(-1);
+        days += prevMonth.daysInMonth();
+        months -= 1;
+    }
+
+    // Adjust for negative months
+    if (months < 0) {
+        months += 12;
+        years -= 1;
+    }
+
+
+    result = QString("%1 years, %2 months, %3 days.").arg((years <= 0 ? 0 : years)).arg((months <= 0 ? 0 : months)).arg((days <= 0 ? 0 : days));
+
+
+    return (result);
+}
+
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]

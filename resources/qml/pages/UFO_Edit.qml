@@ -228,8 +228,6 @@ UFO_Page {
         }
 
         UFO_TextField {
-            id: textField_Age
-
             Layout.fillWidth: true
             Layout.preferredHeight: 35
 
@@ -483,6 +481,64 @@ UFO_Page {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
+            text: qsTr("زمان گذشته از اولین بازدید")
+
+            elide: Text.ElideRight
+            wrapMode: Text.NoWrap
+
+            verticalAlignment: Text.AlignBottom
+
+            font.pixelSize: Qt.application.font.pixelSize * 1
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
+
+        UFO_TextField {
+            id: textField_DifferenceFirstDate
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            enabled: (Database.connectionStatus === true) ? true : false
+
+            readOnly: true
+
+            Connections {
+                target: textField_FirstVisitDate
+
+                // TODO: (Saviz): Add trim() to texts:
+                function onTextChanged() {
+
+                    if (textField_FirstVisitDate.text.match(/^[12]\d{3}-[01]\d-[0-3]\d$/)) { // Validate the format
+                        const year = textField_FirstVisitDate.text.substring(0, 4);   // Extract year
+                        const month = textField_FirstVisitDate.text.substring(5, 7); // Extract month
+                        const day = textField_FirstVisitDate.text.substring(8, 10);  // Extract day
+
+                        textField_DifferenceFirstDate.text = Date.differenceToDateJalali(year, month, day);
+                    }
+                }
+
+                function onTextEdited() {
+
+                    if (textField_FirstVisitDate.text.match(/^[12]\d{3}-[01]\d-[0-3]\d$/)) { // Validate the format
+                        const year = textField_FirstVisitDate.text.substring(0, 4);   // Extract year
+                        const month = textField_FirstVisitDate.text.substring(5, 7); // Extract month
+                        const day = textField_FirstVisitDate.text.substring(8, 10);  // Extract day
+
+                        textField_DifferenceFirstDate.text = Date.differenceToDateJalali(year, month, day);
+                    }
+                }
+            }
+        }
+
+        Text {
+            Layout.fillWidth: true
+
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
             text: qsTr("تاریخ آخرین بازدید")
 
             elide: Text.ElideRight
@@ -518,6 +574,64 @@ UFO_Page {
                     }
 
                     textField_RecentVisitDate.text = Database.getPatientDataMap()["recent_visit_date"];
+                }
+            }
+        }
+
+        Text {
+            Layout.fillWidth: true
+
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            text: qsTr("زمان گذشته از آخرین بازدید")
+
+            elide: Text.ElideRight
+            wrapMode: Text.NoWrap
+
+            verticalAlignment: Text.AlignBottom
+
+            font.pixelSize: Qt.application.font.pixelSize * 1
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
+
+        UFO_TextField {
+            id: textField_DifferenceRecentDate
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            enabled: (Database.connectionStatus === true) ? true : false
+
+            readOnly: true
+
+            Connections {
+                target: textField_RecentVisitDate
+
+                // TODO: (Saviz): Add trim() to texts:
+                function onTextChanged() {
+
+                    if (textField_RecentVisitDate.text.match(/^[12]\d{3}-[01]\d-[0-3]\d$/)) { // Validate the format
+                        const year = textField_RecentVisitDate.text.substring(0, 4);   // Extract year
+                        const month = textField_RecentVisitDate.text.substring(5, 7); // Extract month
+                        const day = textField_RecentVisitDate.text.substring(8, 10);  // Extract day
+
+                        textField_DifferenceRecentDate.text = Date.differenceToDateJalali(year, month, day);
+                    }
+                }
+
+                function onTextEdited() {
+
+                    if (textField_RecentVisitDate.text.match(/^[12]\d{3}-[01]\d-[0-3]\d$/)) { // Validate the format
+                        const year = textField_RecentVisitDate.text.substring(0, 4);   // Extract year
+                        const month = textField_RecentVisitDate.text.substring(5, 7); // Extract month
+                        const day = textField_RecentVisitDate.text.substring(8, 10);  // Extract day
+
+                        textField_DifferenceRecentDate.text = Date.differenceToDateJalali(year, month, day);
+                    }
                 }
             }
         }
