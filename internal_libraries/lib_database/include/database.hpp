@@ -98,7 +98,7 @@ public:
     bool pullLabTests(const quint64 index);
 
     // UPDATE
-    Q_INVOKABLE bool updatePatientData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice, const QVariantList &newDiagnoses, const QString &newDiagnosisNote, const QVariantList &newTreatments, const QString &newTreatmentNote, const QVariantList &newMedicalDrugs, const QString &newMedicalDrugNote, const QVariantList &newConsultations);
+    Q_INVOKABLE bool updatePatientData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice, const QVariantList &newDiagnoses, const QString &newDiagnosisNote, const QVariantList &newTreatments, const QString &newTreatmentNote, const QVariantList &newMedicalDrugs, const QString &newMedicalDrugNote, const QVariantList &newConsultations, const QVariantList &newLabTests);
     bool updateBasicData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice);
     bool updateDiagnoses(const QVariantList &newDiagnoses);
     bool updateDiagnosisNote(const QString &newNote);
@@ -107,6 +107,7 @@ public:
     bool updateMedicalDrugs(const QVariantList &newMedicalDrugs);
     bool updateMedicalDrugNote(const QString &newNote);
     bool updateConsultations(const QVariantList &newConsultations);
+    bool updateLabTests(const QVariantList &newLabTests);
 
     // DELETION
     Q_INVOKABLE bool changeDeletionStatus(bool newStatus);

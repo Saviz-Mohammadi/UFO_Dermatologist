@@ -1872,7 +1872,7 @@ UFO_Page {
                 for (let b = 0; b < listModel_ListView_LabTests.count; b++) {
                     let item = listModel_ListView_LabTests.get(b);
 
-                    consultations.push({
+                    labTests.push({
                         lab_id: item.lab_id,
                         lab_test_date: item.lab_test_date,
                         lab_test_outcome: item.lab_test_outcome
