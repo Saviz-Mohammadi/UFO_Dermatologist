@@ -12,6 +12,7 @@
 #include <QVariantList>
 #include <QDateTime>
 #include <QTextStream>
+#include "date.hpp"
 
 // NOTE (SAVIZ): The combination of 'QVariantMap' and 'QVariantList' enbales us to replicate any type of data structure and exposed it easilly to QML. For this reason I don't use any intermidiate objects or strcuts for data transfer.
 
@@ -94,6 +95,7 @@ public:
     bool pullTreatmentNote(const quint64 index);
     bool pullMedicalDrugNote(const quint64 index);
     bool pullConsultations(const quint64 index);
+    bool pullLabTests(const quint64 index);
 
     // UPDATE
     Q_INVOKABLE bool updatePatientData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice, const QVariantList &newDiagnoses, const QString &newDiagnosisNote, const QVariantList &newTreatments, const QString &newTreatmentNote, const QVariantList &newMedicalDrugs, const QString &newMedicalDrugNote, const QVariantList &newConsultations);

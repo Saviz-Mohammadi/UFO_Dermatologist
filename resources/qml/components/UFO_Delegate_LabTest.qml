@@ -44,8 +44,8 @@ Item {
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                text: qsTr("Remove")
-                icon.source: "./../../icons/Google icons/delete.svg"
+                text: checked ? qsTr("Collapse") : qsTr("Expand")
+                icon.source: checked ? "./../../icons/Google icons/arrow_drop_up.svg" : "./../../icons/Google icons/arrow_drop_down.svg"
             }
 
             Rectangle {

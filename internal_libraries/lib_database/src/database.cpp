@@ -905,9 +905,11 @@ bool Database::pullPatientData(const quint64 index)
 
     bool consultationsPullOutcome = pullConsultations(index);
 
+    bool labTestsPullOutcome = pullLabTests(index);
 
 
-    if(basicDataPullOutcome == false || diagnosesPullOutcome == false || treatmentsPullOutcome == false || medicalDrugsPullOutcome == false || diagnosisNotePullOutcome == false || treatmentNotePullOutcome == false || medicalDrugNotePullOutcome == false || consultationsPullOutcome == false)
+
+    if(basicDataPullOutcome == false || diagnosesPullOutcome == false || treatmentsPullOutcome == false || medicalDrugsPullOutcome == false || diagnosisNotePullOutcome == false || treatmentNotePullOutcome == false || medicalDrugNotePullOutcome == false || consultationsPullOutcome == false || labTestsPullOutcome == false)
     {
 #ifdef QT_DEBUG
         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Errors occured while pulling patient data!");
@@ -916,7 +918,7 @@ bool Database::pullPatientData(const quint64 index)
 
 
         // Notify QML:
-        emit patientDataPushed(false, "Errors occured while pulling patient data. Please retry later.");
+        emit patientDataPushed(false, "خطاهایی هنگام دریافت اطلاعات بیمار رخ داد. لطفاً دوباره تلاش کنید.");
 
 
 
@@ -932,7 +934,7 @@ bool Database::pullPatientData(const quint64 index)
 
 
     // Notify QML:
-    emit patientDataPulled(true, "Patient data successfully pulled from database.");
+    emit patientDataPulled(true, "اطلاعات بیمار با موفقیت از پایگاه داده دریافت شد.");
 
 
 
@@ -1009,10 +1011,51 @@ bool Database::pullPatientBasicData(const quint64 index)
         m_PatientDataMap["gender"] = query.value("gender").toString();
         m_PatientDataMap["marital_status"] = query.value("marital_status").toString();
         m_PatientDataMap["number_of_previous_visits"] = query.value("number_of_previous_visits").toUInt();
-        m_PatientDataMap["first_visit_date"] = query.value("first_visit_date").toString();
-        m_PatientDataMap["recent_visit_date"] = query.value("recent_visit_date").toString();
         m_PatientDataMap["service_price"] = query.value("service_price").toReal();
         m_PatientDataMap["marked_for_deletion"] = query.value("marked_for_deletion").toBool();
+
+        // Dates need to be converted to Jalali:
+        QDate firstVisitDate = query.value("first_visit_date").toDate();
+        QDate recentVisitDate = query.value("recent_visit_date").toDate();
+
+
+        if(!firstVisitDate.isNull())
+        {
+            QCalendar::YearMonthDay fvdgregorianYMD(firstVisitDate.year(), firstVisitDate.month(), firstVisitDate.day());
+
+            QCalendar::YearMonthDay firstVisitDateJalili = Date::cppInstance()->gregorianToJalali(fvdgregorianYMD);
+
+            QString firstVisitDateString = QString("%1-%2-%3")
+                                               .arg(firstVisitDateJalili.year, 4, 10, QChar('0'))
+                                               .arg(firstVisitDateJalili.month, 2, 10, QChar('0'))
+                                               .arg(firstVisitDateJalili.day, 2, 10, QChar('0'));
+
+            m_PatientDataMap["first_visit_date"] = firstVisitDateString;
+        }
+
+        else
+        {
+            m_PatientDataMap["first_visit_date"] = "";
+        }
+
+        if(!recentVisitDate.isNull())
+        {
+            QCalendar::YearMonthDay rvdgregorianYMD(recentVisitDate.year(), recentVisitDate.month(), recentVisitDate.day());
+
+            QCalendar::YearMonthDay recentVisitDateJalili = Date::cppInstance()->gregorianToJalali(rvdgregorianYMD);
+
+            QString recentVisitDateString = QString("%1-%2-%3")
+                                                .arg(recentVisitDateJalili.year, 4, 10, QChar('0'))
+                                                .arg(recentVisitDateJalili.month, 2, 10, QChar('0'))
+                                                .arg(recentVisitDateJalili.day, 2, 10, QChar('0'));
+
+            m_PatientDataMap["recent_visit_date"] = recentVisitDateString;
+        }
+
+        else
+        {
+            m_PatientDataMap["recent_visit_date"] = "";
+        }
     }
 
 
@@ -1099,7 +1142,7 @@ bool Database::pullPatientDiagnoses(const quint64 index)
             QVariantMap diagnosisMap;
 
             diagnosisMap["diagnosis_id"] = query.value("diagnosis_id").toULongLong();
-            diagnosisMap["diagnosis_name"] = query.value("diagnoses.name").toString().trimmed();
+            diagnosisMap["name"] = query.value("diagnoses.name").toString().trimmed();
 
             diagnoses.append(diagnosisMap);
         }
@@ -1193,7 +1236,7 @@ bool Database::pullPatientTreatments(const quint64 index)
             QVariantMap treatmentMap;
 
             treatmentMap["treatment_id"] = query.value("treatment_id").toULongLong();
-            treatmentMap["treatment_name"] = query.value("treatments.name").toString().trimmed();
+            treatmentMap["name"] = query.value("treatments.name").toString().trimmed();
 
             treatments.append(treatmentMap);
         }
@@ -1287,7 +1330,7 @@ bool Database::pullPatientMedicalDrugs(const quint64 index)
             QVariantMap medicalDrugMap;
 
             medicalDrugMap["medical_drug_id"] = query.value("medical_drug_id").toULongLong();
-            medicalDrugMap["medical_drug_name"] = query.value("medical_drugs.name").toString().trimmed();
+            medicalDrugMap["name"] = query.value("medical_drugs.name").toString().trimmed();
 
             medicalDrugs.append(medicalDrugMap);
         }
@@ -1601,15 +1644,36 @@ bool Database::pullConsultations(const quint64 index)
 
     while (query.next())
     {
-        if (!query.value("consultant_id").isNull() && !query.value("consultant_name").isNull())
+        if (!query.value("consultant_id").isNull() && !query.value("consultants.name").isNull())
         {
             QVariantMap consultantMap;
 
             consultantMap["consultant_id"] = query.value("consultant_id").toULongLong();
-            consultantMap["consultant_name"] = query.value("consultant_name").toString().trimmed();
-            consultantMap["consultant_speciality"] = query.value("consultant_speciality").toString().trimmed();
-            consultantMap["consultation_date"] = query.value("consultation_date").toString().trimmed();
+            consultantMap["consultant_name"] = query.value("consultants.name").toString().trimmed();
+            consultantMap["consultant_specialization"] = query.value("consultants.specialization").toString().trimmed();
             consultantMap["consultation_outcome"] = query.value("consultation_outcome").toString().trimmed();
+
+            // Converting date to jalali:
+            QDate outcomeDate = query.value("consultation_date").toDate();
+
+            if(!outcomeDate.isNull())
+            {
+                QCalendar::YearMonthDay fvdgregorianYMD(outcomeDate.year(), outcomeDate.month(), outcomeDate.day());
+
+                QCalendar::YearMonthDay firstVisitDateJalili = Date::cppInstance()->gregorianToJalali(fvdgregorianYMD);
+
+                QString firstVisitDateString = QString("%1-%2-%3")
+                                                   .arg(firstVisitDateJalili.year, 4, 10, QChar('0'))
+                                                   .arg(firstVisitDateJalili.month, 2, 10, QChar('0'))
+                                                   .arg(firstVisitDateJalili.day, 2, 10, QChar('0'));
+
+                consultantMap["consultation_date"] = firstVisitDateString;
+            }
+
+            else
+            {
+                consultantMap["consultation_date"] = "";
+            }
 
 
             consultations.append(consultantMap);
@@ -1619,6 +1683,125 @@ bool Database::pullConsultations(const quint64 index)
 
 
     m_PatientDataMap["consultations"] = consultations;
+
+
+
+#ifdef QT_DEBUG
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+    return (true);
+}
+
+bool Database::pullLabTests(const quint64 index)
+{
+#ifdef QT_DEBUG
+    QString message("Lab Tests pull initiated!\n");
+
+    QTextStream stream(&message);
+
+    stream << "The patient_id is: " + QString::number(index) + "\n";
+#endif
+
+
+
+    QString queryString = R"(
+        SELECT * FROM patients
+
+        LEFT JOIN patient_lab_tests ON patients.patient_id = patient_lab_tests.patient_id
+        LEFT JOIN labs ON labs.lab_id = patient_lab_tests.lab_id
+
+        WHERE patients.patient_id = :patient_id
+    )";
+
+
+
+    QSqlQuery query(m_QSqlDatabase);
+    query.prepare(queryString);
+
+
+
+    query.bindValue(":patient_id", index);
+
+
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        stream << query.lastError().text() << "\n";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        return (false);
+    }
+
+
+
+    if (query.size() == 0)
+    {
+#ifdef QT_DEBUG
+        stream << "Query returned no results.";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        return (false);
+    }
+
+
+
+    QVariantList labTests;
+
+
+
+    while (query.next())
+    {
+        if (!query.value("lab_id").isNull() && !query.value("labs.name").isNull())
+        {
+            QVariantMap labTestMap;
+
+            labTestMap["lab_id"] = query.value("lab_id").toULongLong();
+            labTestMap["lab_name"] = query.value("labs.name").toString().trimmed();
+            labTestMap["lab_specialization"] = query.value("labs.specialization").toString().trimmed();
+            labTestMap["lab_test_outcome"] = query.value("lab_test_outcome").toString().trimmed();
+
+            // Converting date to jalali:
+            QDate outcomeDate = query.value("lab_test_date").toDate();
+
+            if(!outcomeDate.isNull())
+            {
+                QCalendar::YearMonthDay fvdgregorianYMD(outcomeDate.year(), outcomeDate.month(), outcomeDate.day());
+
+                QCalendar::YearMonthDay firstVisitDateJalili = Date::cppInstance()->gregorianToJalali(fvdgregorianYMD);
+
+                QString firstVisitDateString = QString("%1-%2-%3")
+                                                   .arg(firstVisitDateJalili.year, 4, 10, QChar('0'))
+                                                   .arg(firstVisitDateJalili.month, 2, 10, QChar('0'))
+                                                   .arg(firstVisitDateJalili.day, 2, 10, QChar('0'));
+
+                labTestMap["lab_test_date"] = firstVisitDateString;
+            }
+
+            else
+            {
+                labTestMap["lab_test_date"] = "";
+            }
+
+
+            labTests.append(labTestMap);
+        }
+    }
+
+
+
+    m_PatientDataMap["labTests"] = labTests;
 
 
 

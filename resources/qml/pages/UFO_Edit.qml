@@ -517,7 +517,11 @@ UFO_Page {
                         const day = textField_FirstVisitDate.text.substring(8, 10);  // Extract day
 
                         textField_DifferenceFirstDate.text = Date.differenceToDateJalali(year, month, day);
+
+                        return;
                     }
+
+                    textField_DifferenceFirstDate.clear();
                 }
 
                 function onTextEdited() {
@@ -528,7 +532,11 @@ UFO_Page {
                         const day = textField_FirstVisitDate.text.substring(8, 10);  // Extract day
 
                         textField_DifferenceFirstDate.text = Date.differenceToDateJalali(year, month, day);
+
+                        return;
                     }
+
+                    textField_DifferenceFirstDate.clear();
                 }
             }
         }
@@ -620,7 +628,11 @@ UFO_Page {
                         const day = textField_RecentVisitDate.text.substring(8, 10);  // Extract day
 
                         textField_DifferenceRecentDate.text = Date.differenceToDateJalali(year, month, day);
+
+                        return;
                     }
+
+                    textField_RecentVisitDate.clear();
                 }
 
                 function onTextEdited() {
@@ -631,7 +643,11 @@ UFO_Page {
                         const day = textField_RecentVisitDate.text.substring(8, 10);  // Extract day
 
                         textField_DifferenceRecentDate.text = Date.differenceToDateJalali(year, month, day);
+
+                        return;
                     }
+
+                    textField_RecentVisitDate.clear();
                 }
             }
         }
@@ -784,7 +800,7 @@ UFO_Page {
                     }
 
 
-                    listModel_ListViewDiagnoses.append({"diagnosis_id": ufo_ComboBox_Diagnoses.model.get(ufo_ComboBox_Diagnoses.currentIndex)["diagnosis_id"], "diagnosis_name": ufo_ComboBox_Diagnoses.model.get(ufo_ComboBox_Diagnoses.currentIndex)["diagnosis_name"]});
+                    listModel_ListViewDiagnoses.append({"diagnosis_id": ufo_ComboBox_Diagnoses.model.get(ufo_ComboBox_Diagnoses.currentIndex)["diagnosis_id"], "name": ufo_ComboBox_Diagnoses.model.get(ufo_ComboBox_Diagnoses.currentIndex)["name"]});
                 }
             }
         }
@@ -823,7 +839,7 @@ UFO_Page {
                 delegate: UFO_Delegate_Diagnosis {
                     width: listView_Diagnoses.width - scrollBar_Diagnoses.width / 2
 
-                    diagnosisName: model["diagnosis_name"]
+                    diagnosisName: model["name"]
 
                     onRemoveClicked: {
                         listModel_ListViewDiagnoses.remove(index);
@@ -837,7 +853,7 @@ UFO_Page {
                         listModel_ListViewDiagnoses.clear();
 
                         Database.getPatientDataMap()["diagnoses"].forEach(function (diagnosis) {
-                            listModel_ListViewDiagnoses.append({"diagnosis_id": diagnosis["diagnosis_id"], "diagnosis_name": diagnosis["diagnosis_name"]});
+                            listModel_ListViewDiagnoses.append({"diagnosis_id": diagnosis["diagnosis_id"], "name": diagnosis["name"]});
                         });
                     }
                 }
@@ -1002,7 +1018,7 @@ UFO_Page {
                     }
 
 
-                    listModel_ListViewTreatments.append({"treatment_id": ufo_ComboBox_Treatments.model.get(ufo_ComboBox_Treatments.currentIndex)["treatment_id"], "treatment_name": ufo_ComboBox_Treatments.model.get(ufo_ComboBox_Treatments.currentIndex)["treatment_name"]});
+                    listModel_ListViewTreatments.append({"treatment_id": ufo_ComboBox_Treatments.model.get(ufo_ComboBox_Treatments.currentIndex)["treatment_id"], "name": ufo_ComboBox_Treatments.model.get(ufo_ComboBox_Treatments.currentIndex)["name"]});
                 }
             }
         }
@@ -1041,7 +1057,7 @@ UFO_Page {
                 delegate: UFO_Delegate_Treatment {
                     width: listView_Treatments.width - scrollBar_Treatments.width / 2
 
-                    treatmentName: model["treatment_name"]
+                    treatmentName: model["name"]
 
                     onRemoveClicked: {
                         listModel_ListViewTreatments.remove(index);
@@ -1055,7 +1071,7 @@ UFO_Page {
                         listModel_ListViewTreatments.clear();
 
                         Database.getPatientDataMap()["treatments"].forEach(function (treatment) {
-                            listModel_ListViewTreatments.append({"treatment_id": treatment["treatment_id"], "treatment_name": treatment["treatment_name"]});
+                            listModel_ListViewTreatments.append({"treatment_id": treatment["treatment_id"], "name": treatment["name"]});
                         });
                     }
                 }
@@ -1221,7 +1237,7 @@ UFO_Page {
                     }
 
 
-                    listModel_ListViewMedicalDrugs.append({"medical_drug_id": ufo_ComboBox_MedicalDrugs.model.get(ufo_ComboBox_MedicalDrugs.currentIndex)["medical_drug_id"], "medical_drug_name": ufo_ComboBox_MedicalDrugs.model.get(ufo_ComboBox_MedicalDrugs.currentIndex)["medical_drug_name"]});
+                    listModel_ListViewMedicalDrugs.append({"medical_drug_id": ufo_ComboBox_MedicalDrugs.model.get(ufo_ComboBox_MedicalDrugs.currentIndex)["medical_drug_id"], "name": ufo_ComboBox_MedicalDrugs.model.get(ufo_ComboBox_MedicalDrugs.currentIndex)["name"]});
                 }
             }
         }
@@ -1260,7 +1276,7 @@ UFO_Page {
                 delegate: UFO_Delegate_MedicalDrug {
                     width: listView_MedicalDrugs.width - scrollBar_MedicalDrugs.width / 2
 
-                    medicalDrugName: model["medical_drug_name"]
+                    medicalDrugName: model["name"]
 
                     onRemoveClicked: {
                         listModel_ListViewMedicalDrugs.remove(index);
@@ -1274,7 +1290,7 @@ UFO_Page {
                         listModel_ListViewMedicalDrugs.clear();
 
                         Database.getPatientDataMap()["medicalDrugs"].forEach(function (medicalDrug) {
-                            listModel_ListViewMedicalDrugs.append({"medical_drug_id": medicalDrug["medical_drug_id"], "medical_drug_name": medicalDrug["medical_drug_name"]});
+                            listModel_ListViewMedicalDrugs.append({"medical_drug_id": medicalDrug["medical_drug_id"], "name": medicalDrug["name"]});
                         });
                     }
                 }
@@ -1397,7 +1413,7 @@ UFO_Page {
                         listModel_UFO_ComboBox_ConsultantName.clear();
 
                         Database.getConsultantList().forEach(function (consultant) {
-                            listModel_UFO_ComboBox_ConsultantName.append({"consultant_id": consultant["consultant_id"], "consultant_name": consultant["consultant_name"]});
+                            listModel_UFO_ComboBox_ConsultantName.append({"consultant_id": consultant["consultant_id"], "consultant_name": consultant["name"]});
                         });
 
                         // Set default:
@@ -1422,7 +1438,7 @@ UFO_Page {
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                textRole: "speciality"
+                textRole: "specialization"
 
                 model: ListModel {
                     id: listModel_UFO_ComboBox_ConsultantSpeciality
@@ -1445,14 +1461,14 @@ UFO_Page {
 
                     if(ufo_ComboBox_ConsultantSpeciality.currentText === "All") {
                         Database.getConsultantList().forEach(function (consultant) {
-                            listModel_UFO_ComboBox_ConsultantName.append({"consultant_id": consultant["consultant_id"], "consultant_name": consultant["consultant_name"]});
+                            listModel_UFO_ComboBox_ConsultantName.append({"consultant_id": consultant["consultant_id"], "consultant_name": consultant["name"]});
                         });
                     }
 
                     else {
                         Database.getConsultantList().forEach(function (consultant) {
-                            if(consultant["consultant_speciality"] === ufo_ComboBox_ConsultantSpeciality.currentText) {
-                                listModel_UFO_ComboBox_ConsultantName.append({"consultant_id": consultant["consultant_id"], "consultant_name": consultant["consultant_name"]});
+                            if(consultant["consultant_specialization"] === ufo_ComboBox_ConsultantSpeciality.currentText) {
+                                listModel_UFO_ComboBox_ConsultantName.append({"consultant_id": consultant["consultant_id"], "consultant_name": consultant["name"]});
                             }
                         });
                     }
@@ -1511,25 +1527,25 @@ UFO_Page {
                     policy: ScrollBar.AsNeeded
                 }
 
-                // delegate: UFO_Delegate_Consultation {
-                //     width: listView_Consultations.width - scrollBar_Consultations.width / 2
+                delegate: UFO_Delegate_Consultation {
+                    width: listView_Consultations.width - scrollBar_Consultations.width / 2
 
-                //     consultantName: model["consultant_name"]
-                //     consultationConductedDate: model["consultation_date"]
-                //     consultationOutcome: model["consultation_outcome"]
+                    consultantName: model["consultant_name"]
+                    consultationConductedDate: model["consultation_date"]
+                    consultationOutcome: model["consultation_outcome"]
 
-                //     onRemoveClicked: {
-                //         listModel_ListView_Consultations.remove(index);
-                //     }
+                    onRemoveClicked: {
+                        listModel_ListView_Consultations.remove(index);
+                    }
 
-                //     onDateChanged: {
-                //         model["consultation_date"] = consultationConductedDate.trim();
-                //     }
+                    onDateChanged: {
+                        model["consultation_date"] = consultationConductedDate.trim();
+                    }
 
-                //     onOutcomeChanged: {
-                //         model["consultation_outcome"] = consultationOutcome.trim();
-                //     }
-                // }
+                    onOutcomeChanged: {
+                        model["consultation_outcome"] = consultationOutcome.trim();
+                    }
+                }
 
                 Connections {
                     target: Database
@@ -1539,6 +1555,211 @@ UFO_Page {
 
                         Database.getPatientDataMap()["consultations"].forEach(function (consultation) {
                             listModel_ListView_Consultations.append({"consultant_id": consultation["consultant_id"], "consultant_name": consultation["consultant_name"], "consultation_date": consultation["consultation_date"], "consultation_outcome": consultation["consultation_outcome"]});
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    UFO_GroupBox {
+        id: ufo_GroupBox_LabTests
+
+        Layout.fillWidth: true
+        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
+
+        title: qsTr("Lab Tests")
+        contentSpacing: 0
+
+        Text {
+            Layout.fillWidth: true
+
+            Layout.topMargin: 15
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            text: qsTr("The following represents the list of lab tests assigned to the patient")
+
+            elide: Text.ElideRight
+            wrapMode: Text.NoWrap
+
+            horizontalAlignment: Text.AlignLeft
+            verticalAlignment: Text.AlignVCenter
+
+            font.pixelSize: Qt.application.font.pixelSize * 1
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+
+            Layout.topMargin: 15
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            spacing: 2
+
+            UFO_ComboBox {
+                id: ufo_ComboBox_LabName
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                textRole: "lab_name"
+
+                model: ListModel { id: listModel_UFO_ComboBox_LabName }
+
+                Connections {
+                    target: Database
+
+                    function onLabListPopulated() {
+                        listModel_UFO_ComboBox_LabName.clear();
+
+                        Database.getLabList().forEach(function (lab) {
+                            listModel_UFO_ComboBox_LabName.append({"lab_id": lab["lab_id"], "lab_name": lab["name"]});
+                        });
+
+                        // Set default:
+                        ufo_ComboBox_LabName.currentIndex = 0;
+                    }
+                }
+
+                Connections {
+                    target: Database
+
+                    function onPatientDataPulled() {
+                        ufo_ComboBox_LabName.currentIndex = 0;
+                    }
+                }
+            }
+
+            UFO_ComboBox {
+                id: ufo_ComboBox_LabSpeciality
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                textRole: "specialization"
+
+                model: ListModel {
+                    id: listModel_UFO_ComboBox_LabSpeciality
+
+                    ListElement { speciality: "All" }
+                    ListElement { speciality: "Optometrist" }
+                    ListElement { speciality: "Dentist" }
+                }
+
+                Connections {
+                    target: Database
+
+                    function onPatientDataPulled() {
+                        ufo_ComboBox_LabSpeciality.currentIndex = 0;
+                    }
+                }
+
+                onActivated:  {
+                    listModel_UFO_ComboBox_LabName.clear();
+
+                    if(ufo_ComboBox_LabSpeciality.currentText === "All") {
+                        Database.getLabList().forEach(function (lab) {
+                            listModel_UFO_ComboBox_LabName.append({"lab_id": lab["lab_id"], "lab_name": lab["name"]});
+                        });
+                    }
+
+                    else {
+                        Database.getLabList().forEach(function (lab) {
+                            if(lab["lab_specialization"] === ufo_ComboBox_LabSpeciality.currentText) {
+                                listModel_UFO_ComboBox_LabName.append({"lab_id": lab["lab_id"], "lab_name": lab["name"]});
+                            }
+                        });
+                    }
+
+                    ufo_ComboBox_LabName.currentIndex = 0
+                }
+            }
+
+            UFO_Button {
+                Layout.preferredWidth: 120
+                Layout.preferredHeight: 35
+
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                text: qsTr("اضافه کردن")
+                icon.source: "./../../icons/Google icons/add_box.svg"
+
+                onClicked: {
+                    listView_LabTests.append({"lab_id": ufo_ComboBox_LabName.model.get(ufo_ComboBox_LabName.currentIndex)["lab_id"], "lab_name": ufo_ComboBox_LabName.model.get(ufo_ComboBox_LabName.currentIndex)["lab_name"], "lab_test_date": "", "lab_test_outcome": ""});
+                }
+            }
+
+            // TODO (SAVIZ): The combobox is only in charge of adding a new consultant id and name. the actual data like outcome text and date are the responsibilyt of eth patient pull and push to sync with teh delegate.
+        }
+
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 300
+
+            Layout.topMargin: 2
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            radius: 0
+
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_ListView_Background"])
+
+            ListView {
+                id: listView_LabTests
+
+                anchors.fill: parent
+
+                anchors.margins: 15
+
+                spacing: 2
+                clip: true
+
+                model: ListModel { id: listModel_ListView_LabTests }
+
+                ScrollBar.vertical: ScrollBar {
+                    id: scrollBar_LabTests
+
+                    width: 10
+                    policy: ScrollBar.AsNeeded
+                }
+
+                delegate: UFO_Delegate_LabTest {
+                    width: scrollBar_LabTests.width - scrollBar_LabTests.width / 2
+
+                    labName: model["lab_name"]
+                    labTestConductedDate: model["lab_test_date"]
+                    labTestOutcome: model["lab_test_outcome"]
+
+                    onRemoveClicked: {
+                        listModel_ListView_LabTests.remove(index);
+                    }
+
+                    onDateChanged: {
+                        model["lab_test_date"] = labTestConductedDate.trim();
+                    }
+
+                    onOutcomeChanged: {
+                        model["lab_test_outcome"] = labTestOutcome.trim();
+                    }
+                }
+
+                Connections {
+                    target: Database
+
+                    function onPatientDataPulled() {
+                        listModel_ListView_LabTests.clear();
+
+                        Database.getPatientDataMap()["labTests"].forEach(function (labTest) {
+                            listModel_ListView_LabTests.append({"lab_id": labTest["lab_id"], "lab_name": labTest["lab_name"], "lab_test_date": labTest["lab_test_date"], "lab_test_outcome": labTest["lab_test_outcome"]});
                         });
                     }
                 }
@@ -1646,10 +1867,22 @@ UFO_Page {
                     });
                 }
 
-                console.log("Consultations:", JSON.stringify(consultations));
+                let labTests = [];
+
+                for (let b = 0; b < listModel_ListView_LabTests.count; b++) {
+                    let item = listModel_ListView_LabTests.get(b);
+
+                    consultations.push({
+                        lab_id: item.lab_id,
+                        lab_test_date: item.lab_test_date,
+                        lab_test_outcome: item.lab_test_outcome
+                    });
+                }
+
+                console.log("Lab Tests:", JSON.stringify(labTests));
 
                 // Push:
-                Database.updatePatientData(first_name, last_name, birthYear, phone_number, gender, marital_status, numberOfPreviousVisits, firstVisitDate, recentVisitDate, servicePrice, diagnoses, diagnosisNote, treatments, treatmentNote, medicalDrugs, medicalDrugNote, consultations);
+                Database.updatePatientData(first_name, last_name, birthYear, phone_number, gender, marital_status, numberOfPreviousVisits, firstVisitDate, recentVisitDate, servicePrice, diagnoses, diagnosisNote, treatments, treatmentNote, medicalDrugs, medicalDrugNote, consultations, labTests);
             }
         }
     }
@@ -1686,6 +1919,3 @@ UFO_Page {
         // }
     }
 }
-
-// TODO (SAVIZ): You need to come up with someway to show or hide the page for the first time, when the patient is not selected yet, other wise pressing the buttons can cause issues.
-// TODO (SAVIZ): There is a problem with dates first and recent in C++, check it out.
