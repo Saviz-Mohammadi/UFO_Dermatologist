@@ -137,7 +137,14 @@ QString Date::differenceToDateJalali(int year, int month, int day)
     }
 
 
-    result = QString("%1 years, %2 months, %3 days.").arg((years <= 0 ? 0 : years)).arg((months <= 0 ? 0 : months)).arg((days <= 0 ? 0 : days));
+    result = QString("(%1 %2) - (%3 %4) - (%5 %6)") // The Arguments on the left hand side will be the plural form:
+                .arg(years <= 0 ? 0 : years)
+                .arg(years == 1 ? "سال" : "سال")
+                .arg(months <= 0 ? 0 : months)
+                .arg(months == 1 ? "ماه" : "ماه")
+                .arg(days <= 0 ? 0 : days)
+                .arg(days == 1 ? "روز" : "روز");
+
 
 
     return (result);

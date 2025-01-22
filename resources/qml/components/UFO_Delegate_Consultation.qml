@@ -20,10 +20,15 @@ Item {
     implicitWidth: 200
     implicitHeight: 200
 
+    height: ufo_Button_Expand.checked ? expandedHeight : collapsedHeight
+
+    property int collapsedHeight: 35 // Adjust based on your collapsed layout
+    property int expandedHeight: 35 + scrollView.Layout.preferredHeight // Adjust based on expanded content
+
     ColumnLayout {
         anchors.fill: parent
 
-        spacing: 10
+        spacing: 5
 
         RowLayout {
             Layout.fillWidth: true
