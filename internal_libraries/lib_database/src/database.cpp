@@ -21,6 +21,7 @@ Database::Database(QObject *parent, const QString &name)
     , m_DiagnosisList(QVariantList{})
     , m_TreatmentList(QVariantList{})
     , m_MedicalDrugList(QVariantList{})
+    , m_ProcedureList(QVariantList{})
     , m_ConsultantList(QVariantList{})
     , m_LabList(QVariantList{})
     , m_SearchResultList(QVariantList{})
@@ -897,11 +898,15 @@ bool Database::pullPatientData(const quint64 index)
 
     bool medicalDrugsPullOutcome = pullPatientMedicalDrugs(index);
 
+    bool proceduresPullOutcome = pullPatientProcedures(index);
+
     bool diagnosisNotePullOutcome = pullDiagnosisNote(index);
 
     bool treatmentNotePullOutcome = pullTreatmentNote(index);
 
     bool medicalDrugNotePullOutcome = pullMedicalDrugNote(index);
+
+    bool procedureNotePullOutcome = pullProcedureNote(index);
 
     bool consultationsPullOutcome = pullConsultations(index);
 
@@ -909,7 +914,7 @@ bool Database::pullPatientData(const quint64 index)
 
 
 
-    if(basicDataPullOutcome == false || diagnosesPullOutcome == false || treatmentsPullOutcome == false || medicalDrugsPullOutcome == false || diagnosisNotePullOutcome == false || treatmentNotePullOutcome == false || medicalDrugNotePullOutcome == false || consultationsPullOutcome == false || labTestsPullOutcome == false)
+    if(basicDataPullOutcome == false || diagnosesPullOutcome == false || treatmentsPullOutcome == false || medicalDrugsPullOutcome == false || diagnosisNotePullOutcome == false || treatmentNotePullOutcome == false || medicalDrugNotePullOutcome == false || consultationsPullOutcome == false || labTestsPullOutcome == false || proceduresPullOutcome == false || procedureNotePullOutcome == false)
     {
 #ifdef QT_DEBUG
         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Errors occured while pulling patient data!");
@@ -1351,6 +1356,100 @@ bool Database::pullPatientMedicalDrugs(const quint64 index)
     return (true);
 }
 
+bool Database::pullPatientProcedures(const quint64 index)
+{
+#ifdef QT_DEBUG
+    QString message("Procedures pull initiated!\n");
+
+    QTextStream stream(&message);
+
+    stream << "The patient_id is: " + QString::number(index) + "\n";
+#endif
+
+
+
+    QString queryString = R"(
+        SELECT * FROM patients
+
+        LEFT JOIN patient_procedures ON patients.patient_id = patient_procedures.patient_id
+        LEFT JOIN procedures ON procedures.procedure_id = patient_procedures.procedure_id
+
+        WHERE patients.patient_id = :patient_id
+    )";
+
+
+
+    QSqlQuery query(m_QSqlDatabase);
+    query.prepare(queryString);
+
+
+
+    query.bindValue(":patient_id", index);
+
+
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        stream << query.lastError().text() << "\n";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        return (false);
+    }
+
+
+
+    if (query.size() == 0)
+    {
+#ifdef QT_DEBUG
+        stream << "Query returned no results.";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        return (false);
+    }
+
+
+
+    QVariantList procedures;
+
+
+
+    while (query.next())
+    {
+        if (!query.value("procedure_id").isNull() && !query.value("procedures.name").isNull())
+        {
+            QVariantMap procedureMap;
+
+            procedureMap["procedure_id"] = query.value("procedure_id").toULongLong();
+            procedureMap["name"] = query.value("procedures.name").toString().trimmed();
+
+            procedures.append(procedureMap);
+        }
+    }
+
+
+
+    m_PatientDataMap["procedures"] = procedures;
+
+
+
+#ifdef QT_DEBUG
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+    return (true);
+}
+
 bool Database::pullDiagnosisNote(const quint64 index)
 {
 #ifdef QT_DEBUG
@@ -1563,6 +1662,81 @@ bool Database::pullMedicalDrugNote(const quint64 index)
     while (query.next())
     {
         m_PatientDataMap["medical_drug_note"] = query.value("note").toString();
+    }
+
+
+
+#ifdef QT_DEBUG
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+    return (true);
+}
+
+bool Database::pullProcedureNote(const quint64 index)
+{
+#ifdef QT_DEBUG
+    QString message("procedure Note pull initiated!\n");
+
+    QTextStream stream(&message);
+
+    stream << "The patient_id is: " + QString::number(index) + "\n";
+#endif
+
+
+
+    QString queryString = R"(
+        SELECT note FROM procedure_notes
+
+        WHERE patient_id = :patient_id;
+    )";
+
+
+
+    QSqlQuery query(m_QSqlDatabase);
+    query.prepare(queryString);
+
+
+
+    query.bindValue(":patient_id", index);
+
+
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        stream << query.lastError().text() << "\n";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        return (false);
+    }
+
+
+
+    if (query.size() == 0)
+    {
+#ifdef QT_DEBUG
+        stream << "Query returned no results.";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        return (false);
+    }
+
+
+
+    while (query.next())
+    {
+        m_PatientDataMap["procedure_note"] = query.value("note").toString();
     }
 
 
@@ -1815,7 +1989,7 @@ bool Database::pullLabTests(const quint64 index)
 }
 
 // UPDATE
-bool Database::updatePatientData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice, const QVariantList &newDiagnoses, const QString &newDiagnosisNote, const QVariantList &newTreatments, const QString &newTreatmentNote, const QVariantList &newMedicalDrugs, const QString &newMedicalDrugNote, const QVariantList &newConsultations, const QVariantList &newLabTests)
+bool Database::updatePatientData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice, const QVariantList &newDiagnoses, const QString &newDiagnosisNote, const QVariantList &newTreatments, const QString &newTreatmentNote, const QVariantList &newMedicalDrugs, const QString &newMedicalDrugNote, const QVariantList &newProcedures, const QString &newProcedureNote, const QVariantList &newConsultations, const QVariantList &newLabTests)
 {
     if(!m_QSqlDatabase.transaction())
     {
@@ -1837,21 +2011,25 @@ bool Database::updatePatientData(const QString &newFirstName, const QString &new
 
     bool basicDataUpdateOutcome = updateBasicData(newFirstName, newLastName, newBirthYear, newPhoneNumber, newGender, newMaritalStatus, newNumberOfPreviousVisits, newFirstVisitDate, newRecentVisitDate, newServicePrice);
 
-    // bool diagnosesUpdateOutcome = updateDiagnoses(newDiagnoses);
+    bool diagnosesUpdateOutcome = updateDiagnoses(newDiagnoses);
 
-    // bool treatmentsUpdateOutcome = updateTreatments(newTreatments);
+    bool treatmentsUpdateOutcome = updateTreatments(newTreatments);
 
-    // bool medicalDrugsUpdateOutcome = updateMedicalDrugs(newMedicalDrugs);
+    bool medicalDrugsUpdateOutcome = updateMedicalDrugs(newMedicalDrugs);
 
-    // bool diagnosisNoteUpdateOutcome = updateDiagnosisNote(newDiagnosisNote);
+    bool proceduresUpdateOutcome = updateProcedures(newProcedures);
 
-    // bool treatmentNoteUpdateOutcome = updateTreatmentNote(newTreatmentNote);
+    bool diagnosisNoteUpdateOutcome = updateDiagnosisNote(newDiagnosisNote);
 
-    // bool medicalDrugNoteUpdateOutcome = updateMedicalDrugNote(newMedicalDrugNote);
+    bool treatmentNoteUpdateOutcome = updateTreatmentNote(newTreatmentNote);
 
-    // bool consultationsUpdateOutcome = updateConsultations(newConsultations);
+    bool medicalDrugNoteUpdateOutcome = updateMedicalDrugNote(newMedicalDrugNote);
 
-    // bool labTestsUpdateOutcome = updateLabTests(newLabTests);
+    bool procedureNoteUpdateOutcome = updateProcedureNote(newProcedureNote);
+
+    bool consultationsUpdateOutcome = updateConsultations(newConsultations);
+
+    bool labTestsUpdateOutcome = updateLabTests(newLabTests);
 
 
     if(basicDataUpdateOutcome == false)
@@ -1873,157 +2051,195 @@ bool Database::updatePatientData(const QString &newFirstName, const QString &new
         return (false);
     }
 
-//     if(diagnosesUpdateOutcome == false)
-//     {
-// #ifdef QT_DEBUG
-//         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Diagnoses update failed!");
-// #endif
+    if(diagnosesUpdateOutcome == false)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Diagnoses update failed!");
+#endif
 
 
 
-//         emit patientDataPushed(false, "Diagnoses update failed!");
+        emit patientDataPushed(false, "Diagnoses update failed!");
 
 
 
-//         m_QSqlDatabase.rollback();
+        m_QSqlDatabase.rollback();
 
 
 
-//         return (false);
-//     }
+        return (false);
+    }
 
-//     if(treatmentsUpdateOutcome == false)
-//     {
-// #ifdef QT_DEBUG
-//         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Treatment update failed!");
-// #endif
+    if(treatmentsUpdateOutcome == false)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Treatment update failed!");
+#endif
 
 
 
-//         emit patientDataPushed(false, "Treatment update failed!");
+        emit patientDataPushed(false, "Treatment update failed!");
 
 
 
-//         m_QSqlDatabase.rollback();
+        m_QSqlDatabase.rollback();
 
 
 
-//         return (false);
-//     }
+        return (false);
+    }
 
-//     if(medicalDrugsUpdateOutcome == false)
-//     {
-// #ifdef QT_DEBUG
-//         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Medical Drug update failed!");
-// #endif
+    if(medicalDrugsUpdateOutcome == false)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Medical Drug update failed!");
+#endif
 
 
 
-//         emit patientDataPushed(false, "Medical Drug update failed!");
+        emit patientDataPushed(false, "Medical Drug update failed!");
 
 
 
-//         m_QSqlDatabase.rollback();
+        m_QSqlDatabase.rollback();
 
 
 
-//         return (false);
-//     }
+        return (false);
+    }
 
-//     if(diagnosisNoteUpdateOutcome == false)
-//     {
-// #ifdef QT_DEBUG
-//         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Diagnosis note update failed!");
-// #endif
+    if(proceduresUpdateOutcome == false)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Medical Drug update failed!");
+#endif
 
 
 
-//         emit patientDataPushed(false, "Diagnosis note update failed!");
+        emit patientDataPushed(false, "procedures update failed!");
 
 
 
-//         m_QSqlDatabase.rollback();
+        m_QSqlDatabase.rollback();
 
 
 
-//         return (false);
-//     }
+        return (false);
+    }
 
-//     if(treatmentNoteUpdateOutcome == false)
-//     {
-// #ifdef QT_DEBUG
-//         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Treatment note update failed!");
-// #endif
+    if(diagnosisNoteUpdateOutcome == false)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Diagnosis note update failed!");
+#endif
 
 
 
-//         emit patientDataPushed(false, "Treatment note update failed!");
+        emit patientDataPushed(false, "Diagnosis note update failed!");
 
 
 
-//         m_QSqlDatabase.rollback();
+        m_QSqlDatabase.rollback();
 
 
 
-//         return (false);
-//     }
+        return (false);
+    }
 
-//     if(medicalDrugNoteUpdateOutcome == false)
-//     {
-// #ifdef QT_DEBUG
-//         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Medical Drug note update failed!");
-// #endif
+    if(treatmentNoteUpdateOutcome == false)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Treatment note update failed!");
+#endif
 
 
 
-//         emit patientDataPushed(false, "Medical Drug note update failed!");
+        emit patientDataPushed(false, "Treatment note update failed!");
 
 
 
-//         m_QSqlDatabase.rollback();
+        m_QSqlDatabase.rollback();
 
 
 
-//         return (false);
-//     }
+        return (false);
+    }
 
-//     if(consultationsUpdateOutcome == false)
-//     {
-// #ifdef QT_DEBUG
-//         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Consultations update failed!");
-// #endif
+    if(medicalDrugNoteUpdateOutcome == false)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Medical Drug note update failed!");
+#endif
 
 
 
-//         emit patientDataPushed(false, "Consultations update failed!");
+        emit patientDataPushed(false, "Medical Drug note update failed!");
 
 
 
-//         m_QSqlDatabase.rollback();
+        m_QSqlDatabase.rollback();
 
 
 
-//         return (false);
-//     }
+        return (false);
+    }
 
-//     if(labTestsUpdateOutcome == false)
-//     {
-// #ifdef QT_DEBUG
-//         logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Lab Tests update failed!");
-// #endif
+    if(procedureNoteUpdateOutcome == false)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Procedure note update failed!");
+#endif
 
 
 
-//         emit patientDataPushed(false, "Lab Tests update failed!");
+        emit patientDataPushed(false, "Procedure note update failed!");
 
 
 
-//         m_QSqlDatabase.rollback();
+        m_QSqlDatabase.rollback();
 
 
 
-//         return (false);
-//     }
+        return (false);
+    }
+
+    if(consultationsUpdateOutcome == false)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Consultations update failed!");
+#endif
+
+
+
+        emit patientDataPushed(false, "Consultations update failed!");
+
+
+
+        m_QSqlDatabase.rollback();
+
+
+
+        return (false);
+    }
+
+    if(labTestsUpdateOutcome == false)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Lab Tests update failed!");
+#endif
+
+
+
+        emit patientDataPushed(false, "Lab Tests update failed!");
+
+
+
+        m_QSqlDatabase.rollback();
+
+
+
+        return (false);
+    }
 
 
 
@@ -2458,6 +2674,110 @@ bool Database::updateMedicalDrugs(const QVariantList &newMedicalDrugs)
     return (true);
 }
 
+bool Database::updateProcedures(const QVariantList &newProcedures)
+{
+#ifdef QT_DEBUG
+    QString message("procedures List update requested!\n");
+
+    QTextStream stream(&message);
+
+    for (const QVariant &item : newProcedures)
+    {
+        stream << "procedure_id: " << item.toString() << "\n";
+    }
+#endif
+
+
+
+    QSqlQuery queryDelete(m_QSqlDatabase);
+    queryDelete.prepare("DELETE FROM patient_procedures WHERE patient_id = :patient_id");
+
+
+
+    queryDelete.bindValue(":patient_id", m_PatientDataMap["patient_id"].toULongLong());
+
+
+
+    if (!queryDelete.exec())
+    {
+#ifdef QT_DEBUG
+        stream << queryDelete.lastError().text();
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        return (false);
+    }
+
+
+
+    if (newProcedures.isEmpty())
+    {
+#ifdef QT_DEBUG
+        stream << "Procedures list received is empty! Patient requires no medical drugs.";
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        return (true); // If the list is empty, then the doctor decided to assign no medical drugs to the current patient. Technically, the operation is not a failure.
+    }
+
+
+
+    QString queryString = "INSERT INTO patient_procedures (patient_id, procedure_id) VALUES (?, ?)";
+    QSqlQuery queryInsert(m_QSqlDatabase);
+
+
+    queryInsert.prepare(queryString);
+
+
+
+    QVariantList patientIDs;
+    QVariantList procedureIDs;
+
+    for (const QVariant &item : newProcedures)
+    {
+        patientIDs.append(m_PatientDataMap["patient_id"].toULongLong());
+        procedureIDs.append(item.toULongLong());
+    }
+
+
+
+    queryInsert.addBindValue(patientIDs);
+    queryInsert.addBindValue(procedureIDs);
+
+
+
+    if (!queryInsert.execBatch())
+    {
+#ifdef QT_DEBUG
+        stream << queryInsert.lastError().text();
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        return false;
+    }
+
+
+
+#ifdef QT_DEBUG
+    stream << "Procedure List updated successfully!";
+
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+    return (true);
+}
+
 bool Database::updateDiagnosisNote(const QString &newNote)
 {
 #ifdef QT_DEBUG
@@ -2596,6 +2916,52 @@ bool Database::updateMedicalDrugNote(const QString &newNote)
     return (true);
 }
 
+bool Database::updateProcedureNote(const QString &newNote)
+{
+#ifdef QT_DEBUG
+    QString message("Procedure Note update requested!\n");
+
+    QTextStream stream(&message);
+#endif
+
+
+
+    QSqlQuery query(m_QSqlDatabase);
+    query.prepare("UPDATE procedure_notes SET note = :note WHERE patient_id = :patient_id");
+
+
+
+    query.bindValue(":note", newNote);
+    query.bindValue(":patient_id", m_PatientDataMap["patient_id"]);
+
+
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        stream << query.lastError().text();
+
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+        return (false);
+    }
+
+
+
+#ifdef QT_DEBUG
+    stream << "procedure note updated successfully!";
+
+    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+#endif
+
+
+
+    return (true);
+}
+
 bool Database::updateConsultations(const QVariantList &newConsultations)
 {
 #ifdef QT_DEBUG
@@ -2673,8 +3039,14 @@ bool Database::updateConsultations(const QVariantList &newConsultations)
 
         patientIDs.append(m_PatientDataMap["patient_id"].toULongLong());
         consultationIDs.append(map["consultant_id"].toULongLong());
-        consultationDates.append(map["consultation_date"].toDate());
         consultationOutcomes.append(map["consultation_outcome"].toString());
+
+        QCalendar calendarJalali(QCalendar::System::Jalali);
+        QDate fvdJalali = QDate::fromString(map["consultation_date"].toString(), "yyyy-MM-dd", calendarJalali);
+
+        qDebug() << fvdJalali.toString();
+
+        consultationDates.append(fvdJalali);
     }
 
 
@@ -2789,8 +3161,14 @@ bool Database::updateLabTests(const QVariantList &newLabTests)
 
         patientIDs.append(m_PatientDataMap["patient_id"].toULongLong());
         consultationIDs.append(map["lab_id"].toULongLong());
-        consultationDates.append(map["lab_test_date"].toDate());
         consultationOutcomes.append(map["lab_test_outcome"].toString());
+
+        QCalendar calendarJalali(QCalendar::System::Jalali);
+        QDate fvdJalali = QDate::fromString(map["lab_test_date"].toString(), "yyyy-MM-dd", calendarJalali);
+
+        qDebug() << fvdJalali.toString();
+
+        consultationDates.append(fvdJalali);
     }
 
 
@@ -2897,6 +3275,9 @@ bool Database::changeDeletionStatus(bool newStatus)
 // PRIVATE Methods
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
+
+// NOTE (SAVIZ): We have to understand that these method will be called everytime we attempt to connect, therefore we need to make sure to clear the lists before appending to them.
+// TODO (SAVIZ): Probably not a bad idea to let the user know to attempt to refersh the connection if one of these goes wrong: (Or maybe even a better idea is to check for these in the connection funciton and fail the entire thing if all of these are not retrieved)
 
 bool Database::populateDiagnosisList()
 {
@@ -3123,6 +3504,81 @@ bool Database::populateMedicalDrugList()
     return (true);
 }
 
+bool Database::populateProcedureList()
+{
+    QString queryString = "SELECT * FROM procedures WHERE is_active = TRUE";
+
+
+
+    QSqlQuery query(m_QSqlDatabase);
+    query.prepare(queryString);
+
+
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
+#endif
+
+
+
+        // Notify QML:
+        emit procedureListPopulated(false, query.lastError().text());
+
+
+
+        return (false);
+    }
+
+
+
+    if (query.size() == 0)
+    {
+#ifdef QT_DEBUG
+        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Query returned no results.");
+#endif
+
+
+
+        // Notify QML:
+        emit procedureListPopulated(false, "Query returned no results.");
+
+
+
+        return (false);
+    }
+
+
+
+    m_ProcedureList.clear();
+
+
+
+    while (query.next())
+    {
+        QVariantMap procedureMap;
+
+
+
+        procedureMap["procedure_id"] = query.value("procedure_id").toULongLong();
+        procedureMap["name"] = query.value("name").toString();
+
+
+
+        m_ProcedureList.append(procedureMap);
+    }
+
+
+
+    // Notify QML:
+    emit procedureListPopulated(true, "Procedure list successfully acquired.");
+
+
+
+    return (true);
+}
+
 bool Database::populateConsultantList()
 {
     QString queryString = "SELECT * FROM consultants WHERE is_active = TRUE";
@@ -3304,6 +3760,11 @@ QVariantList Database::getTreatmentList() const
 QVariantList Database::getMedicalDrugList() const
 {
     return (m_MedicalDrugList);
+}
+
+QVariantList Database::getProcedureList() const
+{
+    return (m_ProcedureList);
 }
 
 QVariantList Database::getConsultantList() const

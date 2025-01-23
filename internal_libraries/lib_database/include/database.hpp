@@ -53,6 +53,7 @@ private:
     QVariantList m_DiagnosisList;
     QVariantList m_TreatmentList;
     QVariantList m_MedicalDrugList;
+    QVariantList m_ProcedureList;
     QVariantList m_ConsultantList;
     QVariantList m_LabList;
     QVariantList m_SearchResultList;
@@ -66,6 +67,7 @@ signals:
     void consultantListPopulated(bool success, const QString &message);
     void labListPopulated(bool success, const QString &message);
     void medicalDrugListPopulated(bool success, const QString &message);
+    void procedureListPopulated(bool success, const QString &message);
     void queryExecuted(QueryType type, bool success, const QString &message);
     void patientDataPulled(bool success, const QString &message);
     void patientDataPushed(bool success, const QString &message);
@@ -91,14 +93,16 @@ public:
     bool pullPatientDiagnoses(const quint64 index);
     bool pullPatientTreatments(const quint64 index);
     bool pullPatientMedicalDrugs(const quint64 index);
+    bool pullPatientProcedures(const quint64 index);
     bool pullDiagnosisNote(const quint64 index);
     bool pullTreatmentNote(const quint64 index);
     bool pullMedicalDrugNote(const quint64 index);
+    bool pullProcedureNote(const quint64 index);
     bool pullConsultations(const quint64 index);
     bool pullLabTests(const quint64 index);
 
     // UPDATE
-    Q_INVOKABLE bool updatePatientData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice, const QVariantList &newDiagnoses, const QString &newDiagnosisNote, const QVariantList &newTreatments, const QString &newTreatmentNote, const QVariantList &newMedicalDrugs, const QString &newMedicalDrugNote, const QVariantList &newConsultations, const QVariantList &newLabTests);
+    Q_INVOKABLE bool updatePatientData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice, const QVariantList &newDiagnoses, const QString &newDiagnosisNote, const QVariantList &newTreatments, const QString &newTreatmentNote, const QVariantList &newMedicalDrugs, const QString &newMedicalDrugNote, const QVariantList &newProcedures, const QString &newProcedureNote, const QVariantList &newConsultations, const QVariantList &newLabTests);
     bool updateBasicData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice);
     bool updateDiagnoses(const QVariantList &newDiagnoses);
     bool updateDiagnosisNote(const QString &newNote);
@@ -106,6 +110,8 @@ public:
     bool updateTreatmentNote(const QString &newNote);
     bool updateMedicalDrugs(const QVariantList &newMedicalDrugs);
     bool updateMedicalDrugNote(const QString &newNote);
+    bool updateProcedures(const QVariantList &newProcedures);
+    bool updateProcedureNote(const QString &newNote);
     bool updateConsultations(const QVariantList &newConsultations);
     bool updateLabTests(const QVariantList &newLabTests);
 
@@ -117,6 +123,7 @@ private:
     bool populateDiagnosisList();
     bool populateTreatmentList();
     bool populateMedicalDrugList();
+    bool populateProcedureList();
     bool populateConsultantList();
     bool populateLabList();
 
@@ -126,6 +133,7 @@ public:
     Q_INVOKABLE QVariantList getDiagnosisList() const;
     Q_INVOKABLE QVariantList getTreatmentList() const;
     Q_INVOKABLE QVariantList getMedicalDrugList() const;
+    Q_INVOKABLE QVariantList getProcedureList() const;
     Q_INVOKABLE QVariantList getConsultantList() const;
     Q_INVOKABLE QVariantList getLabList() const;
     Q_INVOKABLE QVariantList getSearchResultList() const;
