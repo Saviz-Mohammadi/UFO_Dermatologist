@@ -190,6 +190,7 @@ bool Database::establishConnection(const QString &ipAddress, qint16 port, const 
     populateDiagnosisList();
     populateTreatmentList();
     populateMedicalDrugList();
+    populateProcedureList();
     populateConsultantList();
     populateLabList();
 

@@ -1399,6 +1399,225 @@ UFO_Page {
         }
     }
 
+    UFO_GroupBox {
+        id: ufo_GroupBox_Procedures
+
+        Layout.fillWidth: true
+        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
+
+        title: qsTr("Procedures")
+        contentSpacing: 0
+
+        Text {
+            Layout.fillWidth: true
+
+            Layout.topMargin: 15
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            text: qsTr("فهرست زیر نمایانگر مجموعه‌ای از اقدامات پزشکی است که به بیمار اختصاص داده شده‌اند.")
+
+            elide: Text.ElideRight
+            wrapMode: Text.NoWrap
+
+            verticalAlignment: Text.AlignVCenter
+
+            font.pixelSize: Qt.application.font.pixelSize * 1
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+
+            Layout.topMargin: 15
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            spacing: 2
+
+            UFO_ComboBox {
+                id: ufo_ComboBox_Procedures
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                textRole: "name"
+
+                model: ListModel { id: listModel_ComboBox_Procedures }
+
+                Connections {
+                    target: Database
+
+                    function onProcedureListPopulated() {
+                        listModel_ComboBox_Procedures.clear();
+
+                        Database.getProcedureList().forEach(function (procedure) {
+                            listModel_ComboBox_Procedures.append({"procedure_id": procedure["procedure_id"], "name": procedure["name"]});
+                        });
+
+                        // Set default:
+                        ufo_ComboBox_Procedures.currentIndex = 0;
+                    }
+                }
+
+                Connections {
+                    target: Database
+
+                    function onPatientDataPulled() {
+                        ufo_ComboBox_Procedures.currentIndex = 0;
+                    }
+                }
+            }
+
+            UFO_Button {
+                Layout.preferredWidth: 120
+                Layout.preferredHeight: 35
+
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                text: qsTr("اضافه کردن")
+                icon.source: "./../../icons/Google icons/add_box.svg"
+
+                onClicked: {
+                    let exists = false;
+
+                    for (let index = 0; index < listModel_ListView_Procedures.count; index++) {
+                        if (listView_Procedures.model.get(index)["procedure_id"] === ufo_ComboBox_Procedures.model.get(ufo_ComboBox_Procedures.currentIndex)["procedure_id"]) {
+                            exists = true;
+                        }
+                    }
+
+
+                    if(exists) {
+                        ufo_StatusBar.displayMessage("A procedure of the same type already exists.")
+
+                        return;
+                    }
+
+
+                    listModel_ListView_Procedures.append({"procedure_id": ufo_ComboBox_Procedures.model.get(ufo_ComboBox_Procedures.currentIndex)["procedure_id"], "name": ufo_ComboBox_Procedures.model.get(ufo_ComboBox_Procedures.currentIndex)["name"]});
+                }
+            }
+        }
+
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 300
+
+            Layout.topMargin: 2
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            radius: 0
+
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_ListView_Background"])
+
+            ListView {
+                id: listView_Procedures
+
+                anchors.fill: parent
+
+                anchors.margins: 15
+
+                spacing: 2
+                clip: true
+
+                model: ListModel { id: listModel_ListView_Procedures }
+
+                ScrollBar.vertical: ScrollBar {
+                    id: scrollBar_Procedures
+
+                    width: 10
+                    policy: ScrollBar.AsNeeded
+                }
+
+                delegate: UFO_Delegate_MedicalDrug {
+                    width: listView_Procedures.width - scrollBar_Procedures.width / 2
+
+                    medicalDrugName: model["name"]
+
+                    onRemoveClicked: {
+                        listModel_ListView_Procedures.remove(index);
+                    }
+                }
+
+                Connections {
+                    target: Database
+
+                    function onPatientDataPulled() {
+                        listModel_ListView_Procedures.clear();
+
+                        Database.getPatientDataMap()["procedures"].forEach(function (procedure) {
+                            listModel_ListView_Procedures.append({"procedure_id": procedure["procedure_id"], "name": procedure["name"]});
+                        });
+                    }
+                }
+            }
+        }
+
+        Text {
+            Layout.fillWidth: true
+
+            Layout.topMargin: 25
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            text: qsTr("Procedure Note")
+
+            elide: Text.ElideRight
+            wrapMode: Text.NoWrap
+
+            verticalAlignment: Text.AlignBottom
+
+            font.pixelSize: Qt.application.font.pixelSize * 1
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
+
+        ScrollView {
+            id: scrollView_ProcedureNote
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 200
+
+            Layout.bottomMargin: 15
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            ScrollBar.vertical: UFO_ScrollBar {
+                parent: scrollView_ProcedureNote
+
+                x: scrollView_ProcedureNote.mirrored ? 0 : scrollView_ProcedureNote.width - width
+                y: scrollView_ProcedureNote.topPadding
+
+                height: scrollView_ProcedureNote.availableHeight
+
+                active: scrollView_ProcedureNote.ScrollBar.horizontal.active
+            }
+
+            UFO_TextArea {
+                id: ufo_TextArea_ProcedureNote
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                Connections {
+                    target: Database
+
+                    function onPatientDataPulled(success, message) {
+                        if(success === false) {
+                            return;
+                        }
+
+                        ufo_TextArea_ProcedureNote.text = Database.getPatientDataMap()["procedure_note"];
+                    }
+                }
+            }
+        }
+    }
+
     // TODO (SAVIZ): Have the default on populates be set and then have a onCurrentChangedfor the type combo where every time it changes it will filter the model of the other one based on type selected directly here in qml by looking at teh origin list from C++.
     UFO_GroupBox {
         id: ufo_GroupBox_Consultations
@@ -1873,6 +2092,7 @@ UFO_Page {
                 let diagnoses = [];
                 let treatments = [];
                 let medicalDrugs = [];
+                let procedures = [];
 
                 for (let j = 0; j < listModel_ListViewDiagnoses.count; j++) {
                     diagnoses.push(listModel_ListViewDiagnoses.get(j)["diagnosis_id"]);
@@ -1886,11 +2106,16 @@ UFO_Page {
                     medicalDrugs.push(listModel_ListViewMedicalDrugs.get(z)["medical_drug_id"]);
                 }
 
+                for (let h = 0; h < listModel_ListView_Procedures.count; h++) {
+                    procedures.push(listModel_ListView_Procedures.get(h)["procedure_id"]);
+                }
+
 
                 // Notes:
                 let diagnosisNote = ufo_TextArea_DiagnosisNote.text.trim();
                 let treatmentNote = ufo_TextArea_TreatmentNote.text.trim();
                 let medicalDrugNote = ufo_TextArea_MedicalDrugNote.text.trim();
+                let procedureNote = ufo_TextArea_ProcedureNote.text.trim();
 
                 // After populating the lists, print them to the console for debugging
                 console.log("Diagnoses:", JSON.stringify(diagnoses));
@@ -1925,7 +2150,7 @@ UFO_Page {
                 console.log("Lab Tests:", JSON.stringify(labTests));
 
                 // Push:
-                Database.updatePatientData(first_name, last_name, birthYear, phone_number, gender, marital_status, numberOfPreviousVisits, firstVisitDate, recentVisitDate, servicePrice, diagnoses, diagnosisNote, treatments, treatmentNote, medicalDrugs, medicalDrugNote, consultations, labTests);
+                Database.updatePatientData(first_name, last_name, birthYear, phone_number, gender, marital_status, numberOfPreviousVisits, firstVisitDate, recentVisitDate, servicePrice, diagnoses, diagnosisNote, treatments, treatmentNote, medicalDrugs, medicalDrugNote, procedures, procedureNote, consultations, labTests);
             }
         }
     }
