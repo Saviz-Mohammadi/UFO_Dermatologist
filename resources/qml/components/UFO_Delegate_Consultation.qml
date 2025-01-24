@@ -6,6 +6,9 @@ import QtQuick.Layouts
 import AppTheme 1.0
 import Database 1.0
 
+// TODO: I think maybe a better way to do this, is to have a dialog or something popup and enable editing the information, and then have a edit button and have
+// the date and text field be part of the expandable. this way not only is it better to look and interact with, but we can also guarante that the action of editing is complete.
+
 Item {
     id: root
 
@@ -18,12 +21,10 @@ Item {
     signal outcomeChanged
 
     implicitWidth: 200
-    implicitHeight: 200
-
-    height: ufo_Button_Expand.checked ? expandedHeight : collapsedHeight
+    implicitHeight: ufo_Button_Expand.checked ? expandedHeight : collapsedHeight
 
     property int collapsedHeight: 35 // Adjust based on your collapsed layout
-    property int expandedHeight: 35 + scrollView.Layout.preferredHeight // Adjust based on expanded content
+    property int expandedHeight: 40 + scrollView.Layout.preferredHeight // Adjust based on expanded content
 
     ColumnLayout {
         anchors.fill: parent

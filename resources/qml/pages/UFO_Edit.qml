@@ -1705,9 +1705,9 @@ UFO_Page {
                 model: ListModel {
                     id: listModel_UFO_ComboBox_ConsultantSpeciality
 
-                    ListElement { speciality: "All" }
-                    ListElement { speciality: "Optometrist" }
-                    ListElement { speciality: "Dentist" }
+                    ListElement { specialization: "All" }
+                    ListElement { specialization: "Optometrist" }
+                    ListElement { specialization: "Dentist" }
                 }
 
                 Connections {
@@ -1777,7 +1777,7 @@ UFO_Page {
 
                 anchors.margins: 15
 
-                spacing: 2
+                spacing: 5
                 clip: true
 
                 model: ListModel { id: listModel_ListView_Consultations }
@@ -1910,9 +1910,9 @@ UFO_Page {
                 model: ListModel {
                     id: listModel_UFO_ComboBox_LabSpeciality
 
-                    ListElement { speciality: "All" }
-                    ListElement { speciality: "Optometrist" }
-                    ListElement { speciality: "Dentist" }
+                    ListElement { specialization: "All" }
+                    ListElement { specialization: "Optometrist" }
+                    ListElement { specialization: "Dentist" }
                 }
 
                 Connections {
@@ -1956,7 +1956,7 @@ UFO_Page {
                 icon.source: "./../../icons/Google icons/add_box.svg"
 
                 onClicked: {
-                    listView_LabTests.append({"lab_id": ufo_ComboBox_LabName.model.get(ufo_ComboBox_LabName.currentIndex)["lab_id"], "lab_name": ufo_ComboBox_LabName.model.get(ufo_ComboBox_LabName.currentIndex)["lab_name"], "lab_test_date": "", "lab_test_outcome": ""});
+                    listModel_ListView_LabTests.append({"lab_id": ufo_ComboBox_LabName.model.get(ufo_ComboBox_LabName.currentIndex)["lab_id"], "lab_name": ufo_ComboBox_LabName.model.get(ufo_ComboBox_LabName.currentIndex)["lab_name"], "lab_test_date": "", "lab_test_outcome": ""});
                 }
             }
 
