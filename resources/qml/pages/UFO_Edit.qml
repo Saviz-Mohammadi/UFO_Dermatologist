@@ -1763,6 +1763,7 @@ UFO_Page {
             Layout.preferredHeight: 300
 
             Layout.topMargin: 2
+            Layout.bottomMargin: 15
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
@@ -1968,6 +1969,7 @@ UFO_Page {
             Layout.preferredHeight: 300
 
             Layout.topMargin: 2
+            Layout.bottomMargin: 15
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
@@ -1995,7 +1997,7 @@ UFO_Page {
                 }
 
                 delegate: UFO_Delegate_LabTest {
-                    width: scrollBar_LabTests.width - scrollBar_LabTests.width / 2
+                    width: listView_LabTests.width - scrollBar_LabTests.width / 2
 
                     labName: model["lab_name"]
                     labTestConductedDate: model["lab_test_date"]
