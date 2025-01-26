@@ -298,7 +298,7 @@ UFO_Page {
                 icon.source: "./../../icons/Google icons/wifi_off.svg"
 
                 onClicked: {
-                    Database.disconnect();
+                    Database.disconnectFromDatabase();
                 }
             }
         }

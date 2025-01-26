@@ -1,18 +1,17 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
-#include <QDebug>
 #include <QObject>
 #include <QQmlEngine>
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QPair>
 #include <QVariant>
 #include <QVariantList>
 #include <QDateTime>
 #include <QTextStream>
-#include "date.hpp"
 
 // NOTE (SAVIZ): The combination of 'QVariantMap' and 'QVariantList' enbales us to replicate any type of data structure and exposed it easilly to QML. For this reason I don't use any intermidiate objects or strcuts for data transfer.
 
@@ -62,12 +61,6 @@ private:
     // Signals
 signals:
     void connectionStatusChanged(const QString &message);
-    void diagnosisListPopulated(bool success, const QString &message);
-    void treatmentListPopulated(bool success, const QString &message);
-    void consultantListPopulated(bool success, const QString &message);
-    void labListPopulated(bool success, const QString &message);
-    void medicalDrugListPopulated(bool success, const QString &message);
-    void procedureListPopulated(bool success, const QString &message);
     void queryExecuted(QueryType type, bool success, const QString &message);
     void patientDataPulled(bool success, const QString &message);
     void patientDataPushed(bool success, const QString &message);
@@ -76,7 +69,7 @@ signals:
 public:
     // CONNECTIONS
     Q_INVOKABLE bool establishConnection(const QString &ipAddress, qint16 port, const QString &schema, const QString &username, const QString &password);
-    Q_INVOKABLE bool disconnect();
+    Q_INVOKABLE bool disconnectFromDatabase();
 
     // INSERT
     Q_INVOKABLE bool createPatient(const QString &firstName, const QString &lastName, quint32 birthYear, const QString &phoneNumber, const QString &gender, const QString &maritalStatus);
@@ -120,12 +113,12 @@ public:
 
     // PRIVATE Methods
 private:
-    bool populateDiagnosisList();
-    bool populateTreatmentList();
-    bool populateMedicalDrugList();
-    bool populateProcedureList();
-    bool populateConsultantList();
-    bool populateLabList();
+    QPair<bool, QString> populateDiagnosisList();
+    QPair<bool, QString> populateTreatmentList();
+    QPair<bool, QString> populateMedicalDrugList();
+    QPair<bool, QString> populateProcedureList();
+    QPair<bool, QString> populateConsultantList();
+    QPair<bool, QString> populateLabList();
 
     // PUBLIC Getters
 public:

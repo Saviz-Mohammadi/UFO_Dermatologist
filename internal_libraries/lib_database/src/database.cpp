@@ -1,8 +1,9 @@
-#include "database.hpp"
-
 #ifdef QT_DEBUG
-    #include "logger.hpp"
+    #include <QDebug>
 #endif
+
+#include "database.hpp"
+#include "date.hpp"
 
 
 // WARNING (SAVIZ): 'LEFT JOIN' can produce 'Null' results. Therefore, we need to make sure to check against null valuse when dealing with things such as 'diagnoses', 'treatments', and 'medical drugs'.
@@ -29,31 +30,31 @@ Database::Database(QObject *parent, const QString &name)
 {
     this->setObjectName(name);
 
-
-
 #ifdef QT_DEBUG
-    QString message("Call to Constructor\n");
-
-    QTextStream stream(&message);
-
-    stream << "List of SQL drivers: " << QSqlDatabase::drivers().join(", ");
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "None";
+    qDebug() << "Log Output           :" << "List of SQL drivers: " << QSqlDatabase::drivers().join(", ");
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
 }
 
 Database::~Database()
 {
 #ifdef QT_DEBUG
-    QString message("Call to Destructor");
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "None";
+    qDebug() << "Log Output           :" << "None";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
     // Shutdown.
-    this->disconnect();
+    this->disconnectFromDatabase();
 }
 
 Database *Database::qmlInstance(QQmlEngine *engine, QJSEngine *scriptEngine)
@@ -78,6 +79,7 @@ Database *Database::cppInstance(QObject *parent)
 
     auto instance = new Database(parent);
     m_Instance = instance;
+
     return (instance);
 }
 
@@ -96,37 +98,28 @@ Database *Database::cppInstance(QObject *parent)
 bool Database::establishConnection(const QString &ipAddress, qint16 port, const QString &schema, const QString &username, const QString &password)
 {
 #ifdef QT_DEBUG
-    QString message("Connection request initiated!\n");
-
-    QTextStream stream(&message);
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "IpAddress :" << ipAddress << ", " << "Port :" << port << ", " << "Schema :" << schema << ", " << "Username :" << username << ", " << "Password :" << password;
 #endif
-
-
 
     // Connection exists, abort operation.
     if (m_ConnectionStatus == true)
     {
 #ifdef QT_DEBUG
-        stream << "Connection exists. Aborting operation.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Connection exists. Aborting operation.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
         m_ConnectionStatus = true;
-
-
 
         // Notify QML:
         emit connectionStatusChanged("Connection exists. Aborting operation.");
 
-
-
         return (true);
     }
-
-
 
     m_QSqlDatabase = QSqlDatabase::addDatabase("QMYSQL", "MySQL database");
 
@@ -136,133 +129,128 @@ bool Database::establishConnection(const QString &ipAddress, qint16 port, const 
     m_QSqlDatabase.setUserName(username);
     m_QSqlDatabase.setPassword(password);
 
-
-
     bool connectionFailed = !m_QSqlDatabase.open();
 
     if (connectionFailed)
     {
 #ifdef QT_DEBUG
-        stream  << "Connection failed!\n";
-
-        stream  << m_QSqlDatabase.lastError().text() << "\n\n";
-
-        stream  << "IpAddress : " << ipAddress << "\n"
-                << "Port      : " << port << "\n"
-                << "Schema    : " << schema << "\n"
-                << "Username  : " << username << "\n"
-                << "Password  : " << password << "\n";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Connection failed!" << "\n" << m_QSqlDatabase.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
         m_ConnectionStatus = false;
-
-
 
         // Notify QML:
         emit connectionStatusChanged("اتصال برقرار نشد: " + m_QSqlDatabase.lastError().text());
 
+        return (false);
+    }
 
+    QPair<bool, QString> populateDiagnosisListResult = populateDiagnosisList();
+    QPair<bool, QString> populateTreatmentListResult = populateTreatmentList();
+    QPair<bool, QString> populateMedicalListDrugResult = populateMedicalDrugList();
+    QPair<bool, QString> populateProcedureListResult = populateProcedureList();
+    QPair<bool, QString> populateConsultantListResult = populateConsultantList();
+    QPair<bool, QString> populateLabListResult = populateLabList();
+
+    QStringList failedOperations;
+
+    if (populateDiagnosisListResult.first == false)
+    {
+        failedOperations << populateDiagnosisListResult.second;
+    }
+
+    if (populateTreatmentListResult.first == false)
+    {
+        failedOperations << populateTreatmentListResult.second;
+    }
+
+    if (populateMedicalListDrugResult.first == false)
+    {
+        failedOperations << populateMedicalListDrugResult.second;
+    }
+
+    if (populateProcedureListResult.first == false)
+    {
+        failedOperations << populateProcedureListResult.second;
+    }
+
+    if (populateConsultantListResult.first == false)
+    {
+        failedOperations << populateConsultantListResult.second;
+    }
+
+    if (populateLabListResult.first == false)
+    {
+        failedOperations << populateLabListResult.second;
+    }
+
+    if(!failedOperations.isEmpty())
+    {
+#ifdef QT_DEBUG
+        qDebug() << "Log Output           :" << "Population failed!";
+        qDebug() << "--------------------------------------------------------------------------------";
+#endif
+
+        m_ConnectionStatus = false;
+
+        // Notify QML:
+        emit connectionStatusChanged(QString("اتصال برقرار نشد. خطاهایی در بازیابی لیست‌های داده زیر وجود داشت: %1").arg(failedOperations.join(", ")));
 
         return (false);
     }
 
-
-
 #ifdef QT_DEBUG
-    stream  << "Connection established!\n";
-
-    stream  << "IpAddress : " << ipAddress << "\n"
-            << "Port      : " << port << "\n"
-            << "Schema    : " << schema << "\n"
-            << "Username  : " << username << "\n"
-            << "Password  : " << password << "\n";
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Connection established!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-    // Populate lists:
-    populateDiagnosisList();
-    populateTreatmentList();
-    populateMedicalDrugList();
-    populateProcedureList();
-    populateConsultantList();
-    populateLabList();
-
-
-
     m_ConnectionStatus = true;
-
-
 
     // Notify QML:
     emit connectionStatusChanged("با موفقیت به پایگاه داده متصل شد.");
 
-
-
     return (true);
 }
 
-bool Database::disconnect()
+bool Database::disconnectFromDatabase()
 {
 #ifdef QT_DEBUG
-    QString message("Disconnect request initiated!\n");
-
-    QTextStream stream(&message);
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "None";
 #endif
-
-
 
     // Connection does not exist, abort operation.
     if (m_ConnectionStatus == false)
     {
 #ifdef QT_DEBUG
-        stream << "Connection does not exist. Aborting operation.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Connection does not exist. Aborting operation.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
         m_ConnectionStatus = false;
-
-
 
         // Notify QML:
         emit connectionStatusChanged("اتصال وجود ندارد. عملیات متوقف می‌شود.");
 
-
-
         return (true);
     }
-
-
 
     m_QSqlDatabase.close();
 
 
-
 #ifdef QT_DEBUG
-    stream << "Closing the database connection...\n";
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Closing the database connection...";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     m_ConnectionStatus = false;
 
-
-
     // Notify QML:
     emit connectionStatusChanged("از پایگاه داده قطع ارتباط شد.");
-
-
 
     return (true);
 }
@@ -271,28 +259,22 @@ bool Database::disconnect()
 bool Database::createPatient(const QString &firstName, const QString &lastName, quint32 birthYear, const QString &phoneNumber, const QString &gender, const QString &maritalStatus)
 {
 #ifdef QT_DEBUG
-    QString message("Insert initiated!\n");
-
-    QTextStream stream(&message);
-
-    stream << "first_name     : " << firstName     << "\n";
-    stream << "last_name      : " << lastName      << "\n";
-    stream << "phone_number   : " << phoneNumber   << "\n";
-    stream << "birth_year     : " << birthYear     << "\n";
-    stream << "gender         : " << gender        << "\n";
-    stream << "marital_status : " << maritalStatus << "\n";
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "First name :" << firstName << ", " << "Last name :" << lastName << ", " << "Phone number :" << phoneNumber << ", " << "Birth year :" << birthYear << ", " << "Gender :" << gender << ", " << "Marital status :" << maritalStatus;
 #endif
 
+    QString queryString = R"(
+        INSERT IGNORE INTO patients (first_name, last_name, birth_year, phone_number, gender, marital_status, first_visit_date, recent_visit_date)
 
+        VALUES (:first_name, :last_name, :birth_year, :phone_number, :gender, :marital_status, :first_visit_date, :recent_visit_date)
+    )";
 
-    QString queryString = "INSERT IGNORE INTO patients (first_name, last_name, birth_year, phone_number, gender, marital_status, first_visit_date, recent_visit_date) VALUES (:first_name, :last_name, :birth_year, :phone_number, :gender, :marital_status, :first_visit_date, :recent_visit_date);";
     QSqlQuery query(m_QSqlDatabase);
 
-
-
     query.prepare(queryString);
-
-
 
     query.bindValue(":first_name", firstName);
     query.bindValue(":last_name", lastName);
@@ -301,53 +283,38 @@ bool Database::createPatient(const QString &firstName, const QString &lastName, 
     query.bindValue(":gender", gender);
     query.bindValue(":marital_status", maritalStatus);
 
-
-
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text() + "\n" + message);
+        qDebug() << "Log Output           :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
         emit queryExecuted(QueryType::CREATE, false, "در حین عملیات مشکلی پیش آمد: " + query.lastError().text());
-
-
 
         return (false);
     }
 
-
-
     if (query.numRowsAffected() == 0)
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "The record already exists and was not inserted.\n" + message);
+        qDebug() << "Log Output           :" << "The record already exists and was not inserted!";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         // Notify QML:
         emit queryExecuted(QueryType::CREATE, false, "بیمار قبلاً وجود دارد و وارد نشد.");
 
-
-
         return(false);
     }
 
-
-
 #ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Record insertion succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     // Notify QML:
     emit queryExecuted(QueryType::CREATE, true, "رکورد بیمار با موفقیت وارد شد.");
-
-
 
     return (true);
 }
@@ -3277,459 +3244,342 @@ bool Database::changeDeletionStatus(bool newStatus)
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 
-// NOTE (SAVIZ): We have to understand that these method will be called everytime we attempt to connect, therefore we need to make sure to clear the lists before appending to them.
-// TODO (SAVIZ): Probably not a bad idea to let the user know to attempt to refersh the connection if one of these goes wrong: (Or maybe even a better idea is to check for these in the connection funciton and fail the entire thing if all of these are not retrieved)
-
-bool Database::populateDiagnosisList()
+QPair<bool, QString> Database::populateDiagnosisList()
 {
+#ifdef QT_DEBUG
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "None";
+#endif
+
     QString queryString = "SELECT * FROM diagnoses WHERE is_active = TRUE";
-
-
 
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
 
-
-
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
+        qDebug() << "Log Output           :" << "Population failed!" << "\n" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        // Notify QML:
-        emit diagnosisListPopulated(false, query.lastError().text());
-
-
-
-        return (false);
+        return QPair<bool, QString>(false, query.lastError().text());
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Query returned no results.");
+        qDebug() << "Log Output           :" << "Population succeeded!";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        // Notify QML:
-        emit diagnosisListPopulated(false, "Query returned no results.");
-
-
-
-        return (false);
+        // NOTE (SAVIZ): Technically, the specialist might have chosen not to provide a list of diagnoses yet.
+        return QPair<bool, QString>(true, "The query did not return any results.");
     }
 
-
-
     m_DiagnosisList.clear();
-
-
 
     while (query.next())
     {
         QVariantMap diagnosisMap;
 
-
-
         diagnosisMap["diagnosis_id"] = query.value("diagnosis_id").toULongLong();
-        diagnosisMap["name"] = query.value("name").toString();
-
-
+        diagnosisMap["diagnosis_name"] = query.value("name").toString();
 
         m_DiagnosisList.append(diagnosisMap);
     }
 
+#ifdef QT_DEBUG
+    qDebug() << "Log Output           :" << "Population succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
+#endif
 
-
-    // Notify QML:
-    emit diagnosisListPopulated(true, "Diagnosis list successfully acquired.");
-
-
-
-    return (true);
+    return QPair<bool, QString>(true, "");
 }
 
-bool Database::populateTreatmentList()
+QPair<bool, QString> Database::populateTreatmentList()
 {
+#ifdef QT_DEBUG
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "None";
+#endif
+
     QString queryString = "SELECT * FROM treatments WHERE is_active = TRUE";
-
-
 
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
 
-
-
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
+        qDebug() << "Log Output           :" << "Population failed!" << "\n" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        // Notify QML:
-        emit treatmentListPopulated(false, query.lastError().text());
-
-
-
-        return (false);
+        return QPair<bool, QString>(false, query.lastError().text());
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Query returned no results.");
+        qDebug() << "Log Output           :" << "Population succeeded!";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        // Notify QML:
-        emit treatmentListPopulated(false, "Query returned no results.");
-
-
-
-        return (false);
+        // NOTE (SAVIZ): Technically, the specialist might have chosen not to provide a list of treatments yet.
+        return QPair<bool, QString>(true, "The query did not return any results.");
     }
 
-
-
     m_TreatmentList.clear();
-
-
 
     while (query.next())
     {
         QVariantMap treatmentMap;
 
-
-
         treatmentMap["treatment_id"] = query.value("treatment_id").toULongLong();
-        treatmentMap["name"] = query.value("name").toString();
-
-
+        treatmentMap["treatment_name"] = query.value("name").toString();
 
         m_TreatmentList.append(treatmentMap);
     }
 
+#ifdef QT_DEBUG
+    qDebug() << "Log Output           :" << "Population succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
+#endif
 
-
-    // Notify QML:
-    emit treatmentListPopulated(true, "Treatment list successfully acquired.");
-
-
-
-    return (true);
+    return QPair<bool, QString>(true, "");
 }
 
-bool Database::populateMedicalDrugList()
+QPair<bool, QString> Database::populateMedicalDrugList()
 {
+#ifdef QT_DEBUG
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "None";
+#endif
+
     QString queryString = "SELECT * FROM medical_drugs WHERE is_active = TRUE";
-
-
 
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
 
-
-
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
+        qDebug() << "Log Output           :" << "Population failed!" << "\n" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        // Notify QML:
-        emit medicalDrugListPopulated(false, query.lastError().text());
-
-
-
-        return (false);
+        return QPair<bool, QString>(false, query.lastError().text());
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Query returned no results.");
+        qDebug() << "Log Output           :" << "Population succeeded!";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        // Notify QML:
-        emit medicalDrugListPopulated(false, "Query returned no results.");
-
-
-
-        return (false);
+        // NOTE (SAVIZ): Technically, the specialist might have chosen not to provide a list of medical drugs yet.
+        return QPair<bool, QString>(true, "The query did not return any results.");
     }
 
-
-
     m_MedicalDrugList.clear();
-
-
 
     while (query.next())
     {
         QVariantMap medicalDrugMap;
 
-
-
         medicalDrugMap["medical_drug_id"] = query.value("medical_drug_id").toULongLong();
-        medicalDrugMap["name"] = query.value("name").toString();
-
-
+        medicalDrugMap["medical_drug_name"] = query.value("name").toString();
 
         m_MedicalDrugList.append(medicalDrugMap);
     }
 
+#ifdef QT_DEBUG
+    qDebug() << "Log Output           :" << "Population succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
+#endif
 
-
-    // Notify QML:
-    emit medicalDrugListPopulated(true, "Medical-Drug list successfully acquired.");
-
-
-
-    return (true);
+    return QPair<bool, QString>(true, "");
 }
 
-bool Database::populateProcedureList()
+QPair<bool, QString> Database::populateProcedureList()
 {
+#ifdef QT_DEBUG
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "None";
+#endif
+
     QString queryString = "SELECT * FROM procedures WHERE is_active = TRUE";
-
-
 
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
 
-
-
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
+        qDebug() << "Log Output           :" << "Population failed!" << "\n" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        // Notify QML:
-        emit procedureListPopulated(false, query.lastError().text());
-
-
-
-        return (false);
+        return QPair<bool, QString>(false, query.lastError().text());
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Query returned no results.");
+        qDebug() << "Log Output           :" << "Population succeeded!";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        // Notify QML:
-        emit procedureListPopulated(false, "Query returned no results.");
-
-
-
-        return (false);
+        // NOTE (SAVIZ): Technically, the specialist might have chosen not to provide a list of procedures yet.
+        return QPair<bool, QString>(true, "The query did not return any results.");
     }
 
-
-
     m_ProcedureList.clear();
-
-
 
     while (query.next())
     {
         QVariantMap procedureMap;
 
-
-
         procedureMap["procedure_id"] = query.value("procedure_id").toULongLong();
-        procedureMap["name"] = query.value("name").toString();
-
-
+        procedureMap["procedure_name"] = query.value("name").toString();
 
         m_ProcedureList.append(procedureMap);
     }
 
+#ifdef QT_DEBUG
+    qDebug() << "Log Output           :" << "Population succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
+#endif
 
-
-    // Notify QML:
-    emit procedureListPopulated(true, "Procedure list successfully acquired.");
-
-
-
-    return (true);
+    return QPair<bool, QString>(true, "");
 }
 
-bool Database::populateConsultantList()
+QPair<bool, QString> Database::populateConsultantList()
 {
+#ifdef QT_DEBUG
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "None";
+#endif
+
     QString queryString = "SELECT * FROM consultants WHERE is_active = TRUE";
-
-
 
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
 
-
-
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
+        qDebug() << "Log Output           :" << "Population failed!" << "\n" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        // Notify QML:
-        emit consultantListPopulated(false, query.lastError().text());
-
-
-
-        return (false);
+        return QPair<bool, QString>(false, query.lastError().text());
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Query returned no results.");
+        qDebug() << "Log Output           :" << "Population succeeded!";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        // Notify QML:
-        emit consultantListPopulated(false, "Query returned no results.");
-
-
-
-        return (false);
+        // NOTE (SAVIZ): Technically, the specialist might have chosen not to provide a list of consultants yet.
+        return QPair<bool, QString>(true, "The query did not return any results.");
     }
 
-
-
     m_ConsultantList.clear();
-
-
 
     while (query.next())
     {
         QVariantMap consultantMap;
 
-
-
         consultantMap["consultant_id"] = query.value("consultant_id").toULongLong();
-        consultantMap["name"] = query.value("name").toString();
-        consultantMap["specialization"] = query.value("specialization").toString();
-
-
+        consultantMap["consultant_name"] = query.value("name").toString();
+        consultantMap["consultant_specialization"] = query.value("specialization").toString();
 
         m_ConsultantList.append(consultantMap);
     }
 
+#ifdef QT_DEBUG
+    qDebug() << "Log Output           :" << "Population succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
+#endif
 
-
-    // Notify QML:
-    emit consultantListPopulated(true, "Consultant list successfully acquired.");
-
-
-
-    return (true);
+    return QPair<bool, QString>(true, "");
 }
 
-bool Database::populateLabList()
+QPair<bool, QString> Database::populateLabList()
 {
+#ifdef QT_DEBUG
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "None";
+#endif
+
     QString queryString = "SELECT * FROM labs WHERE is_active = TRUE";
-
-
 
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
 
-
-
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, query.lastError().text());
+        qDebug() << "Log Output           :" << "Population failed!" << "\n" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        // Notify QML:
-        emit labListPopulated(false, query.lastError().text());
-
-
-
-        return (false);
+        return QPair<bool, QString>(false, query.lastError().text());
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Query returned no results.");
+        qDebug() << "Log Output           :" << "Population succeeded!";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        // Notify QML:
-        emit labListPopulated(false, "Query returned no results.");
-
-
-
-        return (false);
+        // NOTE (SAVIZ): Technically, the specialist might have chosen not to provide a list of labs yet.
+        return QPair<bool, QString>(true, "The query did not return any results.");
     }
 
-
-
     m_LabList.clear();
-
-
 
     while (query.next())
     {
         QVariantMap labMap;
 
-
-
         labMap["lab_id"] = query.value("lab_id").toULongLong();
-        labMap["name"] = query.value("name").toString();
-        labMap["specialization"] = query.value("specialization").toString();
-
-
+        labMap["lab_name"] = query.value("name").toString();
+        labMap["lab_specialization"] = query.value("specialization").toString();
 
         m_LabList.append(labMap);
     }
 
+#ifdef QT_DEBUG
+    qDebug() << "Log Output           :" << "Population succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
+#endif
 
-
-    // Notify QML:
-    emit labListPopulated(true, "Lab list successfully acquired.");
-
-
-
-    return (true);
+    return QPair<bool, QString>(true, "");
 }
 
 // [[------------------------------------------------------------------------]]

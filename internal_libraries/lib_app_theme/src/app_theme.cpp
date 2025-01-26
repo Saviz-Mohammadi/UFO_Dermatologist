@@ -1,8 +1,8 @@
-#include "app_theme.hpp"
-
 #ifdef QT_DEBUG
-    #include "logger.hpp"
+    #include <QDebug>
 #endif
+
+#include "app_theme.hpp"
 
 
 AppTheme* AppTheme::m_Instance = Q_NULLPTR;
@@ -19,18 +19,26 @@ AppTheme::AppTheme(QObject *parent, const QString& name)
     this->setObjectName(name);
 
 #ifdef QT_DEBUG
-    QString message("Call to Constructor");
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "None";
+    qDebug() << "Log Output           :" << "None";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
 }
 
 AppTheme::~AppTheme()
 {
 #ifdef QT_DEBUG
-    QString message("Call to Destructor");
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "None";
+    qDebug() << "Log Output           :" << "None";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
 }
 
@@ -56,13 +64,15 @@ AppTheme *AppTheme::cppInstance(QObject *parent)
 
     auto instance = new AppTheme(parent);
     m_Instance = instance;
+
     return(instance);
 }
 
-// In Qt, this won't be neccessary since we have parent-child memory management.
+// NOTE: In Qt, this isn't necessary due to its parent-child memory management system. However, in standard C++, it's a good practice to either explicitly call this when we're done with the object or ensure it gets invoked within the destructor.
 void AppTheme::ShutDown()
 {
     delete (m_Instance);
+
     m_Instance = Q_NULLPTR;
 }
 
@@ -84,15 +94,17 @@ void AppTheme::addTheme(const QString &filePath)
 
 
     if (!file.exists())
-    {
+    {        
 #ifdef QT_DEBUG
-        QString message("File does not exist: %1");
+        QString logOutput = QString("File does not exist: %1").arg(fileInfo.absolutePath());
 
-        message = message.arg(
-            fileInfo.absolutePath()
-        );
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "[DEBUG]";
+        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "objectName           :" << this->objectName();
+        qDebug() << "function Information :" << Q_FUNC_INFO;
+        qDebug() << "Arguments            :" << filePath;
+        qDebug() << "Log Output           :" << logOutput;
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
         return;
@@ -101,18 +113,18 @@ void AppTheme::addTheme(const QString &filePath)
     bool fileTypeIsJson = (fileInfo.suffix().compare("json", Qt::CaseInsensitive) == 0);
 
     if (!fileTypeIsJson)
-    {
+    {        
 #ifdef QT_DEBUG
-        QString message("File is not of JSON type! \n File Name: %1 \n Full Path: %2");
+        QString logOutput = QString("File '%1' is not of JSON type!").arg(fileInfo.fileName());
 
-        message = message.arg(
-            fileInfo.fileName(),
-            fileInfo.absolutePath()
-        );
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "[DEBUG]";
+        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "objectName           :" << this->objectName();
+        qDebug() << "function Information :" << Q_FUNC_INFO;
+        qDebug() << "Arguments            :" << filePath;
+        qDebug() << "Log Output           :" << logOutput;
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
         return;
     }
 
@@ -160,15 +172,17 @@ void AppTheme::loadColorsFromTheme(const QString &themeKey)
 
 
     if (!themeFile.open(QIODevice::ReadOnly))
-    {
+    {        
 #ifdef QT_DEBUG
-        QString message("Could not open JSON file: %1");
+        QString logOutput = QString("Could not open JSON file: %1").arg(QFileInfo(themeFile).filePath());
 
-        message = message.arg(
-            QFileInfo(themeFile).filePath()
-        );
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "[DEBUG]";
+        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "objectName           :" << this->objectName();
+        qDebug() << "function Information :" << Q_FUNC_INFO;
+        qDebug() << "Arguments            :" << themeKey;
+        qDebug() << "Log Output           :" << logOutput;
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
         return;
@@ -177,13 +191,15 @@ void AppTheme::loadColorsFromTheme(const QString &themeKey)
     if (!placeholderFile.open(QIODevice::ReadOnly))
     {
 #ifdef QT_DEBUG
-        QString message("Could not open Placeholder JSON file: %1");
+        QString logOutput = QString("Could not open Placeholder JSON file: %1").arg(QFileInfo(placeholderFile).filePath());
 
-        message = message.arg(
-            QFileInfo(placeholderFile).filePath()
-        );
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "[DEBUG]";
+        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "objectName           :" << this->objectName();
+        qDebug() << "function Information :" << Q_FUNC_INFO;
+        qDebug() << "Arguments            :" << themeKey;
+        qDebug() << "Log Output           :" << logOutput;
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
         return;
@@ -278,13 +294,15 @@ QString AppTheme::resolvePlaceholders(const QString &themeJson, const QString &p
         else
         {
 #ifdef QT_DEBUG
-            QString message("Placeholder: %1 not found!");
+            QString logOutput = QString("Placeholder: %1 not found!").arg(placeholder);
 
-            message = message.arg(
-                placeholder
-            );
-
-            logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+            qDebug() << "[DEBUG]";
+            qDebug() << "--------------------------------------------------------------------------------";
+            qDebug() << "objectName           :" << this->objectName();
+            qDebug() << "function Information :" << Q_FUNC_INFO;
+            qDebug() << "Arguments            :" << themeJson << "\n" << placeholderJson;
+            qDebug() << "Log Output           :" << logOutput;
+            qDebug() << "--------------------------------------------------------------------------------";
 #endif
         }
     }

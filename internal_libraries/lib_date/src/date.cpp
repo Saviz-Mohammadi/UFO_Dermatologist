@@ -1,8 +1,8 @@
-#include "date.hpp"
-
 #ifdef QT_DEBUG
-    #include "logger.hpp"
+    #include <QDebug>
 #endif
+
+#include "date.hpp"
 
 
 Date *Date::m_Instance = Q_NULLPTR;
@@ -17,27 +17,28 @@ Date::Date(QObject *parent, const QString &name)
 {
     this->setObjectName(name);
 
-
-
 #ifdef QT_DEBUG
-    QString message("Call to Constructor\n");
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "None";
+    qDebug() << "Log Output           :" << "None";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
 }
 
 Date::~Date()
 {
 #ifdef QT_DEBUG
-    QString message("Call to Destructor");
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "None";
+    qDebug() << "Log Output           :" << "None";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
-
-    // Shutdown.
-    this->disconnect();
 }
 
 Date *Date::qmlInstance(QQmlEngine *engine, QJSEngine *scriptEngine)
@@ -62,6 +63,7 @@ Date *Date::cppInstance(QObject *parent)
 
     auto instance = new Date(parent);
     m_Instance = instance;
+
     return (instance);
 }
 

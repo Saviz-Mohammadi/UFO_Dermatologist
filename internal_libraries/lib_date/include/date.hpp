@@ -1,7 +1,6 @@
 #ifndef DATE_H
 #define DATE_H
 
-#include <QDebug>
 #include <QObject>
 #include <QQmlEngine>
 #include <QVariant>

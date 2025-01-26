@@ -1,9 +1,8 @@
-#include "main.hpp"
-
 #ifdef QT_DEBUG
-    #include "logger.hpp"
+    #include <QDebug>
 #endif
 
+#include "main.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -92,11 +91,15 @@ void readCustomFonts(const QGuiApplication &application)
         if (fontId == -1)
         {
 #ifdef QT_DEBUG
-            QString message("Failed to load font file: %1");
+            QString logOutput = QString("Failed to load font file: %1").arg(fontPath);
 
-            message = message.arg(fontPath);
-
-            logger::log(logger::LOG_LEVEL::DEBUG, "N/A", Q_FUNC_INFO, message);
+            qDebug() << "[DEBUG]";
+            qDebug() << "--------------------------------------------------------------------------------";
+            qDebug() << "objectName           :" << "Main";
+            qDebug() << "function Information :" << Q_FUNC_INFO;
+            qDebug() << "Arguments            :" << "QGuiApplication";
+            qDebug() << "Log Output           :" << logOutput;
+            qDebug() << "--------------------------------------------------------------------------------";
 #endif
         }
     }
@@ -118,11 +121,15 @@ void setGlobalFont(const QGuiApplication &application)
     else
     {
 #ifdef QT_DEBUG
-        QString message("Font family %1 is not available.");
+        QString logOutput = QString("Font family %1 is not available.").arg(fontFamilyName);
 
-        message = message.arg(fontFamilyName);
-
-        logger::log(logger::LOG_LEVEL::DEBUG, "N/A", Q_FUNC_INFO, message);
+        qDebug() << "[DEBUG]";
+        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "objectName           :" << "Main";
+        qDebug() << "function Information :" << Q_FUNC_INFO;
+        qDebug() << "Arguments            :" << "QGuiApplication";
+        qDebug() << "Log Output           :" << logOutput;
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
     }
 }
