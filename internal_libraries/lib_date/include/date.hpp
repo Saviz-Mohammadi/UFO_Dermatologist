@@ -29,6 +29,7 @@ private:
 public:
     QCalendar::YearMonthDay gregorianToJalali(QCalendar::YearMonthDay gregorianDate);
     QCalendar::YearMonthDay jalaliToGregorian(QCalendar::YearMonthDay jalaliDate);
+    QString gregorianToJalali(QDate georgian);
     Q_INVOKABLE QString calculateJalaliAge(quint32 birthYear);
     Q_INVOKABLE QString differenceToDateJalali(int year, int month, int day);
 };

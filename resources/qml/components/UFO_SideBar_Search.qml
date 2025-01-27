@@ -383,7 +383,7 @@ Item {
 
                 onClicked: {
                     // Grab data:
-                    let patientID = parseInt(textField_PatientID.text.trim(), 10);
+
                     let firstName = textField_FirstName.text.trim()
                     let lastName = textField_LastName.text.trim()
                     let birthYearStart = parseInt(textField_BirthYearStart.text.trim(), 10);
@@ -392,12 +392,17 @@ Item {
                     let gender = comboBox_Gender.currentText
                     let maritalStatus = comboBox_MaritalStatus.currentText
 
-                    // Perform checks:
+                    // If patient id is provided, then only search based on that:
+
+                    let patientID = parseInt(textField_PatientID.text.trim(), 10);
+
                     if(!isNaN(patientID)) {
                         Database.findPatient(patientID);
 
                         return;
                     }
+
+                    // Grab all other data:
 
                     if(ufo_CheckBox_BirthYearStart.checked === false || isNaN(birthYearStart)) {
                         birthYearStart = 0
@@ -415,6 +420,13 @@ Item {
                         maritalStatus = ""
                     }
 
+                    // If all other data is invalid, then don't perform search:
+
+                    let isInvalid = ;
+
+                    if(isInvalid) {
+                        return;
+                    }
 
                     Database.findPatient(firstName, lastName, birthYearStart, birthYearEnd, phoneNumber, gender, maritalStatus);
                 }

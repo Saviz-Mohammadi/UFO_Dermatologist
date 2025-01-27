@@ -36,6 +36,7 @@ public:
     {
         CREATE,
         SEARCH,
+        SELECT,
         UPDATE,
         DELETE,
     };
@@ -62,8 +63,6 @@ private:
 signals:
     void connectionStatusChanged(const QString &message);
     void queryExecuted(QueryType type, bool success, const QString &message);
-    void patientDataPulled(bool success, const QString &message);
-    void patientDataPushed(bool success, const QString &message);
 
     // PUBLIC Methods
 public:
@@ -98,12 +97,12 @@ public:
     Q_INVOKABLE bool updatePatientData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice, const QVariantList &newDiagnoses, const QString &newDiagnosisNote, const QVariantList &newTreatments, const QString &newTreatmentNote, const QVariantList &newMedicalDrugs, const QString &newMedicalDrugNote, const QVariantList &newProcedures, const QString &newProcedureNote, const QVariantList &newConsultations, const QVariantList &newLabTests);
     bool updateBasicData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice);
     bool updateDiagnoses(const QVariantList &newDiagnoses);
-    bool updateDiagnosisNote(const QString &newNote);
     bool updateTreatments(const QVariantList &newTreatments);
-    bool updateTreatmentNote(const QString &newNote);
     bool updateMedicalDrugs(const QVariantList &newMedicalDrugs);
-    bool updateMedicalDrugNote(const QString &newNote);
     bool updateProcedures(const QVariantList &newProcedures);
+    bool updateDiagnosisNote(const QString &newNote);
+    bool updateTreatmentNote(const QString &newNote);
+    bool updateMedicalDrugNote(const QString &newNote);
     bool updateProcedureNote(const QString &newNote);
     bool updateConsultations(const QVariantList &newConsultations);
     bool updateLabTests(const QVariantList &newLabTests);

@@ -102,6 +102,20 @@ QCalendar::YearMonthDay Date::jalaliToGregorian(QCalendar::YearMonthDay jalaliYM
     return (ymd);
 }
 
+QString Date::gregorianToJalali(QDate georgian)
+{
+    QCalendar::YearMonthDay gregorianYMD(georgian.year(), georgian.month(), georgian.day());
+
+    QCalendar::YearMonthDay jaliliYMD = Date::cppInstance()->gregorianToJalali(gregorianYMD);
+
+    QString DateString = QString("%1-%2-%3")
+                                       .arg(jaliliYMD.year, 4, 10, QChar('0'))
+                                       .arg(jaliliYMD.month, 2, 10, QChar('0'))
+                                       .arg(jaliliYMD.day, 2, 10, QChar('0'));
+
+    return (DateString);
+}
+
 QString Date::calculateJalaliAge(quint32 birthYear)
 {
     QCalendar::YearMonthDay gregorianYMD(QDate::currentDate().year(), QDate::currentDate().month(), QDate::currentDate().day());

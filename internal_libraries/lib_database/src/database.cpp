@@ -4,10 +4,7 @@
 
 #include "database.hpp"
 #include "date.hpp"
-
-
-// WARNING (SAVIZ): 'LEFT JOIN' can produce 'Null' results. Therefore, we need to make sure to check against null valuse when dealing with things such as 'diagnoses', 'treatments', and 'medical drugs'.
-
+#include <array>
 
 Database *Database::m_Instance = Q_NULLPTR;
 
@@ -322,85 +319,52 @@ bool Database::createPatient(const QString &firstName, const QString &lastName, 
 // SEARCH
 bool Database::findPatient(const quint64 patientID)
 {
+#ifdef QT_DEBUG
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "Patient ID :" << patientID;
+#endif
+
     QString queryString = "SELECT * FROM patients WHERE patient_id = :patient_id";
     QSqlQuery query(m_QSqlDatabase);
 
-
-
-#ifdef QT_DEBUG
-    QString message("Search initiated! (patient_id)\n");
-
-    QTextStream stream(&message);
-#endif
-
-
-
     query.prepare(queryString);
-
-
 
     query.bindValue(":patient_id", patientID);
 
-
-
     m_SearchResultList.clear();
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Search error occured :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         // Notify QML:
         emit queryExecuted(QueryType::SEARCH, false, query.lastError().text());
 
-
-
         return (false);
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        stream << "Query returned no results.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Query returned no results.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         // Notify QML:
-        emit queryExecuted(QueryType::SEARCH, false, "Query returned no results.");
+        emit queryExecuted(QueryType::SEARCH, true, "عملیات جستجو هیچ نتیجه‌ای برنگرداند.");
 
-
-
-        return (false);
+        return (true);
     }
 
-
-
-#ifdef QT_DEBUG
-    stream  << "patient_id : " << patientID;
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
-#endif
-
-
-
-    // NOTE (SAVIZ): Only obtain minimum data:
     while (query.next())
     {
         QVariantMap patientMap;
-
-
 
         patientMap["patient_id"] = query.value("patient_id").toULongLong();
         patientMap["first_name"] = query.value("first_name").toString();
@@ -411,55 +375,33 @@ bool Database::findPatient(const quint64 patientID)
         patientMap["marital_status"] = query.value("marital_status").toString();
         patientMap["service_price"] = query.value("service_price").toDouble();
 
-
-
         m_SearchResultList.append(patientMap);
     }
 
-
+#ifdef QT_DEBUG
+    qDebug() << "Log Output           :" << "Search operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
+#endif
 
     // Notify QML:
-    emit queryExecuted(QueryType::SEARCH, true, "Search query executed successfully.");
-
-
+    emit queryExecuted(QueryType::SEARCH, true, "عملیات جستجو با موفقیت انجام شد!");
 
     return (true);
 }
 
 bool Database::findPatient(const QString &firstName, const QString &lastName, quint32 birthYearStart, quint32 birthYearEnd, const QString &phoneNumber, const QString &gender, const QString &maritalStatus)
 {
-    if(firstName.isEmpty() && lastName.isEmpty() && birthYearStart <= 0 && birthYearEnd <= 0 && phoneNumber.isEmpty() && gender.isEmpty() && maritalStatus.isEmpty())
-    {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "All fields were denied.");
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "First name :" << firstName << ", " << "Last name :" << lastName << ", " << "Birth year start :" << birthYearStart << ", " << "Birth year end :" << birthYearEnd << ", " << "Phone number :" << phoneNumber << ", " << "Gender :" << gender << ", " << "Marital status :" << maritalStatus;
 #endif
-
-
-
-        // Notify QML:
-        emit queryExecuted(QueryType::SEARCH, false, "All fields were denied.");
-
-
-
-        return (false);
-    }
-
-
 
     QString queryString = "SELECT * FROM patients WHERE 1 = 1";
     QSqlQuery query(m_QSqlDatabase);
 
-
-
-#ifdef QT_DEBUG
-    QString message("Search initiated! (patient data)\n");
-
-    QTextStream stream(&message);
-#endif
-
-
-
-    // NOTE (SAVIZ): I like to use 'std::optional', but QML does not play nice.
     if (!firstName.isEmpty())
     {
         queryString += " AND first_name LIKE :first_name";
@@ -495,11 +437,7 @@ bool Database::findPatient(const QString &firstName, const QString &lastName, qu
         queryString += " AND marital_status = :marital_status";
     }
 
-
-
     query.prepare(queryString);
-
-
 
     if (!firstName.isEmpty())
     {
@@ -536,88 +474,37 @@ bool Database::findPatient(const QString &firstName, const QString &lastName, qu
         query.bindValue(":marital_status", maritalStatus);
     }
 
-
-
     m_SearchResultList.clear();
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream  << query.lastError().text() << "\n";
-
-        stream  << "first_name       : " << firstName      << "\n"
-                << "last_name        : " << lastName       << "\n"
-                << "birth_year_start : " << birthYearStart << "\n"
-                << "birth_year_end   : " << birthYearEnd   << "\n"
-                << "phone_number     : " << phoneNumber    << "\n"
-                << "gender           : " << gender         << "\n"
-                << "marital_status   : " << maritalStatus;
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Search operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         // Notify QML:
         emit queryExecuted(QueryType::SEARCH, false, query.lastError().text());
 
-
-
         return (false);
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        stream  << "Query returned no results." << "\n";
-
-        stream  << "first_name       : " << firstName      << "\n"
-                << "last_name        : " << lastName       << "\n"
-                << "birth_year_start : " << birthYearStart << "\n"
-                << "birth_year_end   : " << birthYearEnd   << "\n"
-                << "phone_number     : " << phoneNumber    << "\n"
-                << "gender           : " << gender         << "\n"
-                << "marital_status   : " << maritalStatus;
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Query returned no results.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         // Notify QML:
-        emit queryExecuted(QueryType::SEARCH, false, "Query returned no results.");
+        emit queryExecuted(QueryType::SEARCH, true, "عملیات جستجو هیچ نتیجه‌ای برنگرداند.");
 
-
-
-        return (false);
+        return (true);
     }
 
-
-
-#ifdef QT_DEBUG
-    stream  << "first_name       : " << firstName      << "\n"
-            << "last_name        : " << lastName       << "\n"
-            << "birth_year_start : " << birthYearStart << "\n"
-            << "birth_year_end   : " << birthYearEnd   << "\n"
-            << "phone_number     : " << phoneNumber    << "\n"
-            << "gender           : " << gender         << "\n"
-            << "marital_status   : " << maritalStatus;
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
-#endif
-
-
-
-    // NOTE (SAVIZ): Only obtain minimum data:
     while (query.next())
     {
         QVariantMap patientMap;
-
-
 
         patientMap["patient_id"] = query.value("patient_id").toULongLong();
         patientMap["first_name"] = query.value("first_name").toString();
@@ -628,102 +515,68 @@ bool Database::findPatient(const QString &firstName, const QString &lastName, qu
         patientMap["marital_status"] = query.value("marital_status").toString();
         patientMap["service_price"] = query.value("service_price").toDouble();
 
-
-
         m_SearchResultList.append(patientMap);
     }
 
-
+#ifdef QT_DEBUG
+    qDebug() << "Log Output           :" << "Search operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
+#endif
 
     // Notify QML:
-    emit queryExecuted(QueryType::SEARCH, true, "Search query executed successfully.");
-
-
+    emit queryExecuted(QueryType::SEARCH, true, "عملیات جستجو با موفقیت انجام شد!");
 
     return (true);
 }
 
 bool Database::findFirstXPatients(const quint64 count)
 {
+#ifdef QT_DEBUG
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "Count :" << count;
+#endif
+
     QString queryString = "SELECT * FROM patients ORDER BY patient_id ASC LIMIT :count";
     QSqlQuery query(m_QSqlDatabase);
 
-
-
-#ifdef QT_DEBUG
-    QString message("Search initiated! (First X)\n");
-
-    QTextStream stream(&message);
-#endif
-
-
-
     query.prepare(queryString);
-
-
 
     query.bindValue(":count", count);
 
-
-
     m_SearchResultList.clear();
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Search operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         // Notify QML:
         emit queryExecuted(QueryType::SEARCH, false, query.lastError().text());
 
-
-
         return (false);
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        stream << "Query returned no results.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Query returned no results.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         // Notify QML:
-        emit queryExecuted(QueryType::SEARCH, false, "Query returned no results.");
+        emit queryExecuted(QueryType::SEARCH, true, "عملیات جستجو هیچ نتیجه‌ای برنگرداند.");
 
-
-
-        return (false);
+        return (true);
     }
 
-
-
-#ifdef QT_DEBUG
-    stream  << "count : " << count;
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
-#endif
-
-
-
-    // NOTE (SAVIZ): Only obtain minimum data:
     while (query.next())
     {
         QVariantMap patientMap;
-
-
 
         patientMap["patient_id"] = query.value("patient_id").toULongLong();
         patientMap["first_name"] = query.value("first_name").toString();
@@ -734,102 +587,68 @@ bool Database::findFirstXPatients(const quint64 count)
         patientMap["marital_status"] = query.value("marital_status").toString();
         patientMap["service_price"] = query.value("service_price").toDouble();
 
-
-
         m_SearchResultList.append(patientMap);
     }
 
-
+#ifdef QT_DEBUG
+    qDebug() << "Log Output           :" << "Search operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
+#endif
 
     // Notify QML:
-    emit queryExecuted(QueryType::SEARCH, true, "Search query executed successfully.");
-
-
+    emit queryExecuted(QueryType::SEARCH, true, "عملیات جستجو با موفقیت انجام شد!");
 
     return (true);
 }
 
 bool Database::findLastXPatients(const quint64 count)
 {
+#ifdef QT_DEBUG
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "Count :" << count;
+#endif
+
     QString queryString = "SELECT * FROM patients ORDER BY patient_id DESC LIMIT :count";
     QSqlQuery query(m_QSqlDatabase);
 
-
-
-#ifdef QT_DEBUG
-    QString message("Search initiated! (Last X)\n");
-
-    QTextStream stream(&message);
-#endif
-
-
-
     query.prepare(queryString);
-
-
 
     query.bindValue(":count", count);
 
-
-
     m_SearchResultList.clear();
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Search operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         // Notify QML:
         emit queryExecuted(QueryType::SEARCH, false, query.lastError().text());
 
-
-
         return (false);
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        stream << "Query returned no results.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Query returned no results.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         // Notify QML:
-        emit queryExecuted(QueryType::SEARCH, false, "Query returned no results.");
+        emit queryExecuted(QueryType::SEARCH, true, "عملیات جستجو هیچ نتیجه‌ای برنگرداند.");
 
-
-
-        return (false);
+        return (true);
     }
 
-
-
-#ifdef QT_DEBUG
-    stream  << "count : " << count;
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
-#endif
-
-
-
-    // NOTE (SAVIZ): Only obtain minimum data:
     while (query.next())
     {
         QVariantMap patientMap;
-
-
 
         patientMap["patient_id"] = query.value("patient_id").toULongLong();
         patientMap["first_name"] = query.value("first_name").toString();
@@ -840,17 +659,16 @@ bool Database::findLastXPatients(const quint64 count)
         patientMap["marital_status"] = query.value("marital_status").toString();
         patientMap["service_price"] = query.value("service_price").toDouble();
 
-
-
         m_SearchResultList.append(patientMap);
     }
 
-
+#ifdef QT_DEBUG
+    qDebug() << "Log Output           :" << "Search operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
+#endif
 
     // Notify QML:
-    emit queryExecuted(QueryType::SEARCH, true, "Search query executed successfully.");
-
-
+    emit queryExecuted(QueryType::SEARCH, true, "عملیات جستجو با موفقیت انجام شد!");
 
     return (true);
 }
@@ -858,58 +676,62 @@ bool Database::findLastXPatients(const quint64 count)
 // SELECT
 bool Database::pullPatientData(const quint64 index)
 {
-    bool basicDataPullOutcome = pullPatientBasicData(index);
-
-    bool diagnosesPullOutcome = pullPatientDiagnoses(index);
-
-    bool treatmentsPullOutcome = pullPatientTreatments(index);
-
-    bool medicalDrugsPullOutcome = pullPatientMedicalDrugs(index);
-
-    bool proceduresPullOutcome = pullPatientProcedures(index);
-
-    bool diagnosisNotePullOutcome = pullDiagnosisNote(index);
-
-    bool treatmentNotePullOutcome = pullTreatmentNote(index);
-
-    bool medicalDrugNotePullOutcome = pullMedicalDrugNote(index);
-
-    bool procedureNotePullOutcome = pullProcedureNote(index);
-
-    bool consultationsPullOutcome = pullConsultations(index);
-
-    bool labTestsPullOutcome = pullLabTests(index);
-
-
-
-    if(basicDataPullOutcome == false || diagnosesPullOutcome == false || treatmentsPullOutcome == false || medicalDrugsPullOutcome == false || diagnosisNotePullOutcome == false || treatmentNotePullOutcome == false || medicalDrugNotePullOutcome == false || consultationsPullOutcome == false || labTestsPullOutcome == false || proceduresPullOutcome == false || procedureNotePullOutcome == false)
-    {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Errors occured while pulling patient data!");
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "Index :" << index;
 #endif
 
+    struct FunctionCall
+    {
+        std::function<bool()> function;
 
+        QString errorMessage;
+    };
 
-        // Notify QML:
-        emit patientDataPushed(false, "خطاهایی هنگام دریافت اطلاعات بیمار رخ داد. لطفاً دوباره تلاش کنید.");
+    const std::array<FunctionCall, 11> calls =
+    {{
+        { [this, index] { return pullPatientBasicData(index); }, "خطا در دریافت اطلاعات اولیه بیمار" },
+        { [this, index] { return pullPatientDiagnoses(index); }, "خطا در دریافت تشخیص‌ها" },
+        { [this, index] { return pullPatientTreatments(index); }, "خطا در دریافت درمان‌ها" },
+        { [this, index] { return pullPatientMedicalDrugs(index); }, "خطا در دریافت اطلاعات دارویی" },
+        { [this, index] { return pullPatientProcedures(index); }, "خطا در دریافت اقدامات پزشکی" },
+        { [this, index] { return pullDiagnosisNote(index); }, "خطا در دریافت یادداشت‌های تشخیصی" },
+        { [this, index] { return pullTreatmentNote(index); }, "خطا در دریافت یادداشت‌های درمانی" },
+        { [this, index] { return pullMedicalDrugNote(index); }, "خطا در دریافت یادداشت‌های دارویی" },
+        { [this, index] { return pullProcedureNote(index); }, "خطا در دریافت یادداشت‌های مربوط به اقدامات پزشکی" },
+        { [this, index] { return pullConsultations(index); }, "خطا در دریافت مشاوره‌ها" },
+        { [this, index] { return pullLabTests(index); }, "خطا در دریافت آزمایش‌ها" },
+    }};
 
+    const QString prefix = "خطاهایی هنگام دریافت اطلاعات بیمار رخ داد: ";
+    const QString suffix = " لطفاً دوباره تلاش کنید.";
 
+    for (const auto& call : calls)
+    {
+        if (call.function() == false)
+        {
+            QString fullMessage = prefix + call.errorMessage + suffix;
 
-        return (false);
+#ifdef QT_DEBUG
+            qDebug() << "Log Output           :" << "Select operation failed! : " << call.errorMessage;
+            qDebug() << "--------------------------------------------------------------------------------";
+#endif
+
+            emit queryExecuted(QueryType::SELECT, false, fullMessage);
+
+            return (false);
+        }
     }
 
-
-
 #ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Patient data successfully pulled from database!");
+    qDebug() << "Log Output           :" << "Select operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-    // Notify QML:
-    emit patientDataPulled(true, "اطلاعات بیمار با موفقیت از پایگاه داده دریافت شد.");
-
-
+    emit queryExecuted(QueryType::SELECT, true, "اطلاعات بیمار با موفقیت از پایگاه داده دریافت شد.");
 
     return (true);
 }
@@ -917,14 +739,12 @@ bool Database::pullPatientData(const quint64 index)
 bool Database::pullPatientBasicData(const quint64 index)
 {
 #ifdef QT_DEBUG
-    QString message("Basic Data pull initiated!\n");
-
-    QTextStream stream(&message);
-
-    stream << "The patient_id is: " + QString::number(index) + "\n";
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "Index :" << index;
 #endif
-
-
 
     QString queryString = R"(
         SELECT * FROM patients
@@ -932,50 +752,33 @@ bool Database::pullPatientBasicData(const quint64 index)
         WHERE patients.patient_id = :patient_id
     )";
 
-
-
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
 
-
-
     query.bindValue(":patient_id", index);
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text() << "\n";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        stream << "Query returned no results.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Query returned no results.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (false);
+        return (true);
     }
-
-
 
     while (query.next())
     {
-        // Basic patient data
         m_PatientDataMap["patient_id"] = query.value("patient_id").toULongLong();
         m_PatientDataMap["first_name"] = query.value("first_name").toString();
         m_PatientDataMap["last_name"] = query.value("last_name").toString();
@@ -984,60 +787,36 @@ bool Database::pullPatientBasicData(const quint64 index)
         m_PatientDataMap["gender"] = query.value("gender").toString();
         m_PatientDataMap["marital_status"] = query.value("marital_status").toString();
         m_PatientDataMap["number_of_previous_visits"] = query.value("number_of_previous_visits").toUInt();
+        m_PatientDataMap["first_visit_date"] = "";
+        m_PatientDataMap["recent_visit_date"] = "";
         m_PatientDataMap["service_price"] = query.value("service_price").toReal();
         m_PatientDataMap["marked_for_deletion"] = query.value("marked_for_deletion").toBool();
 
-        // Dates need to be converted to Jalali:
-        QDate firstVisitDate = query.value("first_visit_date").toDate();
-        QDate recentVisitDate = query.value("recent_visit_date").toDate();
+        // NOTE (SAVIZ): If Gregorian dates are available for the 'first_visit_date' and 'recent_visit_date' fields in the database, they must be converted to the Jalali calendar format before caching:
 
+        QDate firstVisitGregorianDate = query.value("first_visit_date").toDate();
 
-        if(!firstVisitDate.isNull())
+        if(!firstVisitGregorianDate.isNull())
         {
-            QCalendar::YearMonthDay fvdgregorianYMD(firstVisitDate.year(), firstVisitDate.month(), firstVisitDate.day());
+            QString firstVisitJaliliDateString = Date::cppInstance()->gregorianToJalali(firstVisitGregorianDate);
 
-            QCalendar::YearMonthDay firstVisitDateJalili = Date::cppInstance()->gregorianToJalali(fvdgregorianYMD);
-
-            QString firstVisitDateString = QString("%1-%2-%3")
-                                               .arg(firstVisitDateJalili.year, 4, 10, QChar('0'))
-                                               .arg(firstVisitDateJalili.month, 2, 10, QChar('0'))
-                                               .arg(firstVisitDateJalili.day, 2, 10, QChar('0'));
-
-            m_PatientDataMap["first_visit_date"] = firstVisitDateString;
+            m_PatientDataMap["first_visit_date"] = firstVisitJaliliDateString;
         }
 
-        else
+        QDate recentVisitGregorianDate = query.value("recent_visit_date").toDate();
+
+        if(!recentVisitGregorianDate.isNull())
         {
-            m_PatientDataMap["first_visit_date"] = "";
-        }
+            QString recentVisitJaliliDateString = Date::cppInstance()->gregorianToJalali(recentVisitGregorianDate);
 
-        if(!recentVisitDate.isNull())
-        {
-            QCalendar::YearMonthDay rvdgregorianYMD(recentVisitDate.year(), recentVisitDate.month(), recentVisitDate.day());
-
-            QCalendar::YearMonthDay recentVisitDateJalili = Date::cppInstance()->gregorianToJalali(rvdgregorianYMD);
-
-            QString recentVisitDateString = QString("%1-%2-%3")
-                                                .arg(recentVisitDateJalili.year, 4, 10, QChar('0'))
-                                                .arg(recentVisitDateJalili.month, 2, 10, QChar('0'))
-                                                .arg(recentVisitDateJalili.day, 2, 10, QChar('0'));
-
-            m_PatientDataMap["recent_visit_date"] = recentVisitDateString;
-        }
-
-        else
-        {
-            m_PatientDataMap["recent_visit_date"] = "";
+            m_PatientDataMap["recent_visit_date"] = recentVisitJaliliDateString;
         }
     }
 
-
-
 #ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Select operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -1045,14 +824,12 @@ bool Database::pullPatientBasicData(const quint64 index)
 bool Database::pullPatientDiagnoses(const quint64 index)
 {
 #ifdef QT_DEBUG
-    QString message("Diagnoses pull initiated!\n");
-
-    QTextStream stream(&message);
-
-    stream << "The patient_id is: " + QString::number(index) + "\n";
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "Index :" << index;
 #endif
-
-
 
     QString queryString = R"(
         SELECT * FROM patients
@@ -1063,75 +840,54 @@ bool Database::pullPatientDiagnoses(const quint64 index)
         WHERE patients.patient_id = :patient_id
     )";
 
-
-
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
 
-
-
     query.bindValue(":patient_id", index);
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text() << "\n";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        stream << "Query returned no results.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Query returned no results.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (false);
+        return (true);
     }
-
-
 
     QVariantList diagnoses;
 
-
-
     while (query.next())
     {
+        // WARNING (SAVIZ): 'LEFT JOIN' can produce 'Null' results. Therefore, we need to make sure to check against 'Null':
+
         if (!query.value("diagnosis_id").isNull() && !query.value("diagnoses.name").isNull())
         {
             QVariantMap diagnosisMap;
 
             diagnosisMap["diagnosis_id"] = query.value("diagnosis_id").toULongLong();
-            diagnosisMap["name"] = query.value("diagnoses.name").toString().trimmed();
+            diagnosisMap["diagnosis_name"] = query.value("diagnoses.name").toString().trimmed();
 
             diagnoses.append(diagnosisMap);
         }
     }
 
-
-
     m_PatientDataMap["diagnoses"] = diagnoses;
 
-
-
 #ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Select operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -1139,14 +895,12 @@ bool Database::pullPatientDiagnoses(const quint64 index)
 bool Database::pullPatientTreatments(const quint64 index)
 {
 #ifdef QT_DEBUG
-    QString message("Treatments pull initiated!\n");
-
-    QTextStream stream(&message);
-
-    stream << "The patient_id is: " + QString::number(index) + "\n";
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "Index :" << index;
 #endif
-
-
 
     QString queryString = R"(
         SELECT * FROM patients
@@ -1157,75 +911,54 @@ bool Database::pullPatientTreatments(const quint64 index)
         WHERE patients.patient_id = :patient_id
     )";
 
-
-
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
 
-
-
     query.bindValue(":patient_id", index);
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text() << "\n";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        stream << "Query returned no results.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Query returned no results.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (false);
+        return (true);
     }
-
-
 
     QVariantList treatments;
 
-
-
     while (query.next())
     {
+        // WARNING (SAVIZ): 'LEFT JOIN' can produce 'Null' results. Therefore, we need to make sure to check against 'Null':
+
         if (!query.value("treatment_id").isNull() && !query.value("treatments.name").isNull())
         {
             QVariantMap treatmentMap;
 
             treatmentMap["treatment_id"] = query.value("treatment_id").toULongLong();
-            treatmentMap["name"] = query.value("treatments.name").toString().trimmed();
+            treatmentMap["treatment_name"] = query.value("treatments.name").toString().trimmed();
 
             treatments.append(treatmentMap);
         }
     }
 
-
-
     m_PatientDataMap["treatments"] = treatments;
 
-
-
 #ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Select operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -1233,14 +966,12 @@ bool Database::pullPatientTreatments(const quint64 index)
 bool Database::pullPatientMedicalDrugs(const quint64 index)
 {
 #ifdef QT_DEBUG
-    QString message("Medical Drugs pull initiated!\n");
-
-    QTextStream stream(&message);
-
-    stream << "The patient_id is: " + QString::number(index) + "\n";
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "Index :" << index;
 #endif
-
-
 
     QString queryString = R"(
         SELECT * FROM patients
@@ -1251,75 +982,54 @@ bool Database::pullPatientMedicalDrugs(const quint64 index)
         WHERE patients.patient_id = :patient_id
     )";
 
-
-
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
 
-
-
     query.bindValue(":patient_id", index);
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text() << "\n";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        stream << "Query returned no results.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Query returned no results.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (false);
+        return (true);
     }
-
-
 
     QVariantList medicalDrugs;
 
-
-
     while (query.next())
     {
+        // WARNING (SAVIZ): 'LEFT JOIN' can produce 'Null' results. Therefore, we need to make sure to check against 'Null':
+
         if (!query.value("medical_drug_id").isNull() && !query.value("medical_drugs.name").isNull())
         {
             QVariantMap medicalDrugMap;
 
             medicalDrugMap["medical_drug_id"] = query.value("medical_drug_id").toULongLong();
-            medicalDrugMap["name"] = query.value("medical_drugs.name").toString().trimmed();
+            medicalDrugMap["medical_drug_name"] = query.value("medical_drugs.name").toString().trimmed();
 
             medicalDrugs.append(medicalDrugMap);
         }
     }
 
-
-
     m_PatientDataMap["medicalDrugs"] = medicalDrugs;
 
-
-
 #ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Select operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -1327,14 +1037,12 @@ bool Database::pullPatientMedicalDrugs(const quint64 index)
 bool Database::pullPatientProcedures(const quint64 index)
 {
 #ifdef QT_DEBUG
-    QString message("Procedures pull initiated!\n");
-
-    QTextStream stream(&message);
-
-    stream << "The patient_id is: " + QString::number(index) + "\n";
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "Index :" << index;
 #endif
-
-
 
     QString queryString = R"(
         SELECT * FROM patients
@@ -1345,75 +1053,54 @@ bool Database::pullPatientProcedures(const quint64 index)
         WHERE patients.patient_id = :patient_id
     )";
 
-
-
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
 
-
-
     query.bindValue(":patient_id", index);
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text() << "\n";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        stream << "Query returned no results.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Query returned no results.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (false);
+        return (true);
     }
-
-
 
     QVariantList procedures;
 
-
-
     while (query.next())
     {
+        // WARNING (SAVIZ): 'LEFT JOIN' can produce 'Null' results. Therefore, we need to make sure to check against 'Null':
+
         if (!query.value("procedure_id").isNull() && !query.value("procedures.name").isNull())
         {
             QVariantMap procedureMap;
 
             procedureMap["procedure_id"] = query.value("procedure_id").toULongLong();
-            procedureMap["name"] = query.value("procedures.name").toString().trimmed();
+            procedureMap["procedure_name"] = query.value("procedures.name").toString().trimmed();
 
             procedures.append(procedureMap);
         }
     }
 
-
-
     m_PatientDataMap["procedures"] = procedures;
 
-
-
 #ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Select operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -1421,14 +1108,12 @@ bool Database::pullPatientProcedures(const quint64 index)
 bool Database::pullDiagnosisNote(const quint64 index)
 {
 #ifdef QT_DEBUG
-    QString message("Diagnosis Note pull initiated!\n");
-
-    QTextStream stream(&message);
-
-    stream << "The patient_id is: " + QString::number(index) + "\n";
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "Index :" << index;
 #endif
-
-
 
     QString queryString = R"(
         SELECT note FROM diagnosis_notes
@@ -1436,59 +1121,40 @@ bool Database::pullDiagnosisNote(const quint64 index)
         WHERE patient_id = :patient_id;
     )";
 
-
-
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
 
-
-
     query.bindValue(":patient_id", index);
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text() << "\n";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        stream << "Query returned no results.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Query returned no results.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (false);
+        return (true);
     }
-
-
 
     while (query.next())
     {
         m_PatientDataMap["diagnosis_note"] = query.value("note").toString();
     }
 
-
-
 #ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Select operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -1496,14 +1162,12 @@ bool Database::pullDiagnosisNote(const quint64 index)
 bool Database::pullTreatmentNote(const quint64 index)
 {
 #ifdef QT_DEBUG
-    QString message("Treatment Note pull initiated!\n");
-
-    QTextStream stream(&message);
-
-    stream << "The patient_id is: " + QString::number(index) + "\n";
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "Index :" << index;
 #endif
-
-
 
     QString queryString = R"(
         SELECT note FROM treatment_notes
@@ -1511,59 +1175,40 @@ bool Database::pullTreatmentNote(const quint64 index)
         WHERE patient_id = :patient_id;
     )";
 
-
-
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
 
-
-
     query.bindValue(":patient_id", index);
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text() << "\n";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        stream << "Query returned no results.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Query returned no results.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (false);
+        return (true);
     }
-
-
 
     while (query.next())
     {
         m_PatientDataMap["treatment_note"] = query.value("note").toString();
     }
 
-
-
 #ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Select operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -1571,14 +1216,12 @@ bool Database::pullTreatmentNote(const quint64 index)
 bool Database::pullMedicalDrugNote(const quint64 index)
 {
 #ifdef QT_DEBUG
-    QString message("Medical Drug Note pull initiated!\n");
-
-    QTextStream stream(&message);
-
-    stream << "The patient_id is: " + QString::number(index) + "\n";
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "Index :" << index;
 #endif
-
-
 
     QString queryString = R"(
         SELECT note FROM medical_drug_notes
@@ -1586,59 +1229,40 @@ bool Database::pullMedicalDrugNote(const quint64 index)
         WHERE patient_id = :patient_id;
     )";
 
-
-
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
 
-
-
     query.bindValue(":patient_id", index);
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text() << "\n";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        stream << "Query returned no results.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Query returned no results.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (false);
+        return (true);
     }
-
-
 
     while (query.next())
     {
         m_PatientDataMap["medical_drug_note"] = query.value("note").toString();
     }
 
-
-
 #ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Select operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -1646,14 +1270,12 @@ bool Database::pullMedicalDrugNote(const quint64 index)
 bool Database::pullProcedureNote(const quint64 index)
 {
 #ifdef QT_DEBUG
-    QString message("procedure Note pull initiated!\n");
-
-    QTextStream stream(&message);
-
-    stream << "The patient_id is: " + QString::number(index) + "\n";
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "Index :" << index;
 #endif
-
-
 
     QString queryString = R"(
         SELECT note FROM procedure_notes
@@ -1661,59 +1283,40 @@ bool Database::pullProcedureNote(const quint64 index)
         WHERE patient_id = :patient_id;
     )";
 
-
-
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
 
-
-
     query.bindValue(":patient_id", index);
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text() << "\n";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        stream << "Query returned no results.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Query returned no results.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (false);
+        return (true);
     }
-
-
 
     while (query.next())
     {
         m_PatientDataMap["procedure_note"] = query.value("note").toString();
     }
 
-
-
 #ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Select operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -1721,14 +1324,12 @@ bool Database::pullProcedureNote(const quint64 index)
 bool Database::pullConsultations(const quint64 index)
 {
 #ifdef QT_DEBUG
-    QString message("Consultations pull initiated!\n");
-
-    QTextStream stream(&message);
-
-    stream << "The patient_id is: " + QString::number(index) + "\n";
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "Index :" << index;
 #endif
-
-
 
     QString queryString = R"(
         SELECT * FROM patients
@@ -1739,12 +1340,8 @@ bool Database::pullConsultations(const quint64 index)
         WHERE patients.patient_id = :patient_id
     )";
 
-
-
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
-
-
 
     query.bindValue(":patient_id", index);
 
@@ -1753,39 +1350,29 @@ bool Database::pullConsultations(const quint64 index)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text() << "\n";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        stream << "Query returned no results.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Query returned no results.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (false);
+        return (true);
     }
-
-
 
     QVariantList consultations;
 
-
-
     while (query.next())
     {
+        // WARNING (SAVIZ): 'LEFT JOIN' can produce 'Null' results. Therefore, we need to make sure to check against 'Null':
+
         if (!query.value("consultant_id").isNull() && !query.value("consultants.name").isNull())
         {
             QVariantMap consultantMap;
@@ -1793,46 +1380,29 @@ bool Database::pullConsultations(const quint64 index)
             consultantMap["consultant_id"] = query.value("consultant_id").toULongLong();
             consultantMap["consultant_name"] = query.value("consultants.name").toString().trimmed();
             consultantMap["consultant_specialization"] = query.value("consultants.specialization").toString().trimmed();
-            consultantMap["consultation_outcome"] = query.value("consultation_outcome").toString().trimmed();
+            consultantMap["consultation_outcome"] = "";
 
-            // Converting date to jalali:
-            QDate outcomeDate = query.value("consultation_date").toDate();
+            // NOTE (SAVIZ): If Gregorian dates are available for the 'first_visit_date' and 'recent_visit_date' fields in the database, they must be converted to the Jalali calendar format before caching:
 
-            if(!outcomeDate.isNull())
+            QDate outcomeGregorianDate = query.value("consultation_outcome").toDate();
+
+            if(!outcomeGregorianDate.isNull())
             {
-                QCalendar::YearMonthDay fvdgregorianYMD(outcomeDate.year(), outcomeDate.month(), outcomeDate.day());
+                QString outcomeJaliliDateString = Date::cppInstance()->gregorianToJalali(outcomeGregorianDate);
 
-                QCalendar::YearMonthDay firstVisitDateJalili = Date::cppInstance()->gregorianToJalali(fvdgregorianYMD);
-
-                QString firstVisitDateString = QString("%1-%2-%3")
-                                                   .arg(firstVisitDateJalili.year, 4, 10, QChar('0'))
-                                                   .arg(firstVisitDateJalili.month, 2, 10, QChar('0'))
-                                                   .arg(firstVisitDateJalili.day, 2, 10, QChar('0'));
-
-                consultantMap["consultation_date"] = firstVisitDateString;
+                consultantMap["consultation_outcome"] = outcomeJaliliDateString;
             }
-
-            else
-            {
-                consultantMap["consultation_date"] = "";
-            }
-
 
             consultations.append(consultantMap);
         }
     }
 
-
-
     m_PatientDataMap["consultations"] = consultations;
 
-
-
 #ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Select operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -1840,14 +1410,12 @@ bool Database::pullConsultations(const quint64 index)
 bool Database::pullLabTests(const quint64 index)
 {
 #ifdef QT_DEBUG
-    QString message("Lab Tests pull initiated!\n");
-
-    QTextStream stream(&message);
-
-    stream << "The patient_id is: " + QString::number(index) + "\n";
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "Index :" << index;
 #endif
-
-
 
     QString queryString = R"(
         SELECT * FROM patients
@@ -1858,53 +1426,37 @@ bool Database::pullLabTests(const quint64 index)
         WHERE patients.patient_id = :patient_id
     )";
 
-
-
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
 
-
-
     query.bindValue(":patient_id", index);
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text() << "\n";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
-
-
 
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        stream << "Query returned no results.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Query returned no results.";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (false);
+        return (true);
     }
-
-
 
     QVariantList labTests;
 
-
-
     while (query.next())
     {
+        // WARNING (SAVIZ): 'LEFT JOIN' can produce 'Null' results. Therefore, we need to make sure to check against 'Null':
+
         if (!query.value("lab_id").isNull() && !query.value("labs.name").isNull())
         {
             QVariantMap labTestMap;
@@ -1912,329 +1464,131 @@ bool Database::pullLabTests(const quint64 index)
             labTestMap["lab_id"] = query.value("lab_id").toULongLong();
             labTestMap["lab_name"] = query.value("labs.name").toString().trimmed();
             labTestMap["lab_specialization"] = query.value("labs.specialization").toString().trimmed();
-            labTestMap["lab_test_outcome"] = query.value("lab_test_outcome").toString().trimmed();
+            labTestMap["lab_test_outcome"] = "";
 
-            // Converting date to jalali:
-            QDate outcomeDate = query.value("lab_test_date").toDate();
+            // NOTE (SAVIZ): If Gregorian dates are available for the 'first_visit_date' and 'recent_visit_date' fields in the database, they must be converted to the Jalali calendar format before caching:
 
-            if(!outcomeDate.isNull())
+            QDate testOutcomeGregorianDate = query.value("lab_test_outcome").toDate();
+
+            if(!testOutcomeGregorianDate.isNull())
             {
-                QCalendar::YearMonthDay fvdgregorianYMD(outcomeDate.year(), outcomeDate.month(), outcomeDate.day());
+                QString testOutcomeJaliliDateString = Date::cppInstance()->gregorianToJalali(testOutcomeGregorianDate);
 
-                QCalendar::YearMonthDay firstVisitDateJalili = Date::cppInstance()->gregorianToJalali(fvdgregorianYMD);
-
-                QString firstVisitDateString = QString("%1-%2-%3")
-                                                   .arg(firstVisitDateJalili.year, 4, 10, QChar('0'))
-                                                   .arg(firstVisitDateJalili.month, 2, 10, QChar('0'))
-                                                   .arg(firstVisitDateJalili.day, 2, 10, QChar('0'));
-
-                labTestMap["lab_test_date"] = firstVisitDateString;
+                labTestMap["lab_test_outcome"] = testOutcomeJaliliDateString;
             }
-
-            else
-            {
-                labTestMap["lab_test_date"] = "";
-            }
-
 
             labTests.append(labTestMap);
         }
     }
 
-
-
     m_PatientDataMap["labTests"] = labTests;
 
-
-
 #ifdef QT_DEBUG
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Select operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
 
 // UPDATE
-bool Database::updatePatientData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice, const QVariantList &newDiagnoses, const QString &newDiagnosisNote, const QVariantList &newTreatments, const QString &newTreatmentNote, const QVariantList &newMedicalDrugs, const QString &newMedicalDrugNote, const QVariantList &newProcedures, const QString &newProcedureNote, const QVariantList &newConsultations, const QVariantList &newLabTests)
+bool Database::updatePatientData(const QString& newFirstName, const QString& newLastName, quint32 newBirthYear, const QString& newPhoneNumber, const QString& newGender, const QString& newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString& newFirstVisitDate, const QString& newRecentVisitDate, qreal newServicePrice, const QVariantList& newDiagnoses, const QString& newDiagnosisNote, const QVariantList& newTreatments, const QString& newTreatmentNote, const QVariantList& newMedicalDrugs, const QString& newMedicalDrugNote, const QVariantList& newProcedures, const QString& newProcedureNote, const QVariantList& newConsultations, const QVariantList& newLabTests)
 {
-    if(!m_QSqlDatabase.transaction())
-    {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Failed to start transaction!");
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :";
+    qDebug() << "    newFirstName          :" << newFirstName;
+    qDebug() << "    newLastName           :" << newLastName;
+    qDebug() << "    newBirthYear          :" << newBirthYear;
+    qDebug() << "    newPhoneNumber        :" << newPhoneNumber;
+    qDebug() << "    newGender             :" << newGender;
+    qDebug() << "    newMaritalStatus      :" << newMaritalStatus;
+    qDebug() << "    newNumberOfVisits     :" << newNumberOfPreviousVisits;
+    qDebug() << "    newFirstVisitDate     :" << newFirstVisitDate;
+    qDebug() << "    newRecentVisitDate    :" << newRecentVisitDate;
+    qDebug() << "    newServicePrice       :" << newServicePrice;
+    qDebug() << "    newDiagnoses          :" << newDiagnoses;
+    qDebug() << "    newDiagnosisNote      :" << newDiagnosisNote;
+    qDebug() << "    newTreatments         :" << newTreatments;
+    qDebug() << "    newTreatmentNote      :" << newTreatmentNote;
+    qDebug() << "    newMedicalDrugs       :" << newMedicalDrugs;
+    qDebug() << "    newMedicalDrugNote    :" << newMedicalDrugNote;
+    qDebug() << "    newProcedures         :" << newProcedures;
+    qDebug() << "    newProcedureNote      :" << newProcedureNote;
+    qDebug() << "    newConsultations      :" << newConsultations;
+    qDebug() << "    newLabTests           :" << newLabTests;
 #endif
 
+    const QString prefix = "خطاهایی هنگام به‌روزرسانی اطلاعات بیمار رخ داد: ";
+    const QString suffix = " لطفاً دوباره تلاش کنید.";
 
-
-        // Notify QML:
-        emit patientDataPushed(false, "Failed to start transaction!");
-
-
+    if (!m_QSqlDatabase.transaction())
+    {
+#ifdef QT_DEBUG
+        qDebug() << "Log Output           :" << "Update operation failed! :" << "Transaction could not be started.";
+        qDebug() << "--------------------------------------------------------------------------------";
+#endif
+        emit queryExecuted(QueryType::UPDATE, false, prefix + "شروع تراکنش شکست خورد!" + suffix);
 
         return (false);
     }
 
-
-
-    bool basicDataUpdateOutcome = updateBasicData(newFirstName, newLastName, newBirthYear, newPhoneNumber, newGender, newMaritalStatus, newNumberOfPreviousVisits, newFirstVisitDate, newRecentVisitDate, newServicePrice);
-
-    bool diagnosesUpdateOutcome = updateDiagnoses(newDiagnoses);
-
-    bool treatmentsUpdateOutcome = updateTreatments(newTreatments);
-
-    bool medicalDrugsUpdateOutcome = updateMedicalDrugs(newMedicalDrugs);
-
-    bool proceduresUpdateOutcome = updateProcedures(newProcedures);
-
-    bool diagnosisNoteUpdateOutcome = updateDiagnosisNote(newDiagnosisNote);
-
-    bool treatmentNoteUpdateOutcome = updateTreatmentNote(newTreatmentNote);
-
-    bool medicalDrugNoteUpdateOutcome = updateMedicalDrugNote(newMedicalDrugNote);
-
-    bool procedureNoteUpdateOutcome = updateProcedureNote(newProcedureNote);
-
-    bool consultationsUpdateOutcome = updateConsultations(newConsultations);
-
-    bool labTestsUpdateOutcome = updateLabTests(newLabTests);
-
-
-    if(basicDataUpdateOutcome == false)
+    struct FunctionCall
     {
+        std::function<bool()> function;
+
+        QString errorMessage;
+    };
+
+    // Prepare the tasks array
+    const std::array<FunctionCall, 11> calls =
+    {{
+        { std::bind(&Database::updateBasicData, this, newFirstName, newLastName, newBirthYear, newPhoneNumber, newGender, newMaritalStatus, newNumberOfPreviousVisits, newFirstVisitDate, newRecentVisitDate, newServicePrice), "خطا در به‌روزرسانی اطلاعات اولیه بیمار" },
+        { std::bind(&Database::updateDiagnoses, this, newDiagnoses), "خطا در به‌روزرسانی تشخیص‌ها" },
+        { std::bind(&Database::updateTreatments, this, newTreatments), "خطا در به‌روزرسانی درمان‌ها" },
+        { std::bind(&Database::updateMedicalDrugs, this, newMedicalDrugs), "خطا در به‌روزرسانی داروهای بیمار" },
+        { std::bind(&Database::updateProcedures, this, newProcedures), "خطا در به‌روزرسانی اقدامات پزشکی" },
+        { std::bind(&Database::updateDiagnosisNote, this, newDiagnosisNote), "خطا در به‌روزرسانی یادداشت‌های تشخیصی" },
+        { std::bind(&Database::updateTreatmentNote, this, newTreatmentNote), "خطا در به‌روزرسانی یادداشت‌های درمانی" },
+        { std::bind(&Database::updateMedicalDrugNote, this, newMedicalDrugNote), "خطا در به‌روزرسانی یادداشت‌های دارویی" },
+        { std::bind(&Database::updateProcedureNote, this, newProcedureNote), "خطا در به‌روزرسانی یادداشت‌های مربوط به اقدامات پزشکی" },
+        { std::bind(&Database::updateConsultations, this, newConsultations), "خطا در به‌روزرسانی مشاوره‌ها" },
+        { std::bind(&Database::updateLabTests, this, newLabTests), "خطا در به‌روزرسانی آزمایش‌ها" },
+    }};
+
+    for (const auto& call : calls)
+    {
+        if (!call.function())
+        {
 #ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Basic Data update failed!");
+            qDebug() << "Log Output           :" << "Update operation failed! :" << call.errorMessage;
+            qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
+            emit queryExecuted(QueryType::UPDATE, false, prefix + call.errorMessage + suffix);
 
+            m_QSqlDatabase.rollback();
 
-        emit patientDataPushed(false, "Basic Data update failed!");
+            return (false);
+        }
+    }
 
+    if (!m_QSqlDatabase.commit())
+    {
+#ifdef QT_DEBUG
+        qDebug() << "Log Output           :" << "Update operation failed! :" << "Commit failed!";
+        qDebug() << "--------------------------------------------------------------------------------";
+#endif
 
-
-        m_QSqlDatabase.rollback();
-
-
+        emit queryExecuted(QueryType::UPDATE, false, "تأیید تغییرات شکست خورد!");
 
         return (false);
     }
 
-    if(diagnosesUpdateOutcome == false)
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Diagnoses update failed!");
-#endif
-
-
-
-        emit patientDataPushed(false, "Diagnoses update failed!");
-
-
-
-        m_QSqlDatabase.rollback();
-
-
-
-        return (false);
-    }
-
-    if(treatmentsUpdateOutcome == false)
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Treatment update failed!");
-#endif
-
-
-
-        emit patientDataPushed(false, "Treatment update failed!");
-
-
-
-        m_QSqlDatabase.rollback();
-
-
-
-        return (false);
-    }
-
-    if(medicalDrugsUpdateOutcome == false)
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Medical Drug update failed!");
-#endif
-
-
-
-        emit patientDataPushed(false, "Medical Drug update failed!");
-
-
-
-        m_QSqlDatabase.rollback();
-
-
-
-        return (false);
-    }
-
-    if(proceduresUpdateOutcome == false)
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Medical Drug update failed!");
-#endif
-
-
-
-        emit patientDataPushed(false, "procedures update failed!");
-
-
-
-        m_QSqlDatabase.rollback();
-
-
-
-        return (false);
-    }
-
-    if(diagnosisNoteUpdateOutcome == false)
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Diagnosis note update failed!");
-#endif
-
-
-
-        emit patientDataPushed(false, "Diagnosis note update failed!");
-
-
-
-        m_QSqlDatabase.rollback();
-
-
-
-        return (false);
-    }
-
-    if(treatmentNoteUpdateOutcome == false)
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Treatment note update failed!");
-#endif
-
-
-
-        emit patientDataPushed(false, "Treatment note update failed!");
-
-
-
-        m_QSqlDatabase.rollback();
-
-
-
-        return (false);
-    }
-
-    if(medicalDrugNoteUpdateOutcome == false)
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Medical Drug note update failed!");
-#endif
-
-
-
-        emit patientDataPushed(false, "Medical Drug note update failed!");
-
-
-
-        m_QSqlDatabase.rollback();
-
-
-
-        return (false);
-    }
-
-    if(procedureNoteUpdateOutcome == false)
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Procedure note update failed!");
-#endif
-
-
-
-        emit patientDataPushed(false, "Procedure note update failed!");
-
-
-
-        m_QSqlDatabase.rollback();
-
-
-
-        return (false);
-    }
-
-    if(consultationsUpdateOutcome == false)
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Consultations update failed!");
-#endif
-
-
-
-        emit patientDataPushed(false, "Consultations update failed!");
-
-
-
-        m_QSqlDatabase.rollback();
-
-
-
-        return (false);
-    }
-
-    if(labTestsUpdateOutcome == false)
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Lab Tests update failed!");
-#endif
-
-
-
-        emit patientDataPushed(false, "Lab Tests update failed!");
-
-
-
-        m_QSqlDatabase.rollback();
-
-
-
-        return (false);
-    }
-
-
-
-    bool commitSuccessful = m_QSqlDatabase.commit();
-
-    if(!commitSuccessful)
-    {
-#ifdef QT_DEBUG
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, "Commit failed!");
-#endif
-
-
-
-        // Notify QML:
-        emit patientDataPushed(true, "Commit failed!");
-
-
-
-        return (false);
-    }
-
-
-
-    // Notify QML:
-    emit patientDataPushed(true, "Data successfully pushed to database.");
-
-
+    emit queryExecuted(QueryType::UPDATE, true, "اطلاعات با موفقیت به‌روزرسانی شد.");
 
     return (true);
 }
@@ -2242,38 +1596,41 @@ bool Database::updatePatientData(const QString &newFirstName, const QString &new
 bool Database::updateBasicData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice)
 {
 #ifdef QT_DEBUG
-    QString message("Basic Data update requested!\n");
-
-    QTextStream stream(&message);
-
-    stream << "first_name                : " << newFirstName              << "\n";
-    stream << "last_name                 : " << newLastName               << "\n";
-    stream << "phone_number              : " << newPhoneNumber            << "\n";
-    stream << "birth_year                : " << newBirthYear              << "\n";
-    stream << "gender                    : " << newGender                 << "\n";
-    stream << "marital_status            : " << newMaritalStatus          << "\n";
-    stream << "number_of_previous_visits : " << newNumberOfPreviousVisits << "\n";
-    stream << "first_visit_date          : " << newFirstVisitDate         << "\n";
-    stream << "recent_visit_date         : " << newRecentVisitDate        << "\n";
-    stream << "service_price             : " << newServicePrice           << "\n";
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :";
+    qDebug() << "    newFirstName          :" << newFirstName;
+    qDebug() << "    newLastName           :" << newLastName;
+    qDebug() << "    newBirthYear          :" << newBirthYear;
+    qDebug() << "    newPhoneNumber        :" << newPhoneNumber;
+    qDebug() << "    newGender             :" << newGender;
+    qDebug() << "    newMaritalStatus      :" << newMaritalStatus;
+    qDebug() << "    newNumberOfVisits     :" << newNumberOfPreviousVisits;
+    qDebug() << "    newFirstVisitDate     :" << newFirstVisitDate;
+    qDebug() << "    newRecentVisitDate    :" << newRecentVisitDate;
+    qDebug() << "    newServicePrice       :" << newServicePrice;
 #endif
 
+    QString queryString = R"(
+        UPDATE patients SET
+        first_name = :first_name,
+        last_name = :last_name,
+        birth_year = :birth_year,
+        phone_number = :phone_number,
+        gender = :gender,
+        marital_status = :marital_status,
+        number_of_previous_visits = :number_of_previous_visits,
+        first_visit_date = :first_visit_date,
+        recent_visit_date = :recent_visit_date,
+        service_price = :service_price
 
-
-    QString queryString = "UPDATE patients SET first_name = :first_name, last_name = :last_name, birth_year = :birth_year, phone_number = :phone_number, gender = :gender, marital_status = :marital_status, number_of_previous_visits = :number_of_previous_visits, first_visit_date = :first_visit_date, recent_visit_date = :recent_visit_date, service_price = :service_price WHERE patient_id = :patient_id";
-
-
+        WHERE patient_id = :patient_id"
+    )";
 
     QSqlQuery query(m_QSqlDatabase);
     query.prepare(queryString);
-
-
-    QCalendar calendarJalali(QCalendar::System::Jalali);
-    QDate fvdJalali = QDate::fromString(newFirstVisitDate, "yyyy-MM-dd", calendarJalali);
-    QDate rvdJalali = QDate::fromString(newRecentVisitDate, "yyyy-MM-dd", calendarJalali);
-
-    qDebug() << fvdJalali.toString();
-    qDebug() << rvdJalali.toString();
 
     query.bindValue(":first_name", newFirstName);
     query.bindValue(":last_name", newLastName);
@@ -2282,50 +1639,53 @@ bool Database::updateBasicData(const QString &newFirstName, const QString &newLa
     query.bindValue(":gender", newGender);
     query.bindValue(":marital_status", newMaritalStatus);
     query.bindValue(":number_of_previous_visits", newNumberOfPreviousVisits);
-    query.bindValue(":first_visit_date", fvdJalali);
-    query.bindValue(":recent_visit_date", rvdJalali);
     query.bindValue(":service_price", newServicePrice);
     query.bindValue(":patient_id", m_PatientDataMap["patient_id"]);
 
+    // NOTE (SAVIZ): If Jalali dates are available for the 'first_visit_date' and 'recent_visit_date' arguments, they must be converted to the Gregorian calendar format before caching to the database:
 
+    QCalendar calendarJalali(QCalendar::System::Jalali);
+
+    QDate firstVisitGregorianDate;
+    firstVisitGregorianDate = QDate::fromString(newFirstVisitDate, "yyyy-MM-dd", calendarJalali);
+
+    QDate recentVisitGregorianDate;
+    recentVisitGregorianDate = QDate::fromString(newRecentVisitDate, "yyyy-MM-dd", calendarJalali);
+
+    if(firstVisitGregorianDate.isNull() || !firstVisitGregorianDate.isValid())
+    {
+        query.bindValue(":first_visit_date", QVariant(QMetaType::fromType<QDate>()));
+    }
+
+    else
+    {
+        query.bindValue(":first_visit_date", firstVisitGregorianDate);
+    }
+
+    if(recentVisitGregorianDate.isNull() || !recentVisitGregorianDate.isValid())
+    {
+        query.bindValue(":recent_visit_date", QVariant(QMetaType::fromType<QDate>()));
+    }
+
+    else
+    {
+        query.bindValue(":recent_visit_date", recentVisitGregorianDate);
+    }
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "First visit date :" << recentVisitGregorianDate.toString() << ", " << "Recent visit date :" << recentVisitGregorianDate.toString() << ", " << "Update operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
 
-
-
-    if (query.size() == 0)
-    {
 #ifdef QT_DEBUG
-        stream << "Query returned no results.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "First visit date :" << recentVisitGregorianDate.toString() << ", " << "Recent visit date :" << recentVisitGregorianDate.toString() << ", " << "Update operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
-
-        return (false);
-    }
-
-
-
-#ifdef QT_DEBUG
-    stream << "Basic Data update successful";
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
-#endif
-
-
 
     return (true);
 }
@@ -2333,103 +1693,70 @@ bool Database::updateBasicData(const QString &newFirstName, const QString &newLa
 bool Database::updateDiagnoses(const QVariantList &newDiagnoses)
 {
 #ifdef QT_DEBUG
-    QString message("Diagnoses List update requested!\n");
-
-    QTextStream stream(&message);
-
-    for (const QVariant &item : newDiagnoses)
-    {
-        stream << "diagnosis_id: " << item.toString() << "\n";
-    }
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :";
+    qDebug() << newDiagnoses;
 #endif
-
-
 
     QSqlQuery queryDelete(m_QSqlDatabase);
     queryDelete.prepare("DELETE FROM patient_diagnoses WHERE patient_id = :patient_id");
 
-
-
     queryDelete.bindValue(":patient_id", m_PatientDataMap["patient_id"].toULongLong());
-
-
 
     if (!queryDelete.exec())
     {
 #ifdef QT_DEBUG
-        stream << queryDelete.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Update operation failed! :" << queryDelete.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
 
-
-
     if (newDiagnoses.isEmpty())
     {
 #ifdef QT_DEBUG
-        stream << "Diagnoses list received is empty! Patient requires no diagnoses.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Diagnoses list is empty!";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (true); // If the list is empty, then the doctor decided to assign no diagnoses to the current patient. Technically, the operation is not a failure.
+        return (true);
     }
-
-
 
     QString queryString = "INSERT INTO patient_diagnoses (patient_id, diagnosis_id) VALUES (?, ?)";
     QSqlQuery queryInsert(m_QSqlDatabase);
 
-
     queryInsert.prepare(queryString);
-
-
 
     QVariantList patientIDs;
     QVariantList diagnosisIDs;
 
-    for (const QVariant &item : newDiagnoses)
+    for (const QVariant &newDiagnosis : newDiagnoses)
     {
         patientIDs.append(m_PatientDataMap["patient_id"].toULongLong());
-        diagnosisIDs.append(item.toULongLong());
+        diagnosisIDs.append(newDiagnosis.toULongLong());
     }
-
-
 
     queryInsert.addBindValue(patientIDs);
     queryInsert.addBindValue(diagnosisIDs);
 
-
-
     if (!queryInsert.execBatch())
     {
 #ifdef QT_DEBUG
-        stream << queryInsert.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Update operation failed! :" << queryInsert.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return false;
+        return (false);
     }
 
-
-
 #ifdef QT_DEBUG
-    stream << "Diagnoses List updated successfully!";
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Update operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -2437,103 +1764,70 @@ bool Database::updateDiagnoses(const QVariantList &newDiagnoses)
 bool Database::updateTreatments(const QVariantList &newTreatments)
 {
 #ifdef QT_DEBUG
-    QString message("Treatment List update requested!\n");
-
-    QTextStream stream(&message);
-
-    for (const QVariant &item : newTreatments)
-    {
-        stream << "treatment_id: " << item.toString() << "\n";
-    }
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :";
+    qDebug() << newTreatments;
 #endif
-
-
 
     QSqlQuery queryDelete(m_QSqlDatabase);
     queryDelete.prepare("DELETE FROM patient_treatments WHERE patient_id = :patient_id");
 
-
-
     queryDelete.bindValue(":patient_id", m_PatientDataMap["patient_id"].toULongLong());
-
-
 
     if (!queryDelete.exec())
     {
 #ifdef QT_DEBUG
-        stream << queryDelete.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Update operation failed! :" << queryDelete.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
 
-
-
     if (newTreatments.isEmpty())
     {
 #ifdef QT_DEBUG
-        stream << "Treatment list received is empty! Patient requires no treatments.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Treatment list is empty!";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (true); // If the list is empty, then the doctor decided to assign no treatments to the current patient. Technically, the operation is not a failure.
+        return (true);
     }
-
-
 
     QString queryString = "INSERT INTO patient_treatments (patient_id, treatment_id) VALUES (?, ?)";
     QSqlQuery queryInsert(m_QSqlDatabase);
 
-
     queryInsert.prepare(queryString);
-
-
 
     QVariantList patientIDs;
     QVariantList treatmentIDs;
 
-    for (const QVariant &item : newTreatments)
+    for (const QVariant &newTreatment : newTreatments)
     {
         patientIDs.append(m_PatientDataMap["patient_id"].toULongLong());
-        treatmentIDs.append(item.toULongLong());
+        treatmentIDs.append(newTreatment.toULongLong());
     }
-
-
 
     queryInsert.addBindValue(patientIDs);
     queryInsert.addBindValue(treatmentIDs);
 
-
-
     if (!queryInsert.execBatch())
     {
 #ifdef QT_DEBUG
-        stream << queryInsert.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Update operation failed! :" << queryInsert.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return false;
+        return (false);
     }
 
-
-
 #ifdef QT_DEBUG
-    stream << "Treatment List updated successfully!";
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Update operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -2541,103 +1835,70 @@ bool Database::updateTreatments(const QVariantList &newTreatments)
 bool Database::updateMedicalDrugs(const QVariantList &newMedicalDrugs)
 {
 #ifdef QT_DEBUG
-    QString message("Medical Drugs List update requested!\n");
-
-    QTextStream stream(&message);
-
-    for (const QVariant &item : newMedicalDrugs)
-    {
-        stream << "medical_drug_id: " << item.toString() << "\n";
-    }
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :";
+    qDebug() << newMedicalDrugs;
 #endif
-
-
 
     QSqlQuery queryDelete(m_QSqlDatabase);
     queryDelete.prepare("DELETE FROM patient_medical_drugs WHERE patient_id = :patient_id");
 
-
-
     queryDelete.bindValue(":patient_id", m_PatientDataMap["patient_id"].toULongLong());
-
-
 
     if (!queryDelete.exec())
     {
 #ifdef QT_DEBUG
-        stream << queryDelete.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Update operation failed! :" << queryDelete.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
 
-
-
     if (newMedicalDrugs.isEmpty())
     {
 #ifdef QT_DEBUG
-        stream << "Medical Drug list received is empty! Patient requires no medical drugs.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Medical drug list is empty!";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (true); // If the list is empty, then the doctor decided to assign no medical drugs to the current patient. Technically, the operation is not a failure.
+        return (true);
     }
-
-
 
     QString queryString = "INSERT INTO patient_medical_drugs (patient_id, medical_drug_id) VALUES (?, ?)";
     QSqlQuery queryInsert(m_QSqlDatabase);
 
-
     queryInsert.prepare(queryString);
-
-
 
     QVariantList patientIDs;
     QVariantList medicalDrugIDs;
 
-    for (const QVariant &item : newMedicalDrugs)
+    for (const QVariant &newMedicalDrug : newMedicalDrugs)
     {
         patientIDs.append(m_PatientDataMap["patient_id"].toULongLong());
-        medicalDrugIDs.append(item.toULongLong());
+        medicalDrugIDs.append(newMedicalDrug.toULongLong());
     }
-
-
 
     queryInsert.addBindValue(patientIDs);
     queryInsert.addBindValue(medicalDrugIDs);
 
-
-
     if (!queryInsert.execBatch())
     {
 #ifdef QT_DEBUG
-        stream << queryInsert.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Update operation failed! :" << queryInsert.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return false;
+        return (false);
     }
 
-
-
 #ifdef QT_DEBUG
-    stream << "Medical Drug List updated successfully!";
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Update operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -2645,103 +1906,70 @@ bool Database::updateMedicalDrugs(const QVariantList &newMedicalDrugs)
 bool Database::updateProcedures(const QVariantList &newProcedures)
 {
 #ifdef QT_DEBUG
-    QString message("procedures List update requested!\n");
-
-    QTextStream stream(&message);
-
-    for (const QVariant &item : newProcedures)
-    {
-        stream << "procedure_id: " << item.toString() << "\n";
-    }
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :";
+    qDebug() << newProcedures;
 #endif
-
-
 
     QSqlQuery queryDelete(m_QSqlDatabase);
     queryDelete.prepare("DELETE FROM patient_procedures WHERE patient_id = :patient_id");
 
-
-
     queryDelete.bindValue(":patient_id", m_PatientDataMap["patient_id"].toULongLong());
-
-
 
     if (!queryDelete.exec())
     {
 #ifdef QT_DEBUG
-        stream << queryDelete.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Update operation failed! :" << queryDelete.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
 
-
-
     if (newProcedures.isEmpty())
     {
 #ifdef QT_DEBUG
-        stream << "Procedures list received is empty! Patient requires no medical drugs.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Procedures list is empty!";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (true); // If the list is empty, then the doctor decided to assign no medical drugs to the current patient. Technically, the operation is not a failure.
+        return (true);
     }
-
-
 
     QString queryString = "INSERT INTO patient_procedures (patient_id, procedure_id) VALUES (?, ?)";
     QSqlQuery queryInsert(m_QSqlDatabase);
 
-
     queryInsert.prepare(queryString);
-
-
 
     QVariantList patientIDs;
     QVariantList procedureIDs;
 
-    for (const QVariant &item : newProcedures)
+    for (const QVariant &newProcedure : newProcedures)
     {
         patientIDs.append(m_PatientDataMap["patient_id"].toULongLong());
-        procedureIDs.append(item.toULongLong());
+        procedureIDs.append(newProcedure.toULongLong());
     }
-
-
 
     queryInsert.addBindValue(patientIDs);
     queryInsert.addBindValue(procedureIDs);
 
-
-
     if (!queryInsert.execBatch())
     {
 #ifdef QT_DEBUG
-        stream << queryInsert.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Update operation failed! :" << queryInsert.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return false;
+        return (false);
     }
 
-
-
 #ifdef QT_DEBUG
-    stream << "Procedure List updated successfully!";
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Update operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -2749,45 +1977,33 @@ bool Database::updateProcedures(const QVariantList &newProcedures)
 bool Database::updateDiagnosisNote(const QString &newNote)
 {
 #ifdef QT_DEBUG
-    QString message("Diagnosis Note update requested!\n");
-
-    QTextStream stream(&message);
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "newNote :" << newNote;
 #endif
-
-
 
     QSqlQuery query(m_QSqlDatabase);
     query.prepare("UPDATE diagnosis_notes SET note = :note WHERE patient_id = :patient_id");
 
-
-
     query.bindValue(":note", newNote);
     query.bindValue(":patient_id", m_PatientDataMap["patient_id"]);
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Update operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
 
-
-
 #ifdef QT_DEBUG
-    stream << "Diagnosis note updated successfully!";
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Update operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -2795,45 +2011,33 @@ bool Database::updateDiagnosisNote(const QString &newNote)
 bool Database::updateTreatmentNote(const QString &newNote)
 {
 #ifdef QT_DEBUG
-    QString message("Treatment Note update requested!\n");
-
-    QTextStream stream(&message);
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "newNote :" << newNote;
 #endif
-
-
 
     QSqlQuery query(m_QSqlDatabase);
     query.prepare("UPDATE treatment_notes SET note = :note WHERE patient_id = :patient_id");
 
-
-
     query.bindValue(":note", newNote);
     query.bindValue(":patient_id", m_PatientDataMap["patient_id"]);
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Update operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
 
-
-
 #ifdef QT_DEBUG
-    stream << "Treatment note updated successfully!";
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Update operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -2841,45 +2045,33 @@ bool Database::updateTreatmentNote(const QString &newNote)
 bool Database::updateMedicalDrugNote(const QString &newNote)
 {
 #ifdef QT_DEBUG
-    QString message("Medical Drug Note update requested!\n");
-
-    QTextStream stream(&message);
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "newNote :" << newNote;
 #endif
-
-
 
     QSqlQuery query(m_QSqlDatabase);
     query.prepare("UPDATE medical_drug_notes SET note = :note WHERE patient_id = :patient_id");
 
-
-
     query.bindValue(":note", newNote);
     query.bindValue(":patient_id", m_PatientDataMap["patient_id"]);
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Update operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
 
-
-
 #ifdef QT_DEBUG
-    stream << "Medical Drug note updated successfully!";
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Update operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -2887,45 +2079,33 @@ bool Database::updateMedicalDrugNote(const QString &newNote)
 bool Database::updateProcedureNote(const QString &newNote)
 {
 #ifdef QT_DEBUG
-    QString message("Procedure Note update requested!\n");
-
-    QTextStream stream(&message);
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "newNote :" << newNote;
 #endif
-
-
 
     QSqlQuery query(m_QSqlDatabase);
     query.prepare("UPDATE procedure_notes SET note = :note WHERE patient_id = :patient_id");
 
-
-
     query.bindValue(":note", newNote);
     query.bindValue(":patient_id", m_PatientDataMap["patient_id"]);
-
-
 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Update operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
 
-
-
 #ifdef QT_DEBUG
-    stream << "procedure note updated successfully!";
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Update operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -2933,121 +2113,94 @@ bool Database::updateProcedureNote(const QString &newNote)
 bool Database::updateConsultations(const QVariantList &newConsultations)
 {
 #ifdef QT_DEBUG
-    QString message("Consultations List update requested!\n");
-
-    QTextStream stream(&message);
-
-    for (const QVariant &item : newConsultations)
-    {
-        QVariantMap map = item.toMap();
-
-        stream << "consultant_id: " << map["consultant_id"].toString() << "\n";
-        stream << "consultation_date: " << map["consultation_date"].toString() << "\n";
-        stream << "consultation_outcome: " << map["consultation_outcome"].toString() << "\n";
-    }
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :";
+    qDebug() << newConsultations;
 #endif
-
-
 
     QSqlQuery queryDelete(m_QSqlDatabase);
     queryDelete.prepare("DELETE FROM patient_consultations WHERE patient_id = :patient_id");
 
-
-
     queryDelete.bindValue(":patient_id", m_PatientDataMap["patient_id"].toULongLong());
-
-
 
     if (!queryDelete.exec())
     {
 #ifdef QT_DEBUG
-        stream << queryDelete.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Update operation failed! :" << queryDelete.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
 
-
-
     if (newConsultations.isEmpty())
     {
 #ifdef QT_DEBUG
-        stream << "Consultation list received is empty! Patient requires no treatments.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Consultation list is empty!";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (true); // If the list is empty, then the doctor decided to assign no treatments to the current patient. Technically, the operation is not a failure.
+        return (true);
     }
-
-
 
     QString queryString = "INSERT INTO patient_consultations (patient_id, consultant_id, consultation_date, consultation_outcome) VALUES (?, ?, ?, ?)";
     QSqlQuery queryInsert(m_QSqlDatabase);
 
-
     queryInsert.prepare(queryString);
-
-
 
     QVariantList patientIDs;
     QVariantList consultationIDs;
     QVariantList consultationDates;
     QVariantList consultationOutcomes;
 
-    for (const QVariant &item : newConsultations)
+    for (const QVariant &newConsultation : newConsultations)
     {
-        QVariantMap map = item.toMap();
+        QVariantMap map = newConsultation.toMap();
 
         patientIDs.append(m_PatientDataMap["patient_id"].toULongLong());
         consultationIDs.append(map["consultant_id"].toULongLong());
         consultationOutcomes.append(map["consultation_outcome"].toString());
 
+        // NOTE (SAVIZ): If Jalali date is available for the 'consultation_date', it must be converted to the Gregorian calendar format before caching to the database:
+
         QCalendar calendarJalali(QCalendar::System::Jalali);
-        QDate fvdJalali = QDate::fromString(map["consultation_date"].toString(), "yyyy-MM-dd", calendarJalali);
 
-        qDebug() << fvdJalali.toString();
+        QDate consultationGregorianDate;
+        consultationGregorianDate = QDate::fromString(map["consultation_date"].toString(), "yyyy-MM-dd", calendarJalali);
 
-        consultationDates.append(fvdJalali);
+        if(consultationGregorianDate.isNull() || !consultationGregorianDate.isValid())
+        {
+            consultationDates.append(QVariant(QMetaType::fromType<QDate>()));
+        }
+
+        else
+        {
+            consultationDates.append(consultationGregorianDate);
+        }
     }
-
-
 
     queryInsert.addBindValue(patientIDs);
     queryInsert.addBindValue(consultationIDs);
     queryInsert.addBindValue(consultationDates);
     queryInsert.addBindValue(consultationOutcomes);
 
-
-
     if (!queryInsert.execBatch())
     {
 #ifdef QT_DEBUG
-        stream << queryInsert.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Update operation failed! :" << queryInsert.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return false;
+        return (false);
     }
 
-
-
 #ifdef QT_DEBUG
-    stream << "Consultation List updated successfully!";
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Update operation succeeded! :" << consultationDates;
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -3055,121 +2208,94 @@ bool Database::updateConsultations(const QVariantList &newConsultations)
 bool Database::updateLabTests(const QVariantList &newLabTests)
 {
 #ifdef QT_DEBUG
-    QString message("Lab Test List update requested!\n");
-
-    QTextStream stream(&message);
-
-    for (const QVariant &item : newLabTests)
-    {
-        QVariantMap map = item.toMap();
-
-        stream << "lab_id: " << map["lab_id"].toString() << "\n";
-        stream << "lab_test_date: " << map["lab_test_date"].toString() << "\n";
-        stream << "lab_test_outcome: " << map["lab_test_outcome"].toString() << "\n";
-    }
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :";
+    qDebug() << newLabTests;
 #endif
-
-
 
     QSqlQuery queryDelete(m_QSqlDatabase);
     queryDelete.prepare("DELETE FROM patient_lab_tests WHERE patient_id = :patient_id");
 
-
-
     queryDelete.bindValue(":patient_id", m_PatientDataMap["patient_id"].toULongLong());
-
-
 
     if (!queryDelete.exec())
     {
 #ifdef QT_DEBUG
-        stream << queryDelete.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Update operation failed! :" << queryDelete.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
         return (false);
     }
 
-
-
     if (newLabTests.isEmpty())
     {
 #ifdef QT_DEBUG
-        stream << "Lab Tests list received is empty! Patient requires no treatments.";
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Lab test list is empty!";
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return (true); // If the list is empty, then the doctor decided to assign no treatments to the current patient. Technically, the operation is not a failure.
+        return (true);
     }
-
-
 
     QString queryString = "INSERT INTO patient_lab_tests (patient_id, lab_id, lab_test_date, lab_test_outcome) VALUES (?, ?, ?, ?)";
     QSqlQuery queryInsert(m_QSqlDatabase);
 
-
     queryInsert.prepare(queryString);
 
-
-
     QVariantList patientIDs;
-    QVariantList consultationIDs;
-    QVariantList consultationDates;
-    QVariantList consultationOutcomes;
+    QVariantList labIDs;
+    QVariantList labTestDates;
+    QVariantList labTestOutcomes;
 
-    for (const QVariant &item : newLabTests)
+    for (const QVariant &newLabTest : newLabTests)
     {
-        QVariantMap map = item.toMap();
+        QVariantMap map = newLabTest.toMap();
 
         patientIDs.append(m_PatientDataMap["patient_id"].toULongLong());
-        consultationIDs.append(map["lab_id"].toULongLong());
-        consultationOutcomes.append(map["lab_test_outcome"].toString());
+        labIDs.append(map["lab_id"].toULongLong());
+        labTestOutcomes.append(map["lab_test_outcome"].toString());
+
+        // NOTE (SAVIZ): If Jalali date is available for the 'consultation_date', it must be converted to the Gregorian calendar format before caching to the database:
 
         QCalendar calendarJalali(QCalendar::System::Jalali);
-        QDate fvdJalali = QDate::fromString(map["lab_test_date"].toString(), "yyyy-MM-dd", calendarJalali);
 
-        qDebug() << fvdJalali.toString();
+        QDate labTestGregorianDate;
+        labTestGregorianDate = QDate::fromString(map["lab_test_date"].toString(), "yyyy-MM-dd", calendarJalali);
 
-        consultationDates.append(fvdJalali);
+        if(labTestGregorianDate.isNull() || !labTestGregorianDate.isValid())
+        {
+            labTestDates.append(QVariant(QMetaType::fromType<QDate>()));
+        }
+
+        else
+        {
+            labTestDates.append(labTestGregorianDate);
+        }
     }
 
-
-
     queryInsert.addBindValue(patientIDs);
-    queryInsert.addBindValue(consultationIDs);
-    queryInsert.addBindValue(consultationDates);
-    queryInsert.addBindValue(consultationOutcomes);
-
-
+    queryInsert.addBindValue(labIDs);
+    queryInsert.addBindValue(labTestDates);
+    queryInsert.addBindValue(labTestOutcomes);
 
     if (!queryInsert.execBatch())
     {
 #ifdef QT_DEBUG
-        stream << queryInsert.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Update operation failed! :" << queryInsert.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        return false;
+        return (false);
     }
 
-
-
 #ifdef QT_DEBUG
-    stream << "Lab Tests List updated successfully!";
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Update operation succeeded! :" << labTestDates;
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
-
-
 
     return (true);
 }
@@ -3178,57 +2304,39 @@ bool Database::updateLabTests(const QVariantList &newLabTests)
 bool Database::changeDeletionStatus(bool newStatus)
 {
 #ifdef QT_DEBUG
-    QString message("Deletion status change requested!\n");
-
-    QTextStream stream(&message);
+    qDebug() << "[DEBUG]";
+    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName           :" << this->objectName();
+    qDebug() << "function Information :" << Q_FUNC_INFO;
+    qDebug() << "Arguments            :" << "newStatus :" << newStatus;
 #endif
-
-
 
     QSqlQuery query(m_QSqlDatabase);
     QString queryString = "UPDATE patients SET mark_for_deletion = :newStatus WHERE patient_id = :patient_id;";
 
-
-
     query.prepare(queryString);
-
-
 
     query.bindValue(":newStatus", newStatus);
     query.bindValue(":patient_id", m_PatientDataMap["patient_id"].toULongLong());
 
-
-
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        stream << query.lastError().text();
-
-        logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+        qDebug() << "Log Output           :" << "Delete operation failed! :" << query.lastError().text();
+        qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-        emit queryExecuted(QueryType::DELETE, false, query.lastError().text());
-
-
+        emit queryExecuted(QueryType::DELETE, false, "عملیات حذف ناموفق بود!");
 
         return (false);
     }
 
-
-
 #ifdef QT_DEBUG
-    stream << "Deletion status changed successfully.";
-
-    logger::log(logger::LOG_LEVEL::DEBUG, this->objectName(), Q_FUNC_INFO, message);
+    qDebug() << "Log Output           :" << "Delete operation succeeded!";
+    qDebug() << "--------------------------------------------------------------------------------";
 #endif
 
-
-
-    emit queryExecuted(QueryType::DELETE, true, "Deletion status changed successfully.");
-
-
+    emit queryExecuted(QueryType::DELETE, true, "عملیات حذف با موفقیت انجام شد!");
 
     return (true);
 }
