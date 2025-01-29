@@ -19,7 +19,7 @@ Item {
     RowLayout {
         anchors.fill: parent
 
-        spacing: 1
+        spacing: 5
 
         Rectangle {
             Layout.fillWidth: true

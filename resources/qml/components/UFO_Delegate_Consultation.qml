@@ -6,14 +6,12 @@ import QtQuick.Layouts
 import AppTheme 1.0
 import Database 1.0
 
-// TODO: I think maybe a better way to do this, is to have a dialog or something popup and enable editing the information, and then have a edit button and have
-// the date and text field be part of the expandable. this way not only is it better to look and interact with, but we can also guarante that the action of editing is complete.
-
 Item {
     id: root
 
     property alias consultantName: text_ConsultantName.text
-    property alias consultationConductedDate: ufo_TextField_ConsultationConductDate.text
+    property alias consultantSpecialization: text_ConsultantSpecialization.text
+    property alias consultationDate: ufo_TextField_ConsultationDate.text
     property alias consultationOutcome: ufo_TextArea_Outcome.text
 
     signal removeClicked
@@ -24,7 +22,7 @@ Item {
     implicitHeight: ufo_Button_Expand.checked ? expandedHeight : collapsedHeight
 
     property int collapsedHeight: 35 // Adjust based on your collapsed layout
-    property int expandedHeight: 40 + scrollView.Layout.preferredHeight // Adjust based on expanded content
+    property int expandedHeight: 45 + scrollView.Layout.preferredHeight + ufo_TextField_ConsultationDate.height // Adjust based on expanded content
 
     ColumnLayout {
         anchors.fill: parent
@@ -34,7 +32,7 @@ Item {
         RowLayout {
             Layout.fillWidth: true
 
-            spacing: 1
+            spacing: 5
 
             UFO_Button {
                 id: ufo_Button_Expand
@@ -54,7 +52,7 @@ Item {
             }
 
             Rectangle {
-                Layout.preferredWidth: 100
+                Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
                 color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Background"])
@@ -73,15 +71,23 @@ Item {
                 }
             }
 
-            UFO_TextField {
-                id: ufo_TextField_ConsultationConductDate
-
+            Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
-                onTextEdited: {
-                    // Notify Model:
-                    root.dateChanged()
+                color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Background"])
+
+                Text {
+                    id: text_ConsultantSpecialization
+
+                    anchors.fill: parent
+                    anchors.leftMargin: 10
+
+                    verticalAlignment: Text.AlignVCenter
+
+                    color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
+                    font.pointSize: Qt.application.font.pointSize * 1
+                    elide: Text.ElideRight
                 }
             }
 
@@ -100,6 +106,22 @@ Item {
                     // Notify Model:
                     root.removeClicked()
                 }
+            }
+        }
+
+        UFO_TextField {
+            id: ufo_TextField_ConsultationDate
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            enabled: (Database.connectionStatus === true) ? true : false
+
+            visible: ufo_Button_Expand.checked
+
+            onTextChanged: {
+                // Notify Model:
+                root.dateChanged()
             }
         }
 
@@ -127,7 +149,7 @@ Item {
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                onEditingFinished: {
+                onTextChanged: {
                     // Notify Model:
                     root.outcomeChanged()
                 }

@@ -1267,17 +1267,18 @@ bool Database::pullConsultations(const quint64 index)
             consultantMap["consultant_id"] = query.value("consultant_id").toULongLong();
             consultantMap["consultant_name"] = query.value("consultants.name").toString().trimmed();
             consultantMap["consultant_specialization"] = query.value("consultants.specialization").toString().trimmed();
-            consultantMap["consultation_outcome"] = "";
+            consultantMap["consultation_outcome"] = query.value("consultation_outcome").toString().trimmed();
+            consultantMap["consultation_date"] = "";
 
             // NOTE (SAVIZ): If Gregorian dates are available for the 'first_visit_date' and 'recent_visit_date' fields in the database, they must be converted to the Jalali calendar format before caching:
 
-            QDate outcomeGregorianDate = query.value("consultation_outcome").toDate();
+            QDate outcomeGregorianDate = query.value("consultation_date").toDate();
 
             if(!outcomeGregorianDate.isNull())
             {
                 QString outcomeJaliliDateString = Date::cppInstance()->gregorianToJalali(outcomeGregorianDate);
 
-                consultantMap["consultation_outcome"] = outcomeJaliliDateString;
+                consultantMap["consultation_date"] = outcomeJaliliDateString;
             }
 
             consultations.append(consultantMap);
@@ -1345,17 +1346,18 @@ bool Database::pullLabTests(const quint64 index)
             labTestMap["lab_id"] = query.value("lab_id").toULongLong();
             labTestMap["lab_name"] = query.value("labs.name").toString().trimmed();
             labTestMap["lab_specialization"] = query.value("labs.specialization").toString().trimmed();
-            labTestMap["lab_test_outcome"] = "";
+            labTestMap["lab_test_outcome"] = query.value("lab_test_outcome").toString().trimmed();
+            labTestMap["lab_test_date"] = "";
 
             // NOTE (SAVIZ): If Gregorian dates are available for the 'first_visit_date' and 'recent_visit_date' fields in the database, they must be converted to the Jalali calendar format before caching:
 
-            QDate testOutcomeGregorianDate = query.value("lab_test_outcome").toDate();
+            QDate testOutcomeGregorianDate = query.value("lab_test_date").toDate();
 
             if(!testOutcomeGregorianDate.isNull())
             {
                 QString testOutcomeJaliliDateString = Date::cppInstance()->gregorianToJalali(testOutcomeGregorianDate);
 
-                labTestMap["lab_test_outcome"] = testOutcomeJaliliDateString;
+                labTestMap["lab_test_date"] = testOutcomeJaliliDateString;
             }
 
             labTests.append(labTestMap);

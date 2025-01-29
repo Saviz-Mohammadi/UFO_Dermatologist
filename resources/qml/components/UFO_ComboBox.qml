@@ -9,7 +9,9 @@ ComboBox {
     id: root
 
     property real dropDownTopMargin: 0
-    property alias proxyModel: proxyModel.sourceModel // Bind source model for external updates
+    property alias proxyModel: proxyModel.sourceModel
+    property bool canFilter: false
+    property real popupHeight: 250
 
     opacity: enabled ? 1.0 : 0.5
 
@@ -113,14 +115,22 @@ ComboBox {
         contentItem: ColumnLayout {
             TextInput {
                 id: filterText
-                Layout.preferredHeight: 30
+
+                Layout.preferredHeight: 25
                 Layout.fillWidth: true
+
+                Layout.leftMargin: 15
+                Layout.topMargin: 15
+
+                visible: root.canFilter
                 onTextChanged: proxyModel.filterText = text; // Update filter text
+
+                color: Qt.color(AppTheme.colors["UFO_ComboBox_Item_Text_Normal"])
             }
 
             ListView {
                 id: listView
-                Layout.preferredHeight: Math.min(contentHeight, 200)
+                Layout.preferredHeight: Math.min(contentHeight, root.popupHeight)
                 Layout.fillWidth: true
                 clip: true
                 model: root.popup.visible ? root.delegateModel : null

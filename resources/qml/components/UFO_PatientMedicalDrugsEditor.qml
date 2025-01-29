@@ -16,17 +16,17 @@ Item {
     implicitWidth: 200
     implicitHeight: ufo_GroupBox.implicitHeight
 
-    function getListOfDiagnoses() {
-        let diagnoses = [];
+    function getListOfMedicalDrugs() {
+        let medical_drugs = [];
 
         for (let index = 0; index < listModel_ListView.count; index++) {
-            diagnoses.push(listModel_ListView.get(index)["diagnosis_id"]);
+            medical_drugs.push(listModel_ListView.get(index)["medical_drug_id"]);
         }
 
-        return (diagnoses);
+        return (medical_drugs);
     }
 
-    function getDiagnosisNote() {
+    function getMedicalDrugNote() {
         return (ufo_TextArea.text.trim());
     }
 
@@ -35,7 +35,7 @@ Item {
 
         anchors.fill: parent
 
-        title: qsTr("Diagnoses")
+        title: qsTr("Medical Drugs")
         contentSpacing: 0
 
         Text {
@@ -45,7 +45,7 @@ Item {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: qsTr("موارد زیر نشان‌دهنده فهرست تشخیص‌هایی است که به بیمار اختصاص داده شده‌اند.")
+            text: qsTr("موارد زیر نشان‌دهنده فهرست داروهای پزشکی است که به بیمار اختصاص داده شده‌اند.")
 
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
@@ -73,7 +73,7 @@ Item {
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                textRole: "diagnosis_name"
+                textRole: "medical_drug_name"
 
                 canFilter: true
                 proxyModel: ListModel { id: ufo_ComboBox_Model }
@@ -89,8 +89,8 @@ Item {
 
                         ufo_ComboBox_Model.clear();
 
-                        Database.getDiagnosisList().forEach(function (diagnosis) {
-                            ufo_ComboBox_Model.append({"diagnosis_id": diagnosis["diagnosis_id"], "diagnosis_name": diagnosis["diagnosis_name"]});
+                        Database.getMedicalDrugList().forEach(function (medical_drug) {
+                            ufo_ComboBox_Model.append({"medical_drug_id": medical_drug["medical_drug_id"], "medical_drug_name": medical_drug["medical_drug_name"]});
                         });
 
                         // Set default:
@@ -135,19 +135,19 @@ Item {
 
                         sourceIndex = ufo_ComboBox.model.mapToSourceIndex(ufo_ComboBox.currentIndex);
 
-                        if (listView.model.get(index)["diagnosis_id"] === ufo_ComboBox_Model.get(sourceIndex)["diagnosis_id"]) {
+                        if (listView.model.get(index)["medical_drug_id"] === ufo_ComboBox_Model.get(sourceIndex)["medical_drug_id"]) {
                             exists = true;
                             break;
                         }
                     }
 
                     if(exists) {
-                        ufo_StatusBar.displayMessage("A diagnosis of the same type already exists.", 8000)
+                        ufo_StatusBar.displayMessage("A medical drug of the same type already exists.", 8000)
 
                         return;
                     }
 
-                    listModel_ListView.append({"diagnosis_id": ufo_ComboBox_Model.get(sourceIndex)["diagnosis_id"], "diagnosis_name": ufo_ComboBox_Model.get(sourceIndex)["diagnosis_name"]});
+                    listModel_ListView.append({"medical_drug_id": ufo_ComboBox_Model.get(sourceIndex)["medical_drug_id"], "medical_drug_name": ufo_ComboBox_Model.get(sourceIndex)["medical_drug_name"]});
                 }
             }
         }
@@ -183,10 +183,10 @@ Item {
                     policy: ScrollBar.AlwaysOn
                 }
 
-                delegate: UFO_Delegate_Diagnosis {
+                delegate: UFO_Delegate_MedicalDrug {
                     width: listView.width - scrollBar.width / 2 - 15
 
-                    diagnosisName: model["diagnosis_name"]
+                    medicalDrugName: model["medical_drug_name"]
 
                     onRemoveClicked: {
                         listModel_ListView.remove(index);
@@ -207,8 +207,8 @@ Item {
 
                         listModel_ListView.clear();
 
-                        Database.getPatientDataMap()["diagnoses"].forEach(function (diagnosis) {
-                            listModel_ListView.append({"diagnosis_id": diagnosis["diagnosis_id"], "diagnosis_name": diagnosis["diagnosis_name"]});
+                        Database.getPatientDataMap()["medicalDrugs"].forEach(function (medicalDrug) {
+                            listModel_ListView.append({"medical_drug_id": medicalDrug["medical_drug_id"], "medical_drug_name": medicalDrug["medical_drug_name"]});
                         });
                     }
                 }
@@ -271,7 +271,7 @@ Item {
                             return;
                         }
 
-                        ufo_TextArea.text = Database.getPatientDataMap()["diagnosis_note"];
+                        ufo_TextArea.text = Database.getPatientDataMap()["medical_drug_note"];
                     }
                 }
             }
