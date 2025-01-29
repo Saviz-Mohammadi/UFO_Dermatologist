@@ -64,6 +64,8 @@ UFO_Page {
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
+                horizontalAlignment: Text.AlignRight
+
                 validator: RegularExpressionValidator {
                     regularExpression: /^[\p{L}]+$/u
                 }
@@ -98,6 +100,8 @@ UFO_Page {
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
+
+                horizontalAlignment: Text.AlignRight
 
                 validator: RegularExpressionValidator {
                     regularExpression: /^[\p{L}]+$/u
@@ -134,8 +138,10 @@ UFO_Page {
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
+                horizontalAlignment: Text.AlignRight
+
                 validator: RegularExpressionValidator {
-                    regularExpression: /^[1-9]\d*$/
+                    regularExpression: /^[1-9]\d{3}$/
                 }
 
                 Connections {
@@ -171,6 +177,8 @@ UFO_Page {
                 Layout.row: 1
 
                 enabled: (Database.connectionStatus === true) ? true : false
+
+                horizontalAlignment: Text.AlignRight
 
                 validator: RegularExpressionValidator {
                     regularExpression: /^\+\d{1,3} \(\d{3}\) \d{3}-\d{4}$/

@@ -86,7 +86,6 @@ Item {
                 elide: Text.ElideRight
                 wrapMode: Text.Wrap
 
-                horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
 
                 color: Qt.rgba(0, 0, 0, 0.85)

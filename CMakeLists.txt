@@ -251,7 +251,8 @@ target_link_libraries(${EXECUTABLE_NAME}
     PRIVATE
     "Lib_AppTheme"
     "Lib_Database"
-    "Lib_Date")
+    "Lib_Date"
+    "Lib_Filter")
 
 # [[ ----------------------------------------------------------------------- ]]
 # [[ ----------------------------------------------------------------------- ]]

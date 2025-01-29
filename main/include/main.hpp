@@ -9,6 +9,7 @@
 #include "app_theme.hpp"
 #include "database.hpp"
 #include "date.hpp"
+#include "filter.hpp"
 
 
 void registerTypes();

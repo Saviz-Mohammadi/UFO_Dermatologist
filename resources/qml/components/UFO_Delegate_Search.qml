@@ -123,8 +123,10 @@ Item {
 
                         anchors.fill: parent
                         anchors.leftMargin: 10
+                        anchors.rightMargin: 10
 
                         verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignRight
 
                         color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
                         font.pixelSize: Qt.application.font.pixelSize * 1
@@ -159,8 +161,10 @@ Item {
 
                         anchors.fill: parent
                         anchors.leftMargin: 10
+                        anchors.rightMargin: 10
 
                         verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignRight
 
                         color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
                         font.pixelSize: Qt.application.font.pixelSize * 1
@@ -195,8 +199,10 @@ Item {
 
                         anchors.fill: parent
                         anchors.leftMargin: 10
+                        anchors.rightMargin: 10
 
                         verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignRight
 
                         color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
                         font.pixelSize: Qt.application.font.pixelSize * 1
@@ -231,8 +237,10 @@ Item {
 
                         anchors.fill: parent
                         anchors.leftMargin: 10
+                        anchors.rightMargin: 10
 
                         verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignRight
 
                         color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
                         font.pixelSize: Qt.application.font.pixelSize * 1
@@ -267,8 +275,10 @@ Item {
 
                         anchors.fill: parent
                         anchors.leftMargin: 10
+                        anchors.rightMargin: 10
 
                         verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignRight
 
                         color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
                         font.pixelSize: Qt.application.font.pixelSize * 1
@@ -303,8 +313,10 @@ Item {
 
                         anchors.fill: parent
                         anchors.leftMargin: 10
+                        anchors.rightMargin: 10
 
                         verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignRight
 
                         color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
                         font.pixelSize: Qt.application.font.pixelSize * 1

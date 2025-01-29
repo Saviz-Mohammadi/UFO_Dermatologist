@@ -68,6 +68,8 @@ Item {
 
                         enabled: (Database.connectionStatus === true) ? true : false
 
+                        horizontalAlignment: Text.AlignRight
+
                         validator: RegularExpressionValidator {
                             regularExpression: /^\p{Nd}+$/
                         }
@@ -91,6 +93,8 @@ Item {
                         Layout.preferredHeight: 35
 
                         enabled: (Database.connectionStatus === true) ? true : false
+
+                        horizontalAlignment: Text.AlignRight
 
                         validator: RegularExpressionValidator {
                             regularExpression: /^\+\d{1,3} \(\d{3}\) \d{3}-\d{4}$/
@@ -118,6 +122,8 @@ Item {
 
                         enabled: (Database.connectionStatus === true) ? true : false
 
+                        horizontalAlignment: Text.AlignRight
+
                         validator: RegularExpressionValidator {
                             regularExpression: /^[\p{L}]+$/u
                         }
@@ -141,6 +147,8 @@ Item {
                         Layout.preferredHeight: 35
 
                         enabled: (Database.connectionStatus === true) ? true : false
+
+                        horizontalAlignment: Text.AlignRight
 
                         validator: RegularExpressionValidator {
                             regularExpression: /^[\p{L}]+$/u
@@ -183,8 +191,10 @@ Item {
 
                             enabled: (Database.connectionStatus && ufo_CheckBox_BirthYearStart.checked)
 
+                            horizontalAlignment: Text.AlignRight
+
                             validator: RegularExpressionValidator {
-                                regularExpression: /^[1-9]\d*$/
+                                regularExpression: /^[1-9]\d{3}$/
                             }
                         }
                     }
@@ -223,8 +233,10 @@ Item {
 
                             enabled: (Database.connectionStatus && ufo_CheckBox_BirthYearEnd.checked)
 
+                            horizontalAlignment: Text.AlignRight
+
                             validator: RegularExpressionValidator {
-                                regularExpression: /^[1-9]\d*$/
+                                regularExpression: /^[1-9]\d{3}$/
                             }
                         }
                     }
@@ -382,16 +394,6 @@ Item {
                 icon.source: "./../../icons/Google icons/person_search.svg"
 
                 onClicked: {
-                    // Grab data:
-
-                    let firstName = textField_FirstName.text.trim()
-                    let lastName = textField_LastName.text.trim()
-                    let birthYearStart = parseInt(textField_BirthYearStart.text.trim(), 10);
-                    let birthYearEnd = parseInt(textField_BirthYearEnd.text.trim(), 10);
-                    let phoneNumber = textField_PhoneNumber.text
-                    let gender = comboBox_Gender.currentText
-                    let maritalStatus = comboBox_MaritalStatus.currentText
-
                     // If patient id is provided, then only search based on that:
 
                     let patientID = parseInt(textField_PatientID.text.trim(), 10);
@@ -403,26 +405,35 @@ Item {
                     }
 
                     // Grab all other data:
+                    let phoneNumber = textField_PhoneNumber.text.trim()
+                    let firstName = textField_FirstName.text.trim()
+                    let lastName = textField_LastName.text.trim()
+
+                    let birthYearStart = parseInt(textField_BirthYearStart.text.trim(), 10);
 
                     if(ufo_CheckBox_BirthYearStart.checked === false || isNaN(birthYearStart)) {
                         birthYearStart = 0
                     }
 
+                    let birthYearEnd = parseInt(textField_BirthYearEnd.text.trim(), 10);
+
                     if(ufo_CheckBox_BirthYearEnd.checked === false || isNaN(birthYearEnd)) {
                         birthYearEnd = 0
                     }
+
+                    let gender = comboBox_Gender.currentText
 
                     if(ufo_CheckBox_Gender.checked === false) {
                         gender = ""
                     }
 
+                    let maritalStatus = comboBox_MaritalStatus.currentText
+
                     if(ufo_CheckBox_MaritalStatus.checked === false) {
                         maritalStatus = ""
                     }
 
-                    // If all other data is invalid, then don't perform search:
-
-                    let isInvalid = ;
+                    let isInvalid = phoneNumber === "" && firstName === "" && lastName === "" && birthYearStart === 0 && birthYearEnd === 0 && gender === "" && maritalStatus === "";
 
                     if(isInvalid) {
                         return;

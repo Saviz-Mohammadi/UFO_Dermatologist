@@ -8,7 +8,7 @@
 
 Database *Database::m_Instance = Q_NULLPTR;
 
-// Constructors, Initializers, Destructor
+// Constructors, Initializers, Destructor *
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 
@@ -28,26 +28,18 @@ Database::Database(QObject *parent, const QString &name)
     this->setObjectName(name);
 
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "None";
-    qDebug() << "Log Output           :" << "List of SQL drivers: " << QSqlDatabase::drivers().join(", ");
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
+    qDebug() << "Log Output :" << "List of SQL drivers: " << QSqlDatabase::drivers().join(", ");
 #endif
 }
 
 Database::~Database()
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "None";
-    qDebug() << "Log Output           :" << "None";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
+    qDebug() << "Log Output :" << "None";
 #endif
 
     // Shutdown.
@@ -91,23 +83,19 @@ Database *Database::cppInstance(QObject *parent)
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 
-// CONNECTIONS
+// CONNECTIONS *
 bool Database::establishConnection(const QString &ipAddress, qint16 port, const QString &schema, const QString &username, const QString &password)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "IpAddress :" << ipAddress << ", " << "Port :" << port << ", " << "Schema :" << schema << ", " << "Username :" << username << ", " << "Password :" << password;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "IpAddress :" << ipAddress << ", " << "Port :" << port << ", " << "Schema :" << schema << ", " << "Username :" << username << ", " << "Password :" << password;
 #endif
 
     // Connection exists, abort operation.
     if (m_ConnectionStatus == true)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Connection exists. Aborting operation.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Connection exists. Aborting operation.";
 #endif
 
         m_ConnectionStatus = true;
@@ -131,8 +119,7 @@ bool Database::establishConnection(const QString &ipAddress, qint16 port, const 
     if (connectionFailed)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Connection failed!" << "\n" << m_QSqlDatabase.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Connection failed!" << "\n" << m_QSqlDatabase.lastError().text();
 #endif
 
         m_ConnectionStatus = false;
@@ -185,8 +172,7 @@ bool Database::establishConnection(const QString &ipAddress, qint16 port, const 
     if(!failedOperations.isEmpty())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Population failed!";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Population failed!";
 #endif
 
         m_ConnectionStatus = false;
@@ -198,8 +184,7 @@ bool Database::establishConnection(const QString &ipAddress, qint16 port, const 
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Connection established!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Connection established!";
 #endif
 
     m_ConnectionStatus = true;
@@ -213,19 +198,15 @@ bool Database::establishConnection(const QString &ipAddress, qint16 port, const 
 bool Database::disconnectFromDatabase()
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "None";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
 #endif
 
     // Connection does not exist, abort operation.
     if (m_ConnectionStatus == false)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Connection does not exist. Aborting operation.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Connection does not exist. Aborting operation.";
 #endif
 
         m_ConnectionStatus = false;
@@ -240,8 +221,7 @@ bool Database::disconnectFromDatabase()
 
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Closing the database connection...";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Closing the database connection...";
 #endif
 
     m_ConnectionStatus = false;
@@ -252,15 +232,12 @@ bool Database::disconnectFromDatabase()
     return (true);
 }
 
-// INSERT
+// INSERT *
 bool Database::createPatient(const QString &firstName, const QString &lastName, quint32 birthYear, const QString &phoneNumber, const QString &gender, const QString &maritalStatus)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "First name :" << firstName << ", " << "Last name :" << lastName << ", " << "Phone number :" << phoneNumber << ", " << "Birth year :" << birthYear << ", " << "Gender :" << gender << ", " << "Marital status :" << maritalStatus;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "First name :" << firstName << ", " << "Last name :" << lastName << ", " << "Phone number :" << phoneNumber << ", " << "Birth year :" << birthYear << ", " << "Gender :" << gender << ", " << "Marital status :" << maritalStatus;
 #endif
 
     QString queryString = R"(
@@ -283,8 +260,7 @@ bool Database::createPatient(const QString &firstName, const QString &lastName, 
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << query.lastError().text();
 #endif
 
         emit queryExecuted(QueryType::CREATE, false, "در حین عملیات مشکلی پیش آمد: " + query.lastError().text());
@@ -306,8 +282,7 @@ bool Database::createPatient(const QString &firstName, const QString &lastName, 
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Record insertion succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Record insertion succeeded!";
 #endif
 
     // Notify QML:
@@ -316,15 +291,12 @@ bool Database::createPatient(const QString &firstName, const QString &lastName, 
     return (true);
 }
 
-// SEARCH
+// SEARCH *
 bool Database::findPatient(const quint64 patientID)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "Patient ID :" << patientID;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "Patient ID :" << patientID;
 #endif
 
     QString queryString = "SELECT * FROM patients WHERE patient_id = :patient_id";
@@ -339,8 +311,7 @@ bool Database::findPatient(const quint64 patientID)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Search error occured :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Search error occured :" << query.lastError().text();
 #endif
 
         // Notify QML:
@@ -352,8 +323,7 @@ bool Database::findPatient(const quint64 patientID)
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Query returned no results.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
         // Notify QML:
@@ -379,8 +349,7 @@ bool Database::findPatient(const quint64 patientID)
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Search operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Search operation succeeded!";
 #endif
 
     // Notify QML:
@@ -392,11 +361,8 @@ bool Database::findPatient(const quint64 patientID)
 bool Database::findPatient(const QString &firstName, const QString &lastName, quint32 birthYearStart, quint32 birthYearEnd, const QString &phoneNumber, const QString &gender, const QString &maritalStatus)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "First name :" << firstName << ", " << "Last name :" << lastName << ", " << "Birth year start :" << birthYearStart << ", " << "Birth year end :" << birthYearEnd << ", " << "Phone number :" << phoneNumber << ", " << "Gender :" << gender << ", " << "Marital status :" << maritalStatus;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "First name :" << firstName << ", " << "Last name :" << lastName << ", " << "Birth year start :" << birthYearStart << ", " << "Birth year end :" << birthYearEnd << ", " << "Phone number :" << phoneNumber << ", " << "Gender :" << gender << ", " << "Marital status :" << maritalStatus;
 #endif
 
     QString queryString = "SELECT * FROM patients WHERE 1 = 1";
@@ -479,8 +445,7 @@ bool Database::findPatient(const QString &firstName, const QString &lastName, qu
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Search operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Search operation failed! :" << query.lastError().text();
 #endif
 
         // Notify QML:
@@ -492,8 +457,7 @@ bool Database::findPatient(const QString &firstName, const QString &lastName, qu
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Query returned no results.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
         // Notify QML:
@@ -519,8 +483,7 @@ bool Database::findPatient(const QString &firstName, const QString &lastName, qu
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Search operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Search operation succeeded!";
 #endif
 
     // Notify QML:
@@ -532,11 +495,8 @@ bool Database::findPatient(const QString &firstName, const QString &lastName, qu
 bool Database::findFirstXPatients(const quint64 count)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "Count :" << count;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "Count :" << count;
 #endif
 
     QString queryString = "SELECT * FROM patients ORDER BY patient_id ASC LIMIT :count";
@@ -551,8 +511,7 @@ bool Database::findFirstXPatients(const quint64 count)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Search operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Search operation failed! :" << query.lastError().text();
 #endif
 
         // Notify QML:
@@ -564,8 +523,7 @@ bool Database::findFirstXPatients(const quint64 count)
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Query returned no results.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
         // Notify QML:
@@ -591,8 +549,7 @@ bool Database::findFirstXPatients(const quint64 count)
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Search operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Search operation succeeded!";
 #endif
 
     // Notify QML:
@@ -604,11 +561,8 @@ bool Database::findFirstXPatients(const quint64 count)
 bool Database::findLastXPatients(const quint64 count)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "Count :" << count;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "Count :" << count;
 #endif
 
     QString queryString = "SELECT * FROM patients ORDER BY patient_id DESC LIMIT :count";
@@ -623,8 +577,7 @@ bool Database::findLastXPatients(const quint64 count)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Search operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Search operation failed! :" << query.lastError().text();
 #endif
 
         // Notify QML:
@@ -636,8 +589,7 @@ bool Database::findLastXPatients(const quint64 count)
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Query returned no results.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
         // Notify QML:
@@ -663,8 +615,7 @@ bool Database::findLastXPatients(const quint64 count)
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Search operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Search operation succeeded!";
 #endif
 
     // Notify QML:
@@ -677,11 +628,8 @@ bool Database::findLastXPatients(const quint64 count)
 bool Database::pullPatientData(const quint64 index)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "Index :" << index;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "Index :" << index;
 #endif
 
     struct FunctionCall
@@ -716,8 +664,7 @@ bool Database::pullPatientData(const quint64 index)
             QString fullMessage = prefix + call.errorMessage + suffix;
 
 #ifdef QT_DEBUG
-            qDebug() << "Log Output           :" << "Select operation failed! : " << call.errorMessage;
-            qDebug() << "--------------------------------------------------------------------------------";
+            qDebug() << "Log Output :" << "Select operation failed! : " << call.errorMessage;
 #endif
 
             emit queryExecuted(QueryType::SELECT, false, fullMessage);
@@ -727,8 +674,7 @@ bool Database::pullPatientData(const quint64 index)
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Select operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
     emit queryExecuted(QueryType::SELECT, true, "اطلاعات بیمار با موفقیت از پایگاه داده دریافت شد.");
@@ -739,11 +685,8 @@ bool Database::pullPatientData(const quint64 index)
 bool Database::pullPatientBasicData(const quint64 index)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "Index :" << index;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "Index :" << index;
 #endif
 
     QString queryString = R"(
@@ -760,8 +703,7 @@ bool Database::pullPatientBasicData(const quint64 index)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
         return (false);
@@ -770,8 +712,7 @@ bool Database::pullPatientBasicData(const quint64 index)
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Query returned no results.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
         return (true);
@@ -814,8 +755,7 @@ bool Database::pullPatientBasicData(const quint64 index)
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Select operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
     return (true);
@@ -824,11 +764,8 @@ bool Database::pullPatientBasicData(const quint64 index)
 bool Database::pullPatientDiagnoses(const quint64 index)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "Index :" << index;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "Index :" << index;
 #endif
 
     QString queryString = R"(
@@ -848,8 +785,7 @@ bool Database::pullPatientDiagnoses(const quint64 index)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
         return (false);
@@ -858,8 +794,7 @@ bool Database::pullPatientDiagnoses(const quint64 index)
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Query returned no results.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
         return (true);
@@ -885,8 +820,7 @@ bool Database::pullPatientDiagnoses(const quint64 index)
     m_PatientDataMap["diagnoses"] = diagnoses;
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Select operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
     return (true);
@@ -895,11 +829,8 @@ bool Database::pullPatientDiagnoses(const quint64 index)
 bool Database::pullPatientTreatments(const quint64 index)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "Index :" << index;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "Index :" << index;
 #endif
 
     QString queryString = R"(
@@ -919,8 +850,7 @@ bool Database::pullPatientTreatments(const quint64 index)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
         return (false);
@@ -929,8 +859,7 @@ bool Database::pullPatientTreatments(const quint64 index)
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Query returned no results.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
         return (true);
@@ -956,8 +885,7 @@ bool Database::pullPatientTreatments(const quint64 index)
     m_PatientDataMap["treatments"] = treatments;
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Select operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
     return (true);
@@ -966,11 +894,8 @@ bool Database::pullPatientTreatments(const quint64 index)
 bool Database::pullPatientMedicalDrugs(const quint64 index)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "Index :" << index;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "Index :" << index;
 #endif
 
     QString queryString = R"(
@@ -990,8 +915,7 @@ bool Database::pullPatientMedicalDrugs(const quint64 index)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
         return (false);
@@ -1000,8 +924,7 @@ bool Database::pullPatientMedicalDrugs(const quint64 index)
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Query returned no results.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
         return (true);
@@ -1027,8 +950,7 @@ bool Database::pullPatientMedicalDrugs(const quint64 index)
     m_PatientDataMap["medicalDrugs"] = medicalDrugs;
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Select operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
     return (true);
@@ -1037,11 +959,8 @@ bool Database::pullPatientMedicalDrugs(const quint64 index)
 bool Database::pullPatientProcedures(const quint64 index)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "Index :" << index;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "Index :" << index;
 #endif
 
     QString queryString = R"(
@@ -1061,8 +980,7 @@ bool Database::pullPatientProcedures(const quint64 index)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
         return (false);
@@ -1071,8 +989,7 @@ bool Database::pullPatientProcedures(const quint64 index)
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Query returned no results.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
         return (true);
@@ -1098,8 +1015,7 @@ bool Database::pullPatientProcedures(const quint64 index)
     m_PatientDataMap["procedures"] = procedures;
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Select operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
     return (true);
@@ -1108,11 +1024,8 @@ bool Database::pullPatientProcedures(const quint64 index)
 bool Database::pullDiagnosisNote(const quint64 index)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "Index :" << index;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "Index :" << index;
 #endif
 
     QString queryString = R"(
@@ -1129,8 +1042,7 @@ bool Database::pullDiagnosisNote(const quint64 index)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
         return (false);
@@ -1139,8 +1051,7 @@ bool Database::pullDiagnosisNote(const quint64 index)
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Query returned no results.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
         return (true);
@@ -1152,8 +1063,7 @@ bool Database::pullDiagnosisNote(const quint64 index)
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Select operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
     return (true);
@@ -1162,11 +1072,8 @@ bool Database::pullDiagnosisNote(const quint64 index)
 bool Database::pullTreatmentNote(const quint64 index)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "Index :" << index;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "Index :" << index;
 #endif
 
     QString queryString = R"(
@@ -1183,8 +1090,7 @@ bool Database::pullTreatmentNote(const quint64 index)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
         return (false);
@@ -1193,8 +1099,7 @@ bool Database::pullTreatmentNote(const quint64 index)
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Query returned no results.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
         return (true);
@@ -1206,8 +1111,7 @@ bool Database::pullTreatmentNote(const quint64 index)
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Select operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
     return (true);
@@ -1216,11 +1120,8 @@ bool Database::pullTreatmentNote(const quint64 index)
 bool Database::pullMedicalDrugNote(const quint64 index)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "Index :" << index;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "Index :" << index;
 #endif
 
     QString queryString = R"(
@@ -1237,8 +1138,7 @@ bool Database::pullMedicalDrugNote(const quint64 index)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
         return (false);
@@ -1247,8 +1147,7 @@ bool Database::pullMedicalDrugNote(const quint64 index)
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Query returned no results.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
         return (true);
@@ -1260,8 +1159,7 @@ bool Database::pullMedicalDrugNote(const quint64 index)
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Select operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
     return (true);
@@ -1270,11 +1168,8 @@ bool Database::pullMedicalDrugNote(const quint64 index)
 bool Database::pullProcedureNote(const quint64 index)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "Index :" << index;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "Index :" << index;
 #endif
 
     QString queryString = R"(
@@ -1291,8 +1186,7 @@ bool Database::pullProcedureNote(const quint64 index)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
         return (false);
@@ -1301,8 +1195,7 @@ bool Database::pullProcedureNote(const quint64 index)
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Query returned no results.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
         return (true);
@@ -1314,8 +1207,7 @@ bool Database::pullProcedureNote(const quint64 index)
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Select operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
     return (true);
@@ -1324,11 +1216,8 @@ bool Database::pullProcedureNote(const quint64 index)
 bool Database::pullConsultations(const quint64 index)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "Index :" << index;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "Index :" << index;
 #endif
 
     QString queryString = R"(
@@ -1350,8 +1239,7 @@ bool Database::pullConsultations(const quint64 index)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
         return (false);
@@ -1360,8 +1248,7 @@ bool Database::pullConsultations(const quint64 index)
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Query returned no results.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
         return (true);
@@ -1400,8 +1287,7 @@ bool Database::pullConsultations(const quint64 index)
     m_PatientDataMap["consultations"] = consultations;
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Select operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
     return (true);
@@ -1410,11 +1296,8 @@ bool Database::pullConsultations(const quint64 index)
 bool Database::pullLabTests(const quint64 index)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "Index :" << index;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "Index :" << index;
 #endif
 
     QString queryString = R"(
@@ -1434,8 +1317,7 @@ bool Database::pullLabTests(const quint64 index)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Select operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
         return (false);
@@ -1444,8 +1326,7 @@ bool Database::pullLabTests(const quint64 index)
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Query returned no results.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
         return (true);
@@ -1484,8 +1365,7 @@ bool Database::pullLabTests(const quint64 index)
     m_PatientDataMap["labTests"] = labTests;
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Select operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
     return (true);
@@ -2348,18 +2228,15 @@ bool Database::changeDeletionStatus(bool newStatus)
 
 
 
-// PRIVATE Methods
+// PRIVATE Methods *
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 
 QPair<bool, QString> Database::populateDiagnosisList()
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "None";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
 #endif
 
     QString queryString = "SELECT * FROM diagnoses WHERE is_active = TRUE";
@@ -2370,8 +2247,7 @@ QPair<bool, QString> Database::populateDiagnosisList()
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Population failed!" << "\n" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Population failed!" << "\n" << query.lastError().text();
 #endif
 
         return QPair<bool, QString>(false, query.lastError().text());
@@ -2380,8 +2256,7 @@ QPair<bool, QString> Database::populateDiagnosisList()
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Population succeeded!";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Population succeeded!";
 #endif
 
         // NOTE (SAVIZ): Technically, the specialist might have chosen not to provide a list of diagnoses yet.
@@ -2401,8 +2276,7 @@ QPair<bool, QString> Database::populateDiagnosisList()
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Population succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Population succeeded!";
 #endif
 
     return QPair<bool, QString>(true, "");
@@ -2411,11 +2285,8 @@ QPair<bool, QString> Database::populateDiagnosisList()
 QPair<bool, QString> Database::populateTreatmentList()
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "None";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
 #endif
 
     QString queryString = "SELECT * FROM treatments WHERE is_active = TRUE";
@@ -2426,8 +2297,7 @@ QPair<bool, QString> Database::populateTreatmentList()
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Population failed!" << "\n" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Population failed!" << "\n" << query.lastError().text();
 #endif
 
         return QPair<bool, QString>(false, query.lastError().text());
@@ -2436,8 +2306,7 @@ QPair<bool, QString> Database::populateTreatmentList()
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Population succeeded!";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Population succeeded!";
 #endif
 
         // NOTE (SAVIZ): Technically, the specialist might have chosen not to provide a list of treatments yet.
@@ -2457,8 +2326,7 @@ QPair<bool, QString> Database::populateTreatmentList()
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Population succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Population succeeded!";
 #endif
 
     return QPair<bool, QString>(true, "");
@@ -2467,11 +2335,8 @@ QPair<bool, QString> Database::populateTreatmentList()
 QPair<bool, QString> Database::populateMedicalDrugList()
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "None";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
 #endif
 
     QString queryString = "SELECT * FROM medical_drugs WHERE is_active = TRUE";
@@ -2482,8 +2347,7 @@ QPair<bool, QString> Database::populateMedicalDrugList()
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Population failed!" << "\n" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Population failed!" << "\n" << query.lastError().text();
 #endif
 
         return QPair<bool, QString>(false, query.lastError().text());
@@ -2492,8 +2356,7 @@ QPair<bool, QString> Database::populateMedicalDrugList()
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Population succeeded!";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Population succeeded!";
 #endif
 
         // NOTE (SAVIZ): Technically, the specialist might have chosen not to provide a list of medical drugs yet.
@@ -2513,8 +2376,7 @@ QPair<bool, QString> Database::populateMedicalDrugList()
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Population succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Population succeeded!";
 #endif
 
     return QPair<bool, QString>(true, "");
@@ -2523,11 +2385,8 @@ QPair<bool, QString> Database::populateMedicalDrugList()
 QPair<bool, QString> Database::populateProcedureList()
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "None";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
 #endif
 
     QString queryString = "SELECT * FROM procedures WHERE is_active = TRUE";
@@ -2538,8 +2397,7 @@ QPair<bool, QString> Database::populateProcedureList()
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Population failed!" << "\n" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Population failed!" << "\n" << query.lastError().text();
 #endif
 
         return QPair<bool, QString>(false, query.lastError().text());
@@ -2548,8 +2406,7 @@ QPair<bool, QString> Database::populateProcedureList()
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Population succeeded!";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Population succeeded!";
 #endif
 
         // NOTE (SAVIZ): Technically, the specialist might have chosen not to provide a list of procedures yet.
@@ -2569,8 +2426,7 @@ QPair<bool, QString> Database::populateProcedureList()
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Population succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Population succeeded!";
 #endif
 
     return QPair<bool, QString>(true, "");
@@ -2579,11 +2435,8 @@ QPair<bool, QString> Database::populateProcedureList()
 QPair<bool, QString> Database::populateConsultantList()
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "None";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
 #endif
 
     QString queryString = "SELECT * FROM consultants WHERE is_active = TRUE";
@@ -2594,8 +2447,7 @@ QPair<bool, QString> Database::populateConsultantList()
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Population failed!" << "\n" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Population failed!" << "\n" << query.lastError().text();
 #endif
 
         return QPair<bool, QString>(false, query.lastError().text());
@@ -2604,8 +2456,7 @@ QPair<bool, QString> Database::populateConsultantList()
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Population succeeded!";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Population succeeded!";
 #endif
 
         // NOTE (SAVIZ): Technically, the specialist might have chosen not to provide a list of consultants yet.
@@ -2626,8 +2477,7 @@ QPair<bool, QString> Database::populateConsultantList()
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Population succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Population succeeded!";
 #endif
 
     return QPair<bool, QString>(true, "");
@@ -2636,11 +2486,8 @@ QPair<bool, QString> Database::populateConsultantList()
 QPair<bool, QString> Database::populateLabList()
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "None";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
 #endif
 
     QString queryString = "SELECT * FROM labs WHERE is_active = TRUE";
@@ -2651,8 +2498,7 @@ QPair<bool, QString> Database::populateLabList()
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Population failed!" << "\n" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Population failed!" << "\n" << query.lastError().text();
 #endif
 
         return QPair<bool, QString>(false, query.lastError().text());
@@ -2661,8 +2507,7 @@ QPair<bool, QString> Database::populateLabList()
     if (query.size() == 0)
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Population succeeded!";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Population succeeded!";
 #endif
 
         // NOTE (SAVIZ): Technically, the specialist might have chosen not to provide a list of labs yet.
@@ -2683,8 +2528,7 @@ QPair<bool, QString> Database::populateLabList()
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Population succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Population succeeded!";
 #endif
 
     return QPair<bool, QString>(true, "");
@@ -2697,7 +2541,7 @@ QPair<bool, QString> Database::populateLabList()
 
 
 
-// PUBLIC Getters
+// PUBLIC Getters *
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 

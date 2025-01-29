@@ -6,6 +6,8 @@
 
 int main(int argc, char *argv[])
 {
+    qSetMessagePattern("%{function} (Line: %{line}) >> %{message}");
+
     QGuiApplication application(argc, argv);
     QQmlApplicationEngine engine;
 
@@ -42,6 +44,7 @@ void registerTypes()
     qmlRegisterSingletonType<AppTheme>("AppTheme", 1, 0, "AppTheme", &AppTheme::qmlInstance);
     qmlRegisterSingletonType<Database>("Database", 1, 0, "Database", &Database::qmlInstance);
     qmlRegisterSingletonType<Date>("Date", 1, 0, "Date", &Date::qmlInstance);
+    qmlRegisterType<CustomProxyModel>("CustomProxyModel", 1, 0, "CustomProxyModel");
 }
 
 void setupThemeSystem()

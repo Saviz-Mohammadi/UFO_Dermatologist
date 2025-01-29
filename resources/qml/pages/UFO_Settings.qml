@@ -319,7 +319,6 @@ UFO_Page {
                     ufo_OperationResult.state = true;
                     ufo_OperationResult.displayMessage(message, 8000);
 
-
                     return;
                 }
 
@@ -328,7 +327,6 @@ UFO_Page {
                     ufo_OperationResult.svg = "./../../icons/Google icons/error.svg";
                     ufo_OperationResult.state = false;
                     ufo_OperationResult.displayMessage(message, 8000);
-
 
                     return;
                 }
