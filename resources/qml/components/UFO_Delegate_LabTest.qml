@@ -10,9 +10,9 @@ Item {
     id: root
 
     property alias labName: text_LabName.text
-    property alias labType: text_LabType.text
-    property alias labTestConductedDate: ufo_TextField_LabTestConductDate.text
-    property alias labTestOutcome: ufo_TextArea_Outcome.text
+    property alias labSpecialization: text_LabSpecialization.text
+    property alias labTestDate: ufo_TextField_LabTestDate.text
+    property alias labTestOutcome: ufo_TextArea_LabTestOutcome.text
 
     signal removeClicked
     signal dateChanged
@@ -22,17 +22,17 @@ Item {
     implicitHeight: ufo_Button_Expand.checked ? expandedHeight : collapsedHeight
 
     property int collapsedHeight: 35 // Adjust based on your collapsed layout
-    property int expandedHeight: 40 + scrollView.Layout.preferredHeight // Adjust based on expanded content
+    property int expandedHeight: 45 + scrollView.Layout.preferredHeight + ufo_TextField_LabTestDate.height // Adjust based on expanded content
 
     ColumnLayout {
         anchors.fill: parent
 
-        spacing: 10
+        spacing: 5
 
         RowLayout {
             Layout.fillWidth: true
 
-            spacing: 1
+            spacing: 5
 
             UFO_Button {
                 id: ufo_Button_Expand
@@ -52,7 +52,7 @@ Item {
             }
 
             Rectangle {
-                Layout.preferredWidth: 100
+                Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
                 color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Background"])
@@ -72,13 +72,13 @@ Item {
             }
 
             Rectangle {
-                Layout.preferredWidth: 100
+                Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
                 color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Background"])
 
                 Text {
-                    id: text_LabType
+                    id: text_LabSpecialization
 
                     anchors.fill: parent
                     anchors.leftMargin: 10
@@ -88,18 +88,6 @@ Item {
                     color: Qt.color(AppTheme.colors["UFO_Delegate_Field_Text"])
                     font.pointSize: Qt.application.font.pointSize * 1
                     elide: Text.ElideRight
-                }
-            }
-
-            UFO_TextField {
-                id: ufo_TextField_LabTestConductDate
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                onTextEdited: {
-                    // Notify Model:
-                    root.dateChanged()
                 }
             }
 
@@ -118,6 +106,22 @@ Item {
                     // Notify Model:
                     root.removeClicked()
                 }
+            }
+        }
+
+        UFO_TextField {
+            id: ufo_TextField_LabTestDate
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            enabled: (Database.connectionStatus === true) ? true : false
+
+            visible: ufo_Button_Expand.checked
+
+            onTextChanged: {
+                // Notify Model:
+                root.dateChanged()
             }
         }
 
@@ -141,11 +145,11 @@ Item {
             }
 
             UFO_TextArea {
-                id: ufo_TextArea_Outcome
+                id: ufo_TextArea_LabTestOutcome
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                onEditingFinished: {
+                onTextChanged: {
                     // Notify Model:
                     root.outcomeChanged()
                 }

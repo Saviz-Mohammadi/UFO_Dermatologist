@@ -16,20 +16,20 @@ Item {
     implicitWidth: 200
     implicitHeight: ufo_GroupBox.implicitHeight
 
-    function getListOfConsultations() {
-        let consultations = [];
+    function getListOfLabTests() {
+        let labTests = [];
 
         for (let index = 0; index < listModel_ListView.count; index++) {
             let item = listModel_ListView.get(index);
 
-            consultations.push({
-                consultant_id: item.consultant_id,
-                consultation_date: item.consultation_date,
-                consultation_outcome: item.consultation_outcome
+            labTests.push({
+                lab_id: item.lab_id,
+                lab_test_date: item.lab_test_date,
+                lab_test_outcome: item.lab_test_outcome
             });
         }
 
-        return (consultations);
+        return (labTests);
     }
 
     UFO_GroupBox {
@@ -37,7 +37,7 @@ Item {
 
         anchors.fill: parent
 
-        title: qsTr("Consultations")
+        title: qsTr("Lab Tests")
         contentSpacing: 0
 
         Text {
@@ -47,7 +47,7 @@ Item {
             Layout.leftMargin: 15
             Layout.rightMargin: 15
 
-            text: qsTr("عبارت زیر فهرست مشاوره‌های اختصاص داده شده به بیمار را نشان می‌دهد.")
+            text: qsTr("عبارت زیر لیست آزمایش‌های تعیین‌شده برای بیمار را نشان می‌دهد.")
 
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
@@ -68,17 +68,17 @@ Item {
             spacing: 3
 
             UFO_ComboBox {
-                id: ufo_ComboBox_ConsultantName
+                id: ufo_ComboBox_LabName
 
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
-                textRole: "consultant_name"
+                textRole: "lab_name"
 
                 canFilter: true
-                proxyModel: ListModel { id: listModel_ComboBox_ConsultantName }
+                proxyModel: ListModel { id: listModel_ComboBox_LabName }
 
                 Connections {
                     target: Database
@@ -89,14 +89,14 @@ Item {
                             return;
                         }
 
-                        listModel_ComboBox_ConsultantName.clear();
+                        listModel_ComboBox_LabName.clear();
 
-                        Database.getConsultantList().forEach(function (consultant) {
-                            listModel_ComboBox_ConsultantName.append({"consultant_id": consultant["consultant_id"], "consultant_name": consultant["consultant_name"], "consultant_specialization": consultant["consultant_specialization"]});
+                        Database.getLabList().forEach(function (lab) {
+                            listModel_ComboBox_LabName.append({"lab_id": lab["lab_id"], "lab_name": lab["lab_name"], "lab_specialization": lab["lab_specialization"]});
                         });
 
                         // Set default:
-                        ufo_ComboBox_ConsultantName.currentIndex = 0;
+                        ufo_ComboBox_LabName.currentIndex = 0;
                     }
                 }
 
@@ -112,13 +112,13 @@ Item {
                             return;
                         }
 
-                        ufo_ComboBox_ConsultantName.currentIndex = 0;
+                        ufo_ComboBox_LabName.currentIndex = 0;
                     }
                 }
             }
 
             UFO_ComboBox {
-                id: ufo_ComboBox_ConsultantSpecialization
+                id: ufo_ComboBox_LabSpecialization
 
                 Layout.fillWidth: true
                 Layout.preferredHeight: 35
@@ -148,28 +148,28 @@ Item {
                             return;
                         }
 
-                        ufo_ComboBox_ConsultantSpecialization.currentIndex = 0;
+                        ufo_ComboBox_LabSpecialization.currentIndex = 0;
                     }
                 }
 
                 onActivated: {
-                    listModel_ComboBox_ConsultantName.clear();
+                    listModel_ComboBox_LabName.clear();
 
-                    if(ufo_ComboBox_ConsultantSpecialization.currentText === "All") {
-                        Database.getConsultantList().forEach(function (consultant) {
-                            listModel_ComboBox_ConsultantName.append({"consultant_id": consultant["consultant_id"], "consultant_name": consultant["consultant_name"], "consultant_specialization": consultant["consultant_specialization"]});
+                    if(ufo_ComboBox_LabSpecialization.currentText === "All") {
+                        Database.getLabList().forEach(function (lab) {
+                            listModel_ComboBox_LabName.append({"lab_id": lab["lab_id"], "lab_name": lab["lab_name"], "lab_specialization": lab["lab_specialization"]});
                         });
                     }
 
                     else {
-                        Database.getConsultantList().forEach(function (consultant) {
-                            if(consultant["consultant_specialization"] === ufo_ComboBox_ConsultantSpecialization.currentText) {
-                                listModel_ComboBox_ConsultantName.append({"consultant_id": consultant["consultant_id"], "consultant_name": consultant["consultant_name"], "consultant_specialization": consultant["consultant_specialization"]});
+                        Database.getLabList().forEach(function (lab) {
+                            if(lab["lab_specialization"] === ufo_ComboBox_LabSpecialization.currentText) {
+                                listModel_ComboBox_LabName.append({"lab_id": lab["lab_id"], "lab_name": lab["lab_name"], "lab_specialization": lab["lab_specialization"]});
                             }
                         });
                     }
 
-                    ufo_ComboBox_ConsultantName.currentIndex = 0
+                    ufo_ComboBox_LabName.currentIndex = 0
                 }
             }
 
@@ -185,9 +185,9 @@ Item {
                 icon.source: "./../../icons/Google icons/add_box.svg"
 
                 onClicked: {
-                    let sourceIndex = ufo_ComboBox_ConsultantName.model.mapToSourceIndex(ufo_ComboBox_ConsultantName.currentIndex);
+                    let sourceIndex = ufo_ComboBox_LabName.model.mapToSourceIndex(ufo_ComboBox_LabName.currentIndex);
 
-                    listModel_ListView.append({"consultant_id": listModel_ComboBox_ConsultantName.get(sourceIndex)["consultant_id"], "consultant_name": listModel_ComboBox_ConsultantName.get(sourceIndex)["consultant_name"], "consultant_specialization": listModel_ComboBox_ConsultantName.get(sourceIndex)["consultant_specialization"], "consultation_date": "", "consultation_outcome": ""});
+                    listModel_ListView.append({"lab_id": listModel_ComboBox_LabName.get(sourceIndex)["lab_id"], "lab_name": listModel_ComboBox_LabName.get(sourceIndex)["lab_name"], "lab_specialization": listModel_ComboBox_LabName.get(sourceIndex)["lab_specialization"], "lab_test_date": "", "lab_test_outcome": ""});
                 }
             }
         }
@@ -218,33 +218,33 @@ Item {
                 model: ListModel { id: listModel_ListView }
 
                 ScrollBar.vertical: ScrollBar {
-                    id: scrollBar_Consultations
+                    id: scrollBar_LabTests
 
                     width: 10
                     policy: ScrollBar.AlwaysOn
                 }
 
-                delegate: UFO_Delegate_Consultation {
-                    width: listView.width - scrollBar_Consultations.width / 2 - 15
+                delegate: UFO_Delegate_LabTest {
+                    width: listView.width - scrollBar_LabTests.width / 2 - 15
 
                     onRemoveClicked: {
                         listModel_ListView.remove(index);
                     }
 
                     onDateChanged: {
-                        model["consultation_date"] = consultationDate.trim();
+                        model["lab_test_date"] = labTestDate.trim();
                     }
 
                     onOutcomeChanged: {
-                        model["consultation_outcome"] = consultationOutcome.trim();
+                        model["lab_test_outcome"] = labTestOutcome.trim();
                     }
 
                     // NOTE (SAVIZ): This technically works and gets called everytime, because the list gets cleared with every SELECT query. Therefore the data will be refreshed.
                     Component.onCompleted: {
-                        consultantName = model["consultant_name"]
-                        consultantSpecialization = model["consultant_specialization"]
-                        consultationDate = model["consultation_date"]
-                        consultationOutcome = model["consultation_outcome"]
+                        labName = model["lab_name"]
+                        labSpecialization = model["lab_specialization"]
+                        labTestDate = model["lab_test_date"]
+                        labTestOutcome = model["lab_test_outcome"]
                     }
                 }
 
@@ -262,8 +262,8 @@ Item {
 
                         listModel_ListView.clear();
 
-                        Database.getPatientDataMap()["consultations"].forEach(function (consultation) {
-                            listModel_ListView.append({"consultant_id": consultation["consultant_id"], "consultant_name": consultation["consultant_name"], "consultant_specialization": consultation["consultant_specialization"], "consultation_date": consultation["consultation_date"], "consultation_outcome": consultation["consultation_outcome"]});
+                        Database.getPatientDataMap()["labTests"].forEach(function (labTest) {
+                            listModel_ListView.append({"lab_id": labTest["lab_id"], "lab_name": labTest["lab_name"], "lab_specialization": labTest["lab_specialization"], "lab_test_date": labTest["lab_test_date"], "lab_test_outcome": labTest["lab_test_outcome"]});
                         });
                     }
                 }

@@ -12,7 +12,7 @@ Item {
     property alias consultantName: text_ConsultantName.text
     property alias consultantSpecialization: text_ConsultantSpecialization.text
     property alias consultationDate: ufo_TextField_ConsultationDate.text
-    property alias consultationOutcome: ufo_TextArea_Outcome.text
+    property alias consultationOutcome: ufo_TextArea_ConsultationOutcome.text
 
     signal removeClicked
     signal dateChanged
@@ -145,7 +145,7 @@ Item {
             }
 
             UFO_TextArea {
-                id: ufo_TextArea_Outcome
+                id: ufo_TextArea_ConsultationOutcome
 
                 enabled: (Database.connectionStatus === true) ? true : false
 
