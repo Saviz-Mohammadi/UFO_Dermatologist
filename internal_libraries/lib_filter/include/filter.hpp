@@ -26,6 +26,7 @@ protected:
 
 public:
     Q_INVOKABLE int mapToSourceIndex(int proxyIndex) const;
+    Q_INVOKABLE int getRole(const QString &role) const;
 
 public:
     QString filterText() const;

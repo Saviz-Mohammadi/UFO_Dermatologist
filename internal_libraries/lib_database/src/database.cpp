@@ -1377,11 +1377,8 @@ bool Database::pullLabTests(const quint64 index)
 bool Database::updatePatientData(const QString& newFirstName, const QString& newLastName, quint32 newBirthYear, const QString& newPhoneNumber, const QString& newGender, const QString& newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString& newFirstVisitDate, const QString& newRecentVisitDate, qreal newServicePrice, const QVariantList& newDiagnoses, const QString& newDiagnosisNote, const QVariantList& newTreatments, const QString& newTreatmentNote, const QVariantList& newMedicalDrugs, const QString& newMedicalDrugNote, const QVariantList& newProcedures, const QString& newProcedureNote, const QVariantList& newConsultations, const QVariantList& newLabTests)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :";
     qDebug() << "    newFirstName          :" << newFirstName;
     qDebug() << "    newLastName           :" << newLastName;
     qDebug() << "    newBirthYear          :" << newBirthYear;
@@ -1410,8 +1407,7 @@ bool Database::updatePatientData(const QString& newFirstName, const QString& new
     if (!m_QSqlDatabase.transaction())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << "Transaction could not be started.";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << "Transaction could not be started.";
 #endif
         emit queryExecuted(QueryType::UPDATE, false, prefix + "شروع تراکنش شکست خورد!" + suffix);
 
@@ -1446,8 +1442,7 @@ bool Database::updatePatientData(const QString& newFirstName, const QString& new
         if (!call.function())
         {
 #ifdef QT_DEBUG
-            qDebug() << "Log Output           :" << "Update operation failed! :" << call.errorMessage;
-            qDebug() << "--------------------------------------------------------------------------------";
+            qDebug() << "Log Output :" << "Update operation failed! :" << call.errorMessage;
 #endif
 
             emit queryExecuted(QueryType::UPDATE, false, prefix + call.errorMessage + suffix);
@@ -1461,14 +1456,17 @@ bool Database::updatePatientData(const QString& newFirstName, const QString& new
     if (!m_QSqlDatabase.commit())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << "Commit failed!";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << "Commit failed!";
 #endif
 
         emit queryExecuted(QueryType::UPDATE, false, "تأیید تغییرات شکست خورد!");
 
         return (false);
     }
+
+#ifdef QT_DEBUG
+    qDebug() << "Log Output :" << "Update operation succeeded!";
+#endif
 
     emit queryExecuted(QueryType::UPDATE, true, "اطلاعات با موفقیت به‌روزرسانی شد.");
 
@@ -1478,11 +1476,8 @@ bool Database::updatePatientData(const QString& newFirstName, const QString& new
 bool Database::updateBasicData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :";
     qDebug() << "    newFirstName          :" << newFirstName;
     qDebug() << "    newLastName           :" << newLastName;
     qDebug() << "    newBirthYear          :" << newBirthYear;
@@ -1508,7 +1503,7 @@ bool Database::updateBasicData(const QString &newFirstName, const QString &newLa
         recent_visit_date = :recent_visit_date,
         service_price = :service_price
 
-        WHERE patient_id = :patient_id"
+        WHERE patient_id = :patient_id
     )";
 
     QSqlQuery query(m_QSqlDatabase);
@@ -1557,16 +1552,14 @@ bool Database::updateBasicData(const QString &newFirstName, const QString &newLa
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "First visit date :" << recentVisitGregorianDate.toString() << ", " << "Recent visit date :" << recentVisitGregorianDate.toString() << ", " << "Update operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "First visit date :" << recentVisitGregorianDate.toString() << ", " << "Recent visit date :" << recentVisitGregorianDate.toString() << ", " << "Update operation failed! :" << query.lastError().text();
 #endif
 
         return (false);
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "First visit date :" << recentVisitGregorianDate.toString() << ", " << "Recent visit date :" << recentVisitGregorianDate.toString() << ", " << "Update operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "First visit date :" << recentVisitGregorianDate.toString() << ", " << "Recent visit date :" << recentVisitGregorianDate.toString() << ", " << "Update operation succeeded!";
 #endif
 
     return (true);
@@ -1575,11 +1568,8 @@ bool Database::updateBasicData(const QString &newFirstName, const QString &newLa
 bool Database::updateDiagnoses(const QVariantList &newDiagnoses)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :";
     qDebug() << newDiagnoses;
 #endif
 
@@ -1591,8 +1581,7 @@ bool Database::updateDiagnoses(const QVariantList &newDiagnoses)
     if (!queryDelete.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << queryDelete.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << queryDelete.lastError().text();
 #endif
 
         return (false);
@@ -1601,8 +1590,7 @@ bool Database::updateDiagnoses(const QVariantList &newDiagnoses)
     if (newDiagnoses.isEmpty())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Diagnoses list is empty!";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Diagnoses list is empty!";
 #endif
 
         return (true);
@@ -1628,16 +1616,14 @@ bool Database::updateDiagnoses(const QVariantList &newDiagnoses)
     if (!queryInsert.execBatch())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << queryInsert.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << queryInsert.lastError().text();
 #endif
 
         return (false);
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Update operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Update operation succeeded!";
 #endif
 
     return (true);
@@ -1646,11 +1632,8 @@ bool Database::updateDiagnoses(const QVariantList &newDiagnoses)
 bool Database::updateTreatments(const QVariantList &newTreatments)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :";
     qDebug() << newTreatments;
 #endif
 
@@ -1662,8 +1645,7 @@ bool Database::updateTreatments(const QVariantList &newTreatments)
     if (!queryDelete.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << queryDelete.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << queryDelete.lastError().text();
 #endif
 
         return (false);
@@ -1672,8 +1654,7 @@ bool Database::updateTreatments(const QVariantList &newTreatments)
     if (newTreatments.isEmpty())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Treatment list is empty!";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Treatment list is empty!";
 #endif
 
         return (true);
@@ -1699,16 +1680,14 @@ bool Database::updateTreatments(const QVariantList &newTreatments)
     if (!queryInsert.execBatch())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << queryInsert.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << queryInsert.lastError().text();
 #endif
 
         return (false);
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Update operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Update operation succeeded!";
 #endif
 
     return (true);
@@ -1717,11 +1696,8 @@ bool Database::updateTreatments(const QVariantList &newTreatments)
 bool Database::updateMedicalDrugs(const QVariantList &newMedicalDrugs)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :";
     qDebug() << newMedicalDrugs;
 #endif
 
@@ -1733,8 +1709,7 @@ bool Database::updateMedicalDrugs(const QVariantList &newMedicalDrugs)
     if (!queryDelete.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << queryDelete.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << queryDelete.lastError().text();
 #endif
 
         return (false);
@@ -1743,8 +1718,7 @@ bool Database::updateMedicalDrugs(const QVariantList &newMedicalDrugs)
     if (newMedicalDrugs.isEmpty())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Medical drug list is empty!";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Medical drug list is empty!";
 #endif
 
         return (true);
@@ -1770,16 +1744,14 @@ bool Database::updateMedicalDrugs(const QVariantList &newMedicalDrugs)
     if (!queryInsert.execBatch())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << queryInsert.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << queryInsert.lastError().text();
 #endif
 
         return (false);
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Update operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Update operation succeeded!";
 #endif
 
     return (true);
@@ -1788,11 +1760,8 @@ bool Database::updateMedicalDrugs(const QVariantList &newMedicalDrugs)
 bool Database::updateProcedures(const QVariantList &newProcedures)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :";
     qDebug() << newProcedures;
 #endif
 
@@ -1804,8 +1773,7 @@ bool Database::updateProcedures(const QVariantList &newProcedures)
     if (!queryDelete.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << queryDelete.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << queryDelete.lastError().text();
 #endif
 
         return (false);
@@ -1814,8 +1782,7 @@ bool Database::updateProcedures(const QVariantList &newProcedures)
     if (newProcedures.isEmpty())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Procedures list is empty!";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Procedures list is empty!";
 #endif
 
         return (true);
@@ -1841,16 +1808,14 @@ bool Database::updateProcedures(const QVariantList &newProcedures)
     if (!queryInsert.execBatch())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << queryInsert.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << queryInsert.lastError().text();
 #endif
 
         return (false);
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Update operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Update operation succeeded!";
 #endif
 
     return (true);
@@ -1859,11 +1824,8 @@ bool Database::updateProcedures(const QVariantList &newProcedures)
 bool Database::updateDiagnosisNote(const QString &newNote)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "newNote :" << newNote;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "newNote :" << newNote;
 #endif
 
     QSqlQuery query(m_QSqlDatabase);
@@ -1875,16 +1837,14 @@ bool Database::updateDiagnosisNote(const QString &newNote)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << query.lastError().text();
 #endif
 
         return (false);
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Update operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Update operation succeeded!";
 #endif
 
     return (true);
@@ -1893,11 +1853,8 @@ bool Database::updateDiagnosisNote(const QString &newNote)
 bool Database::updateTreatmentNote(const QString &newNote)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "newNote :" << newNote;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "newNote :" << newNote;
 #endif
 
     QSqlQuery query(m_QSqlDatabase);
@@ -1909,16 +1866,14 @@ bool Database::updateTreatmentNote(const QString &newNote)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << query.lastError().text();
 #endif
 
         return (false);
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Update operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Update operation succeeded!";
 #endif
 
     return (true);
@@ -1927,11 +1882,8 @@ bool Database::updateTreatmentNote(const QString &newNote)
 bool Database::updateMedicalDrugNote(const QString &newNote)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "newNote :" << newNote;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "newNote :" << newNote;
 #endif
 
     QSqlQuery query(m_QSqlDatabase);
@@ -1943,16 +1895,14 @@ bool Database::updateMedicalDrugNote(const QString &newNote)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << query.lastError().text();
 #endif
 
         return (false);
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Update operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Update operation succeeded!";
 #endif
 
     return (true);
@@ -1961,11 +1911,8 @@ bool Database::updateMedicalDrugNote(const QString &newNote)
 bool Database::updateProcedureNote(const QString &newNote)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "newNote :" << newNote;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "newNote :" << newNote;
 #endif
 
     QSqlQuery query(m_QSqlDatabase);
@@ -1977,16 +1924,14 @@ bool Database::updateProcedureNote(const QString &newNote)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << query.lastError().text();
 #endif
 
         return (false);
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Update operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Update operation succeeded!";
 #endif
 
     return (true);
@@ -1995,11 +1940,8 @@ bool Database::updateProcedureNote(const QString &newNote)
 bool Database::updateConsultations(const QVariantList &newConsultations)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :";
     qDebug() << newConsultations;
 #endif
 
@@ -2011,8 +1953,7 @@ bool Database::updateConsultations(const QVariantList &newConsultations)
     if (!queryDelete.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << queryDelete.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << queryDelete.lastError().text();
 #endif
 
         return (false);
@@ -2021,8 +1962,7 @@ bool Database::updateConsultations(const QVariantList &newConsultations)
     if (newConsultations.isEmpty())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Consultation list is empty!";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Consultation list is empty!";
 #endif
 
         return (true);
@@ -2072,16 +2012,14 @@ bool Database::updateConsultations(const QVariantList &newConsultations)
     if (!queryInsert.execBatch())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << queryInsert.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << queryInsert.lastError().text();
 #endif
 
         return (false);
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Update operation succeeded! :" << consultationDates;
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Update operation succeeded! :" << consultationDates;
 #endif
 
     return (true);
@@ -2090,11 +2028,8 @@ bool Database::updateConsultations(const QVariantList &newConsultations)
 bool Database::updateLabTests(const QVariantList &newLabTests)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :";
     qDebug() << newLabTests;
 #endif
 
@@ -2106,8 +2041,7 @@ bool Database::updateLabTests(const QVariantList &newLabTests)
     if (!queryDelete.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << queryDelete.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << queryDelete.lastError().text();
 #endif
 
         return (false);
@@ -2116,8 +2050,7 @@ bool Database::updateLabTests(const QVariantList &newLabTests)
     if (newLabTests.isEmpty())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Lab test list is empty!";
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Lab test list is empty!";
 #endif
 
         return (true);
@@ -2167,16 +2100,14 @@ bool Database::updateLabTests(const QVariantList &newLabTests)
     if (!queryInsert.execBatch())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Update operation failed! :" << queryInsert.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Update operation failed! :" << queryInsert.lastError().text();
 #endif
 
         return (false);
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Update operation succeeded! :" << labTestDates;
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Update operation succeeded! :" << labTestDates;
 #endif
 
     return (true);
@@ -2186,15 +2117,12 @@ bool Database::updateLabTests(const QVariantList &newLabTests)
 bool Database::changeDeletionStatus(bool newStatus)
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "newStatus :" << newStatus;
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "newStatus :" << newStatus;
 #endif
 
     QSqlQuery query(m_QSqlDatabase);
-    QString queryString = "UPDATE patients SET mark_for_deletion = :newStatus WHERE patient_id = :patient_id;";
+    QString queryString = "UPDATE patients SET marked_for_deletion = :newStatus WHERE patient_id = :patient_id;";
 
     query.prepare(queryString);
 
@@ -2204,8 +2132,7 @@ bool Database::changeDeletionStatus(bool newStatus)
     if (!query.exec())
     {
 #ifdef QT_DEBUG
-        qDebug() << "Log Output           :" << "Delete operation failed! :" << query.lastError().text();
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "Log Output :" << "Delete operation failed! :" << query.lastError().text();
 #endif
 
         emit queryExecuted(QueryType::DELETE, false, "عملیات حذف ناموفق بود!");
@@ -2214,8 +2141,7 @@ bool Database::changeDeletionStatus(bool newStatus)
     }
 
 #ifdef QT_DEBUG
-    qDebug() << "Log Output           :" << "Delete operation succeeded!";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "Log Output :" << "Delete operation succeeded!";
 #endif
 
     emit queryExecuted(QueryType::DELETE, true, "عملیات حذف با موفقیت انجام شد!");

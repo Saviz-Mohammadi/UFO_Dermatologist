@@ -127,27 +127,36 @@ Item {
                 icon.source: "./../../icons/Google icons/add_box.svg"
 
                 onClicked: {
+                    let currentText = ufo_ComboBox.currentText;
+
+                    if (!currentText || currentText.trim() === "") {
+                        console.log("No valid selection");
+                        return;
+                    }
+
+                    // Check if procedure_name already exists in listView model
                     let exists = false;
-
-                    let sourceIndex;
-
                     for (let index = 0; index < listModel_ListView.count; index++) {
-
-                        sourceIndex = ufo_ComboBox.model.mapToSourceIndex(ufo_ComboBox.currentIndex);
-
-                        if (listView.model.get(index)["procedure_id"] === ufo_ComboBox_Model.get(sourceIndex)["procedure_id"]) {
+                        if (listView.model.get(index)["procedure_name"] === currentText) {
                             exists = true;
                             break;
                         }
                     }
 
-                    if(exists) {
-                        ufo_StatusBar.displayMessage("A procedure of the same type already exists.", 8000)
-
+                    if (exists) {
+                        ufo_StatusBar.displayMessage("A procedure of the same type already exists.", 8000);
                         return;
                     }
 
-                    listModel_ListView.append({"procedure_id": ufo_ComboBox_Model.get(sourceIndex)["procedure_id"], "procedure_name": ufo_ComboBox_Model.get(sourceIndex)["procedure_name"]});
+                    // Find the corresponding procedure_id
+                    let proxyIndex = ufo_ComboBox.currentIndex;
+                    let procedureId = ufo_ComboBox.model.data(ufo_ComboBox.model.index(proxyIndex, 0), "procedure_id");
+
+                    // Append the new medical_drug to listModel_ListView
+                    listModel_ListView.append({
+                        "procedure_id": procedureId,
+                        "procedure_name": currentText
+                    });
                 }
             }
         }

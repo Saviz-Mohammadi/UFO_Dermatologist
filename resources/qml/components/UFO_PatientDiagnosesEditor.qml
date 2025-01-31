@@ -127,27 +127,36 @@ Item {
                 icon.source: "./../../icons/Google icons/add_box.svg"
 
                 onClicked: {
+                    let currentText = ufo_ComboBox.currentText;
+
+                    if (!currentText || currentText.trim() === "") {
+                        console.log("No valid selection");
+                        return;
+                    }
+
+                    // Check if diagnosis_name already exists in listView model
                     let exists = false;
-
-                    let sourceIndex;
-
                     for (let index = 0; index < listModel_ListView.count; index++) {
-
-                        sourceIndex = ufo_ComboBox.model.mapToSourceIndex(ufo_ComboBox.currentIndex);
-
-                        if (listView.model.get(index)["diagnosis_id"] === ufo_ComboBox_Model.get(sourceIndex)["diagnosis_id"]) {
+                        if (listView.model.get(index)["diagnosis_name"] === currentText) {
                             exists = true;
                             break;
                         }
                     }
 
-                    if(exists) {
-                        ufo_StatusBar.displayMessage("A diagnosis of the same type already exists.", 8000)
-
+                    if (exists) {
+                        ufo_StatusBar.displayMessage("A diagnosis of the same type already exists.", 8000);
                         return;
                     }
 
-                    listModel_ListView.append({"diagnosis_id": ufo_ComboBox_Model.get(sourceIndex)["diagnosis_id"], "diagnosis_name": ufo_ComboBox_Model.get(sourceIndex)["diagnosis_name"]});
+                    // Find the corresponding diagnosis_id
+                    let proxyIndex = ufo_ComboBox.currentIndex;
+                    let diagnosisId = ufo_ComboBox.model.data(ufo_ComboBox.model.index(proxyIndex, 0), "diagnosis_id");
+
+                    // Append the new diagnosis to listModel_ListView
+                    listModel_ListView.append({
+                        "diagnosis_id": diagnosisId,
+                        "diagnosis_name": currentText
+                    });
                 }
             }
         }

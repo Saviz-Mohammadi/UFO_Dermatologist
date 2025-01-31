@@ -20,6 +20,10 @@ ComboBox {
         filterRole: root.textRole
     }
 
+    function getRole(name) {
+        return proxyModel.getRole(name);
+    }
+
     model: proxyModel
 
     delegate: ItemDelegate {

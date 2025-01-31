@@ -127,27 +127,36 @@ Item {
                 icon.source: "./../../icons/Google icons/add_box.svg"
 
                 onClicked: {
+                    let currentText = ufo_ComboBox.currentText;
+
+                    if (!currentText || currentText.trim() === "") {
+                        console.log("No valid selection");
+                        return;
+                    }
+
+                    // Check if treatment_name already exists in listView model
                     let exists = false;
-
-                    let sourceIndex;
-
                     for (let index = 0; index < listModel_ListView.count; index++) {
-
-                        sourceIndex = ufo_ComboBox.model.mapToSourceIndex(ufo_ComboBox.currentIndex);
-
-                        if (listView.model.get(index)["treatment_id"] === ufo_ComboBox_Model.get(sourceIndex)["treatment_id"]) {
+                        if (listView.model.get(index)["treatment_name"] === currentText) {
                             exists = true;
                             break;
                         }
                     }
 
-                    if(exists) {
-                        ufo_StatusBar.displayMessage("A treatment of the same type already exists.", 8000)
-
+                    if (exists) {
+                        ufo_StatusBar.displayMessage("A treatment of the same type already exists.", 8000);
                         return;
                     }
 
-                    listModel_ListView.append({"treatment_id": ufo_ComboBox_Model.get(sourceIndex)["treatment_id"], "treatment_name": ufo_ComboBox_Model.get(sourceIndex)["treatment_name"]});
+                    // Find the corresponding treatment_id
+                    let proxyIndex = ufo_ComboBox.currentIndex;
+                    let treatmentId = ufo_ComboBox.model.data(ufo_ComboBox.model.index(proxyIndex, 0), "treatment_id");
+
+                    // Append the new treatment to listModel_ListView
+                    listModel_ListView.append({
+                        "treatment_id": treatmentId,
+                        "treatment_name": currentText
+                    });
                 }
             }
         }

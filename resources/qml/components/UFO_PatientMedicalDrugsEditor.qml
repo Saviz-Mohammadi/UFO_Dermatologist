@@ -127,27 +127,36 @@ Item {
                 icon.source: "./../../icons/Google icons/add_box.svg"
 
                 onClicked: {
+                    let currentText = ufo_ComboBox.currentText;
+
+                    if (!currentText || currentText.trim() === "") {
+                        console.log("No valid selection");
+                        return;
+                    }
+
+                    // Check if medical_drug_name already exists in listView model
                     let exists = false;
-
-                    let sourceIndex;
-
                     for (let index = 0; index < listModel_ListView.count; index++) {
-
-                        sourceIndex = ufo_ComboBox.model.mapToSourceIndex(ufo_ComboBox.currentIndex);
-
-                        if (listView.model.get(index)["medical_drug_id"] === ufo_ComboBox_Model.get(sourceIndex)["medical_drug_id"]) {
+                        if (listView.model.get(index)["medical_drug_name"] === currentText) {
                             exists = true;
                             break;
                         }
                     }
 
-                    if(exists) {
-                        ufo_StatusBar.displayMessage("A medical drug of the same type already exists.", 8000)
-
+                    if (exists) {
+                        ufo_StatusBar.displayMessage("A medical drug of the same type already exists.", 8000);
                         return;
                     }
 
-                    listModel_ListView.append({"medical_drug_id": ufo_ComboBox_Model.get(sourceIndex)["medical_drug_id"], "medical_drug_name": ufo_ComboBox_Model.get(sourceIndex)["medical_drug_name"]});
+                    // Find the corresponding medical_drug_id
+                    let proxyIndex = ufo_ComboBox.currentIndex;
+                    let medicalDrugId = ufo_ComboBox.model.data(ufo_ComboBox.model.index(proxyIndex, 0), "medical_drug_id");
+
+                    // Append the new medical_drug to listModel_ListView
+                    listModel_ListView.append({
+                        "medical_drug_id": medicalDrugId,
+                        "medical_drug_name": currentText
+                    });
                 }
             }
         }

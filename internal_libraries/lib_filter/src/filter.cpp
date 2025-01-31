@@ -82,12 +82,23 @@ int CustomProxyModel::mapToSourceIndex(int proxyIndex) const
         return -1;
     }
 
-    QModelIndex proxyModelIndex = index(proxyIndex, 0);
+    QModelIndex proxyModelIndex = this->index(proxyIndex, 0);
+    if (!proxyModelIndex.isValid()) {
+        return -1;
+    }
+
     QModelIndex sourceModelIndex = mapToSource(proxyModelIndex);
+    if (!sourceModelIndex.isValid()) {
+        return -1;
+    }
 
     return sourceModelIndex.row();
 }
 
+int CustomProxyModel::getRole(const QString &role) const
+{
+    return (sourceModel()->roleNames().key(m_filterRole.toUtf8(), -1));
+}
 
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]

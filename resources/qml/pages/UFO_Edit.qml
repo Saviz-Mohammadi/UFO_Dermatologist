@@ -145,7 +145,7 @@ UFO_Page {
             icon.source: "./../../icons/Google icons/upload.svg"
 
             onClicked: {
-                // Personal Information:
+                // Basic Data:
                 let first_name = ufo_BasicData.patientFirstName.trim();
                 let last_name = ufo_BasicData.patientLastName.trim();
                 let birthYear = parseInt(ufo_BasicData.patientBirthYear.trim(), 10);
@@ -157,33 +157,19 @@ UFO_Page {
                 let recentVisitDate = ufo_BasicData.patientRecentVisitDate.trim();
                 let servicePrice = parseFloat(ufo_BasicData.patientServicePrice.trim());
 
-
                 // Lists:
                 let newDiagnoses = ufo_Diagnoses.getListOfDiagnoses();
-                let treatments = [];
-                let medicalDrugs = [];
-                let procedures = [];
-
+                let treatments = ufo_Treatments.getListOfTreatments();
+                let medicalDrugs = ufo_MedicalDrugs.getListOfMedicalDrugs();
+                let procedures = ufo_Procedures.getListOfProcedures();
+                let consultations = ufo_Consultations.getListOfConsultations();
+                let labTests = ufo_LabTests.getListOfLabTests();
 
                 // Notes:
-                let diagnosisNote;
-                let treatmentNote;
-                let medicalDrugNote;
-                let procedureNote;
-
-                let consultations = [];
-
-                let labTests = [];
-
-                for (let b = 0; b < listModel_ListView_LabTests.count; b++) {
-                    let item = listModel_ListView_LabTests.get(b);
-
-                    labTests.push({
-                        lab_id: item.lab_id,
-                        lab_test_date: item.lab_test_date,
-                        lab_test_outcome: item.lab_test_outcome
-                    });
-                }
+                let diagnosisNote = ufo_Diagnoses.getDiagnosisNote();
+                let treatmentNote = ufo_Treatments.getTreatmentNote();
+                let medicalDrugNote = ufo_MedicalDrugs.getMedicalDrugNote();
+                let procedureNote = ufo_Procedures.getProcedureNote();
 
                 // Push:
                 Database.updatePatientData(first_name, last_name, birthYear, phone_number, gender, marital_status, numberOfPreviousVisits, firstVisitDate, recentVisitDate, servicePrice, newDiagnoses, diagnosisNote, treatments, treatmentNote, medicalDrugs, medicalDrugNote, procedures, procedureNote, consultations, labTests);
@@ -197,29 +183,33 @@ UFO_Page {
         Layout.fillWidth: true
         // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
 
-        // Connections {
-        //     target: Database
+        Connections {
+            target: Database
 
-        //     function onConnectionStatusChanged(message) {
-        //         if(Database.connectionStatus === true) {
-        //             ufo_OperationResult.svg = "./../../icons/Google icons/check_box.svg";
-        //             ufo_OperationResult.state = true;
-        //             ufo_OperationResult.displayMessage(message, 5000);
+            function onQueryExecuted(type, success, message) {
+                if(type !== Database.QueryType.SELECT || type !== Database.QueryType.UPDATE) {
+                    return;
+                }
 
-
-        //             return;
-        //         }
-
-
-        //         if(Database.connectionStatus === false) {
-        //             ufo_OperationResult.svg = "./../../icons/Google icons/error.svg";
-        //             ufo_OperationResult.state = false;
-        //             ufo_OperationResult.displayMessage(message, 5000);
+                if(success === true) {
+                    ufo_OperationResult.svg = "./../../icons/Google icons/check_box.svg";
+                    ufo_OperationResult.state = true;
+                    ufo_OperationResult.displayMessage(message, 8000);
 
 
-        //             return;
-        //         }
-        //     }
-        // }
+                    return;
+                }
+
+
+                if(success === false) {
+                    ufo_OperationResult.svg = "./../../icons/Google icons/error.svg";
+                    ufo_OperationResult.state = false;
+                    ufo_OperationResult.displayMessage(message, 8000);
+
+
+                    return;
+                }
+            }
+        }
     }
 }
