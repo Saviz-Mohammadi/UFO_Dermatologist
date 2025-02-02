@@ -1,3 +1,6 @@
+Install cups for linux print support:
+        sudo apt-get install libcups2-dev
+
 Install mysql-server:
         sudo apt install mysql-server
         

@@ -46,7 +46,8 @@ find_package(Qt6 6.7.2 COMPONENTS
     Network
     Sql
     Multimedia
-    LinguistTools)
+    LinguistTools
+    PrintSupport)
 
 # Add more Qt Components as needed...
 
@@ -207,9 +208,8 @@ target_link_libraries(${EXECUTABLE_NAME}
     Qt6::QuickControls2
     Qt6::Network
     Qt6::Sql
-    Qt6::Multimedia)
-
-
+    Qt6::Multimedia
+    Qt6::PrintSupport)
 
 
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES
