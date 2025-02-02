@@ -10,6 +10,7 @@
 #include "database.hpp"
 #include "date.hpp"
 #include "filter.hpp"
+#include "printer.hpp"
 
 
 void registerTypes();

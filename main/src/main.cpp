@@ -45,6 +45,7 @@ void registerTypes()
     qmlRegisterSingletonType<Database>("Database", 1, 0, "Database", &Database::qmlInstance);
     qmlRegisterSingletonType<Date>("Date", 1, 0, "Date", &Date::qmlInstance);
     qmlRegisterType<CustomProxyModel>("CustomProxyModel", 1, 0, "CustomProxyModel");
+    qmlRegisterSingletonType<Printer>("Printer", 1, 0, "Printer", &Printer::qmlInstance);
 }
 
 void setupThemeSystem()

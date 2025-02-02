@@ -88,6 +88,19 @@ ApplicationWindow {
                 leftPadding: 10
                 rightPadding: 10
 
+                text: qsTr("صفحه چاپ")
+
+                onTriggered: {
+                    stackLayout.currentIndex = ufo_Print.StackLayout.index
+
+                    ufo_SideBar_Main.checkTabButton("Print Page")
+                }
+            }
+
+            UFO_MenuItem {
+                leftPadding: 10
+                rightPadding: 10
+
                 text: qsTr("صفحه تنظیمات")
 
                 onTriggered: {
@@ -184,6 +197,13 @@ ApplicationWindow {
                 Layout.fillHeight: true
             }
 
+            UFO_Print {
+                id: ufo_Print
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
             UFO_Settings {
                 id: ufo_Settings
 
@@ -219,6 +239,9 @@ ApplicationWindow {
                     switch (pageName) {
                         case "Create Page":
                             stackLayout.currentIndex = ufo_Create.StackLayout.index
+                            break
+                        case "Print Page":
+                            stackLayout.currentIndex = ufo_Print.StackLayout.index
                             break
                         case "Edit Page":
                             stackLayout.currentIndex = ufo_Edit.StackLayout.index

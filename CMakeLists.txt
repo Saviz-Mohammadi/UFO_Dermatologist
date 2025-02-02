@@ -252,7 +252,8 @@ target_link_libraries(${EXECUTABLE_NAME}
     "Lib_AppTheme"
     "Lib_Database"
     "Lib_Date"
-    "Lib_Filter")
+    "Lib_Filter"
+    "Lib_Printer")
 
 # [[ ----------------------------------------------------------------------- ]]
 # [[ ----------------------------------------------------------------------- ]]

@@ -23,6 +23,9 @@ Item {
             case "Create Page":
                 ufo_SideBar_Button_Create.checked = true
                 break
+            case "Print Page":
+                ufo_SideBar_Button_Print.checked = true
+                break
             case "Settings Page":
                 ufo_SideBar_Button_Settings.checked = true
                 break
@@ -132,6 +135,29 @@ Item {
 
                         onClicked: {
                             root.tabChanged("Create Page")
+                        }
+                    }
+
+                    UFO_SideBar_Button {
+                        id: ufo_SideBar_Button_Print
+
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 40
+
+                        Layout.leftMargin: 15
+                        Layout.rightMargin: 15
+
+                        ButtonGroup.group: buttonGroup
+
+                        checkable: true
+                        autoExclusive: true
+                        checked: false
+
+                        text: qsTr("چاپ")
+                        icon.source: "./../../icons/Google icons/print.svg"
+
+                        onClicked: {
+                            root.tabChanged("Print Page")
                         }
                     }
 

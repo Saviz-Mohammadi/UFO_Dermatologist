@@ -111,11 +111,11 @@ void Printer::printPatientData()
     htmlContent.replace("{{id}}", QString::number(map["id"].toInt()));
     htmlContent.replace("{{first_name}}", map["first_name"].toString());
     htmlContent.replace("{{last_name}}", map["last_name"].toString());
-    htmlContent.replace("{{service_price}}", QString::number(map["service_price"].toDouble(), 'f', 2));
+    htmlContent.replace("{{service_price}}", QString::number(map["service_price"].toDouble(), 'f', 3));
 
     // Handle medical drugs list
     QStringList drugList;
-    for (const QVariant &drug : map["medical_drugs"].toList()) {
+    for (const QVariant &drug : map["medicalDrugs"].toList()) {
         QVariantMap drugMap = drug.toMap();
 
         drugList.append("<li>" + drugMap["medical_drug_name"].toString() + "</li>");

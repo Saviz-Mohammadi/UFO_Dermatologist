@@ -27,8 +27,8 @@ Dialog {
 
     background: Rectangle {
         radius: 0
-        color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-        border.color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        color: Qt.color(AppTheme.colors["UFO_Dialog_Background"])
+        border.color: Qt.color(AppTheme.colors["UFO_Dialog_Border"])
         border.width: 1
     }
 
