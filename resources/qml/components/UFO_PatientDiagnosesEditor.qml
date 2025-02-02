@@ -127,17 +127,15 @@ Item {
                 icon.source: "./../../icons/Google icons/add_box.svg"
 
                 onClicked: {
-                    let currentText = ufo_ComboBox.currentText;
+                    let proxyIndex = ufo_ComboBox.currentIndex;
 
-                    if (!currentText || currentText.trim() === "") {
-                        console.log("No valid selection");
-                        return;
-                    }
+                    let id = ufo_ComboBox.model.sourceData(proxyIndex, "diagnosis_id");
+                    let name = ufo_ComboBox.model.sourceData(proxyIndex, "diagnosis_name");
 
-                    // Check if diagnosis_name already exists in listView model
                     let exists = false;
+
                     for (let index = 0; index < listModel_ListView.count; index++) {
-                        if (listView.model.get(index)["diagnosis_name"] === currentText) {
+                        if (listView.model.get(index)["diagnosis_id"] === id) {
                             exists = true;
                             break;
                         }
@@ -148,14 +146,9 @@ Item {
                         return;
                     }
 
-                    // Find the corresponding diagnosis_id
-                    let proxyIndex = ufo_ComboBox.currentIndex;
-                    let diagnosisId = ufo_ComboBox.model.data(ufo_ComboBox.model.index(proxyIndex, 0), "diagnosis_id");
-
-                    // Append the new diagnosis to listModel_ListView
                     listModel_ListView.append({
-                        "diagnosis_id": diagnosisId,
-                        "diagnosis_name": currentText
+                        "diagnosis_id": id,
+                        "diagnosis_name": name
                     });
                 }
             }

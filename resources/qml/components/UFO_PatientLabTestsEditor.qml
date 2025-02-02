@@ -185,17 +185,19 @@ Item {
                 icon.source: "./../../icons/Google icons/add_box.svg"
 
                 onClicked: {
-                    let currentText = ufo_ComboBox_LabName.currentText;
-
-                    // Find the corresponding consultant_id
                     let proxyIndex = ufo_ComboBox_LabName.currentIndex;
-                    let labId = ufo_ComboBox_LabName.model.data(ufo_ComboBox_LabName.model.index(proxyIndex, 0), "lab_id");
 
-                    let sourceIndex = ufo_ComboBox_LabName.model.mapToSourceIndex(ufo_ComboBox_LabName.currentIndex);
+                    let id = ufo_ComboBox_LabName.model.sourceData(proxyIndex, "lab_id");
+                    let name = ufo_ComboBox_LabName.model.sourceData(proxyIndex, "lab_name");
+                    let specialization = ufo_ComboBox_LabName.model.sourceData(proxyIndex, "lab_specialization");
 
-                    let labSpecialization = listModel_ComboBox_LabName.get(sourceIndex)["lab_specialization"];
-
-                    listModel_ListView.append({"lab_id": labId, "lab_name": currentText, "lab_specialization": labSpecialization, "lab_test_date": "", "lab_test_outcome": ""});
+                    listModel_ListView.append({
+                        "lab_id": id,
+                        "lab_name": name,
+                        "lab_specialization": specialization,
+                        "lab_test_date": "",
+                        "lab_test_outcome": ""
+                    });
                 }
             }
         }

@@ -25,7 +25,7 @@ protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 
 public:
-    Q_INVOKABLE int mapToSourceIndex(int proxyIndex) const;
+    Q_INVOKABLE QVariant sourceData(int proxyRow, const QString &roleName) const;
     Q_INVOKABLE int getRole(const QString &role) const;
 
 public:

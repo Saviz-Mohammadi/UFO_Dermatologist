@@ -59,7 +59,6 @@ void CustomProxyModel::setFilterRole(const QString &role)
     }
 }
 
-
 bool CustomProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
     if (m_filterText.isEmpty()) {
@@ -76,28 +75,22 @@ bool CustomProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &source
     return data.toString().contains(m_filterText, Qt::CaseInsensitive);
 }
 
-int CustomProxyModel::mapToSourceIndex(int proxyIndex) const
-{
-    if (!sourceModel() || proxyIndex < 0) {
-        return -1;
-    }
+QVariant CustomProxyModel::sourceData(int proxyRow, const QString &roleName) const {
+    QModelIndex sourceIndex = mapToSource(index(proxyRow, 0));
+    if (!sourceIndex.isValid()) return QVariant();
 
-    QModelIndex proxyModelIndex = this->index(proxyIndex, 0);
-    if (!proxyModelIndex.isValid()) {
-        return -1;
-    }
+    QAbstractItemModel *sourceModel = this->sourceModel();
+    if (!sourceModel) return QVariant();
 
-    QModelIndex sourceModelIndex = mapToSource(proxyModelIndex);
-    if (!sourceModelIndex.isValid()) {
-        return -1;
-    }
-
-    return sourceModelIndex.row();
+    int role = sourceModel->roleNames().key(roleName.toUtf8(), -1);
+    return role != -1 ? sourceModel->data(sourceIndex, role) : QVariant();
 }
 
 int CustomProxyModel::getRole(const QString &role) const
 {
-    return (sourceModel()->roleNames().key(m_filterRole.toUtf8(), -1));
+    int roleIndex = sourceModel()->roleNames().key(m_filterRole.toUtf8(), -1);
+
+    return (roleIndex);
 }
 
 // [[------------------------------------------------------------------------]]

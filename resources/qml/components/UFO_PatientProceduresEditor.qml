@@ -127,17 +127,15 @@ Item {
                 icon.source: "./../../icons/Google icons/add_box.svg"
 
                 onClicked: {
-                    let currentText = ufo_ComboBox.currentText;
+                    let proxyIndex = ufo_ComboBox.currentIndex;
 
-                    if (!currentText || currentText.trim() === "") {
-                        console.log("No valid selection");
-                        return;
-                    }
+                    let id = ufo_ComboBox.model.sourceData(proxyIndex, "procedure_id");
+                    let name = ufo_ComboBox.model.sourceData(proxyIndex, "procedure_name");
 
-                    // Check if procedure_name already exists in listView model
                     let exists = false;
+
                     for (let index = 0; index < listModel_ListView.count; index++) {
-                        if (listView.model.get(index)["procedure_name"] === currentText) {
+                        if (listView.model.get(index)["procedure_id"] === id) {
                             exists = true;
                             break;
                         }
@@ -148,14 +146,9 @@ Item {
                         return;
                     }
 
-                    // Find the corresponding procedure_id
-                    let proxyIndex = ufo_ComboBox.currentIndex;
-                    let procedureId = ufo_ComboBox.model.data(ufo_ComboBox.model.index(proxyIndex, 0), "procedure_id");
-
-                    // Append the new medical_drug to listModel_ListView
                     listModel_ListView.append({
-                        "procedure_id": procedureId,
-                        "procedure_name": currentText
+                        "procedure_id": id,
+                        "procedure_name": name
                     });
                 }
             }

@@ -185,17 +185,19 @@ Item {
                 icon.source: "./../../icons/Google icons/add_box.svg"
 
                 onClicked: {
-                    let currentText = ufo_ComboBox_ConsultantName.currentText;
-
-                    // Find the corresponding consultant_id
                     let proxyIndex = ufo_ComboBox_ConsultantName.currentIndex;
-                    let consultantId = ufo_ComboBox_ConsultantName.model.data(ufo_ComboBox_ConsultantName.model.index(proxyIndex, 0), "consultant_id");
 
-                    let sourceIndex = ufo_ComboBox_ConsultantName.model.mapToSourceIndex(ufo_ComboBox_ConsultantName.currentIndex);
+                    let id = ufo_ComboBox_ConsultantName.model.sourceData(proxyIndex, "consultant_id");
+                    let name = ufo_ComboBox_ConsultantName.model.sourceData(proxyIndex, "consultant_name");
+                    let specialization = ufo_ComboBox_ConsultantName.model.sourceData(proxyIndex, "consultant_specialization");
 
-                    let consultantSpecialization = listModel_ComboBox_ConsultantName.get(sourceIndex)["consultant_specialization"];
-
-                    listModel_ListView.append({"consultant_id": consultantId, "consultant_name": currentText, "consultant_specialization": consultantSpecialization, "consultation_date": "", "consultation_outcome": ""});
+                    listModel_ListView.append({
+                        "consultant_id": id,
+                        "consultant_name": name,
+                        "consultant_specialization": specialization,
+                        "consultation_date": "",
+                        "consultation_outcome": ""
+                    });
                 }
             }
         }
