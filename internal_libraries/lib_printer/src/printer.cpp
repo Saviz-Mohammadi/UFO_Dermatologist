@@ -108,7 +108,7 @@ void Printer::printPatientData()
                            .arg(outputFolder, firstName, lastName);
 
     // Replace placeholders with data
-    htmlContent.replace("{{id}}", QString::number(map["id"].toInt()));
+    htmlContent.replace("{{id}}", QString::number(map["patient_id"].toInt()));
     htmlContent.replace("{{first_name}}", map["first_name"].toString());
     htmlContent.replace("{{last_name}}", map["last_name"].toString());
     htmlContent.replace("{{service_price}}", QString::number(map["service_price"].toDouble(), 'f', 3));

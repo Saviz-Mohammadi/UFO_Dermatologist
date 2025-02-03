@@ -1,17 +1,46 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Medical Report</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>گزارش پزشکی</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        hr {
+            border: 1px solid black;
+            margin: 20px 0;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Medical Report</h1>
-    <p>ID: {{id}}</p>
-    <p>Name: {{first_name}} {{last_name}}</p>
-    <p>Service Price: ${{service_price}}</p>
-    <h2>Prescribed Drugs</h2>
-    <ul>
+    <!-- Header -->
+    <h1 style="text-align: center;">گزارش پزشکی</h1>
+
+    <!-- Horizontal line -->
+    <hr>
+
+    <!-- Patient Information -->
+    <h2 style="text-align: right;">اطلاعات بیمار</h2>
+    
+    <p style="text-indent: 20px; font-weight: bold; text-align: right;">شماره پرونده: {{id}}</p>
+    <p style="text-indent: 20px; font-weight: bold; text-align: right;">نام: {{first_name}}</p>
+    <p style="text-indent: 20px; font-weight: bold; text-align: right;">نام خانوادگی: {{last_name}}</p>
+    <p style="text-indent: 20px; font-weight: bold; text-align: right;">قیمت خدمات: {{service_price}}</p>
+
+    <!-- Horizontal line -->
+    <hr>
+
+    <!-- Prescribed Medical Drugs -->
+    <h2 style="text-align: right;">داروهای تجویز شده</h2>
+    <ul style="font-weight: bold; padding-left: 20px;">
         {{medical_drugs}}
     </ul>
 </body>
+
 </html>
 
