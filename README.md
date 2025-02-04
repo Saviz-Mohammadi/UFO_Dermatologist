@@ -24,42 +24,42 @@ Before using this project and building it, ensure your development environment m
 
 ### Windows
 
-1- Install a MySQL service (preferably MySQL Workbench) and use the provided SQL files to setup the database.
-2- Install and open the [Qt Online Installer](https://www.qt.io/download-qt-installer-oss) for Windows.
-3- Install Qt Framework (Version 6.8 LTS) & QtCreator using the installer.
-4- Clone the repository and open the CMakeLists.txt file in the Qt Creator.
-5- Configure the project with your favourite compiler (preferably MSVC).
-6- Build and Run the project.
+1. Install a MySQL service (preferably MySQL Workbench) and use the provided SQL files to setup the database.
+2. Install and open the [Qt Online Installer](https://www.qt.io/download-qt-installer-oss) for Windows.
+3. Install Qt Framework (Version 6.8 LTS) & QtCreator using the installer.
+4. Clone the repository and open the CMakeLists.txt file in the Qt Creator.
+5. Configure the project with your favourite compiler (preferably MSVC).
+6. Build and Run the project.
 
 ### macOS
 
-1- Install a MySQL service (preferably MySQL Workbench) and use the provided SQL files to setup the database.
-2- Install and open the [Qt Online Installer](https://www.qt.io/download-qt-installer-oss) for macOS.
-3- Install Qt Framework (Version 6.8 LTS) & QtCreator using the installer.
-4- Clone the repository and open the CMakeLists.txt file in the Qt Creator.
-5- Configure the project with your favourite compiler.
-6- Build and Run the project.  
+1. Install a MySQL service (preferably MySQL Workbench) and use the provided SQL files to setup the database.
+2. Install and open the [Qt Online Installer](https://www.qt.io/download-qt-installer-oss) for macOS.
+3. Install Qt Framework (Version 6.8 LTS) & QtCreator using the installer.
+4. Clone the repository and open the CMakeLists.txt file in the Qt Creator.
+5. Configure the project with your favourite compiler.
+6. Build and Run the project.  
 
 ### Linux
 
-1- Install a MySQL service (preferably MySQL Workbench) and use the provided SQL files to setup the database.
-2- The project uses a MySQL database. Therefore, you may need to install additional packages to make the project work on Linux:
+1. Install a MySQL service (preferably MySQL Workbench) and use the provided SQL files to setup the database.
+2. The project uses a MySQL database. Therefore, you may need to install additional packages to make the project work on Linux:
 ```diff
 sudo apt install libmysqlclient-dev
 ```
-3- Since QML uses OpenGL, on Linux systems, you may need to install additional dependencies to avoid errors:
+3. Since QML uses OpenGL, on Linux systems, you may need to install additional dependencies to avoid errors:
 ```diff
 sudo apt install libglx-dev libgl1-mesa-dev
 ```
-4- The project uses the 'PrintSupport' module. Therefore, you may need to install the CUPS printing system module for Linux:
+4. The project uses the 'PrintSupport' module. Therefore, you may need to install the CUPS printing system module for Linux:
 ```diff
 sudo apt-get install libcups2-dev
 ```
-5- Install and open the [Qt Online Installer](https://www.qt.io/download-qt-installer-oss) for Linux.
-6- Install Qt Framework (Version 6.8 LTS) & QtCreator using the installer.
-7- Clone the repository and open the CMakeLists.txt file in the Qt Creator.
-8- Configure the project with your favourite compiler.
-9- Build and Run the project.
+5. Install and open the [Qt Online Installer](https://www.qt.io/download-qt-installer-oss) for Linux.
+6. Install Qt Framework (Version 6.8 LTS) & QtCreator using the installer.
+7. Clone the repository and open the CMakeLists.txt file in the Qt Creator.
+8. Configure the project with your favourite compiler.
+9. Build and Run the project.
 
 
 ## Drivers
