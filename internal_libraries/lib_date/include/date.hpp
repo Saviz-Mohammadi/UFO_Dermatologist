@@ -15,6 +15,8 @@ class Date : public QObject
     Q_OBJECT
     Q_DISABLE_COPY_MOVE(Date) // Needed for Singleton
 
+    // Q_PROPERTY
+
 public:
     explicit Date(QObject *parent = Q_NULLPTR, const QString& name = "No name");
     ~Date();
@@ -22,8 +24,24 @@ public:
     static Date *qmlInstance(QQmlEngine *engine, QJSEngine *scriptEngine);
     static Date *cppInstance(QObject *parent = Q_NULLPTR);
 
+    static void Init();
+    static void ShutDown();
+
+    // PUBLIC Enums
+public:
+
+    // Fields
 private:
     static Date *m_Instance;
+
+    // Signals
+signals:
+
+    // PUBLIC Slots:
+public slots:
+
+    // PRIVATE Slots:
+private slots:
 
     // PUBLIC Methods
 public:
@@ -32,6 +50,21 @@ public:
     QString gregorianToJalali(QDate georgian);
     Q_INVOKABLE QString calculateJalaliAge(quint32 birthYear);
     Q_INVOKABLE QString differenceToDateJalali(int year, int month, int day);
+
+    // PRIVATE Methods
+private:
+
+    // PUBLIC Getters
+public:
+
+    // PRIVATE Getters
+public:
+
+    // PUBLIC Setters
+public:
+
+    // PRIVATE Setters
+private:
 };
 
 #endif // DATE_H

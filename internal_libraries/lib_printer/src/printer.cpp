@@ -7,7 +7,7 @@
 
 Printer *Printer::m_Instance = Q_NULLPTR;
 
-// Constructors, Initializers, Destructor *
+// Constructors, Init, ShutDown, Destructor
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 
@@ -65,6 +65,20 @@ Printer *Printer::cppInstance(QObject *parent)
     m_Instance = instance;
 
     return (instance);
+}
+
+// NOTE (SAVIZ): Not needed. However, provided just in case.
+void Printer::Init()
+{
+    // Init resources;
+}
+
+// NOTE (SAVIZ): In Qt, this isn't necessary due to its parent-child memory management system. However, in standard C++, it's a good practice to either explicitly call this when we're done with the object or ensure it gets invoked within the destructor.
+void Printer::ShutDown()
+{
+    delete (m_Instance);
+
+    m_Instance = Q_NULLPTR;
 }
 
 // [[------------------------------------------------------------------------]]
@@ -153,4 +167,3 @@ void Printer::setPatientID(unsigned int newPatientID)
 
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
-// PUBLIC Methods

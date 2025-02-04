@@ -4,10 +4,9 @@
 
 #include "app_theme.hpp"
 
-
 AppTheme* AppTheme::m_Instance = Q_NULLPTR;
 
-// Constructors, Initializers, ShutDown, Destructor
+// Constructors, Init, ShutDown, Destructor
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 
@@ -19,26 +18,18 @@ AppTheme::AppTheme(QObject *parent, const QString& name)
     this->setObjectName(name);
 
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "None";
-    qDebug() << "Log Output           :" << "None";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
+    qDebug() << "Log Output :" << "None";
 #endif
 }
 
 AppTheme::~AppTheme()
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "None";
-    qDebug() << "Log Output           :" << "None";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
+    qDebug() << "Log Output :" << "None";
 #endif
 }
 
@@ -68,7 +59,13 @@ AppTheme *AppTheme::cppInstance(QObject *parent)
     return(instance);
 }
 
-// NOTE: In Qt, this isn't necessary due to its parent-child memory management system. However, in standard C++, it's a good practice to either explicitly call this when we're done with the object or ensure it gets invoked within the destructor.
+// NOTE (SAVIZ): Not needed. However, provided just in case.
+void AppTheme::Init()
+{
+    // Init resources;
+}
+
+// NOTE (SAVIZ): In Qt, this isn't necessary due to its parent-child memory management system. However, in standard C++, it's a good practice to either explicitly call this when we're done with the object or ensure it gets invoked within the destructor.
 void AppTheme::ShutDown()
 {
     delete (m_Instance);
@@ -92,19 +89,14 @@ void AppTheme::addTheme(const QString &filePath)
     QFile file(filePath);
     QFileInfo fileInfo(file);
 
-
     if (!file.exists())
     {        
 #ifdef QT_DEBUG
         QString logOutput = QString("File does not exist: %1").arg(fileInfo.absolutePath());
 
-        qDebug() << "[DEBUG]";
-        qDebug() << "--------------------------------------------------------------------------------";
-        qDebug() << "objectName           :" << this->objectName();
-        qDebug() << "function Information :" << Q_FUNC_INFO;
-        qDebug() << "Arguments            :" << filePath;
-        qDebug() << "Log Output           :" << logOutput;
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "objectName :" << this->objectName();
+        qDebug() << "Arguments  :" << filePath;
+        qDebug() << "Log Output :" << logOutput;
 #endif
 
         return;
@@ -117,17 +109,12 @@ void AppTheme::addTheme(const QString &filePath)
 #ifdef QT_DEBUG
         QString logOutput = QString("File '%1' is not of JSON type!").arg(fileInfo.fileName());
 
-        qDebug() << "[DEBUG]";
-        qDebug() << "--------------------------------------------------------------------------------";
-        qDebug() << "objectName           :" << this->objectName();
-        qDebug() << "function Information :" << Q_FUNC_INFO;
-        qDebug() << "Arguments            :" << filePath;
-        qDebug() << "Log Output           :" << logOutput;
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "objectName :" << this->objectName();
+        qDebug() << "Arguments  :" << filePath;
+        qDebug() << "Log Output :" << logOutput;
 #endif
         return;
     }
-
 
     // You can add more rules for fileName here using Regex.
 
@@ -158,9 +145,7 @@ void AppTheme::loadColorsFromTheme(const QString &themeKey)
     QVariantMap map;
     QString filePath = getThemes().value(themeKey).toString();
 
-
     cacheTheme(themeKey);
-
 
     QFile themeFile(
         filePath
@@ -170,19 +155,14 @@ void AppTheme::loadColorsFromTheme(const QString &themeKey)
         "./resources/json/placeholder.json"
     );
 
-
     if (!themeFile.open(QIODevice::ReadOnly))
     {        
 #ifdef QT_DEBUG
         QString logOutput = QString("Could not open JSON file: %1").arg(QFileInfo(themeFile).filePath());
 
-        qDebug() << "[DEBUG]";
-        qDebug() << "--------------------------------------------------------------------------------";
-        qDebug() << "objectName           :" << this->objectName();
-        qDebug() << "function Information :" << Q_FUNC_INFO;
-        qDebug() << "Arguments            :" << themeKey;
-        qDebug() << "Log Output           :" << logOutput;
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "objectName :" << this->objectName();
+        qDebug() << "Arguments  :" << themeKey;
+        qDebug() << "Log Output :" << logOutput;
 #endif
 
         return;
@@ -193,18 +173,13 @@ void AppTheme::loadColorsFromTheme(const QString &themeKey)
 #ifdef QT_DEBUG
         QString logOutput = QString("Could not open Placeholder JSON file: %1").arg(QFileInfo(placeholderFile).filePath());
 
-        qDebug() << "[DEBUG]";
-        qDebug() << "--------------------------------------------------------------------------------";
-        qDebug() << "objectName           :" << this->objectName();
-        qDebug() << "function Information :" << Q_FUNC_INFO;
-        qDebug() << "Arguments            :" << themeKey;
-        qDebug() << "Log Output           :" << logOutput;
-        qDebug() << "--------------------------------------------------------------------------------";
+        qDebug() << "objectName :" << this->objectName();
+        qDebug() << "Arguments  :" << themeKey;
+        qDebug() << "Log Output :" << logOutput;
 #endif
 
         return;
     }
-
 
     QByteArray themeJsonData = themeFile.readAll();
     themeFile.close();
@@ -212,12 +187,10 @@ void AppTheme::loadColorsFromTheme(const QString &themeKey)
     QByteArray placeholderJsonData = placeholderFile.readAll();
     placeholderFile.close();
 
-
     QString resolvedJson = resolvePlaceholders(
         themeJsonData,
         placeholderJsonData
     );
-
 
     QJsonDocument jsonDoc = QJsonDocument::fromJson(resolvedJson.toUtf8());
     QJsonObject rootObject = jsonDoc.object();
@@ -263,16 +236,13 @@ QString AppTheme::resolvePlaceholders(const QString &themeJson, const QString &p
     QJsonObject themeJsonObject = QJsonDocument::fromJson(themeJson.toUtf8()).object();
     QJsonObject placeholderJsonObject = QJsonDocument::fromJson(placeholderJson.toUtf8()).object();
 
-
     QString resolvedThemeString = themeJson;
-
 
     // Regex pattern matches placeholders with the following pattern:
     // "Color_<name>_numbers[0-9]";
     static const QRegularExpression placeholderRegex("\"(Color_[a-zA-Z]*_[0-9]+)\"");
 
     QRegularExpressionMatchIterator iter = placeholderRegex.globalMatch(themeJson);
-
 
     while (iter.hasNext())
     {
@@ -296,13 +266,9 @@ QString AppTheme::resolvePlaceholders(const QString &themeJson, const QString &p
 #ifdef QT_DEBUG
             QString logOutput = QString("Placeholder: %1 not found!").arg(placeholder);
 
-            qDebug() << "[DEBUG]";
-            qDebug() << "--------------------------------------------------------------------------------";
-            qDebug() << "objectName           :" << this->objectName();
-            qDebug() << "function Information :" << Q_FUNC_INFO;
-            qDebug() << "Arguments            :" << themeJson << "\n" << placeholderJson;
-            qDebug() << "Log Output           :" << logOutput;
-            qDebug() << "--------------------------------------------------------------------------------";
+            qDebug() << "objectName :" << this->objectName();
+            qDebug() << "Arguments  :" << themeJson << "\n" << placeholderJson;
+            qDebug() << "Log Output :" << logOutput;
 #endif
         }
     }
@@ -341,12 +307,10 @@ QString AppTheme::getCachedTheme() const
 
     QVariant returnValue = settings.value("lastUsedThemeKey");
 
-
     if(returnValue.isNull())
     {
         return "";
     }
-
 
     return (returnValue.toString());
 }

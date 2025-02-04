@@ -13,8 +13,6 @@
 #include <QDateTime>
 #include <QTextStream>
 
-// NOTE (SAVIZ): The combination of 'QVariantMap' and 'QVariantList' enbales us to replicate any type of data structure and exposed it easilly to QML. For this reason I don't use any intermidiate objects or strcuts for data transfer.
-
 class Database : public QObject
 {
     Q_OBJECT
@@ -30,7 +28,10 @@ public:
     static Database *qmlInstance(QQmlEngine *engine, QJSEngine *scriptEngine);
     static Database *cppInstance(QObject *parent = Q_NULLPTR);
 
-    // Enum
+    static void Init();
+    static void ShutDown();
+
+    // PUBLIC Enum
 public:
     enum class QueryType
     {
@@ -43,11 +44,9 @@ public:
 
     Q_ENUM(QueryType)
 
-private:
-    static Database *m_Instance;
-
     // Fields
 private:
+    static Database *m_Instance;
     QSqlDatabase m_QSqlDatabase;
     bool m_ConnectionStatus;
     QVariantList m_DiagnosisList;
@@ -63,6 +62,12 @@ private:
 signals:
     void connectionStatusChanged(const QString &message);
     void queryExecuted(QueryType type, bool success, const QString &message);
+
+    // PUBLIC Slots:
+public slots:
+
+    // PRIVATE Slots:
+private slots:
 
     // PUBLIC Methods
 public:
@@ -130,6 +135,15 @@ public:
     Q_INVOKABLE QVariantList getLabList() const;
     Q_INVOKABLE QVariantList getSearchResultList() const;
     Q_INVOKABLE QVariantMap getPatientDataMap() const;
+
+    // PRIVATE Getters
+public:
+
+    // PUBLIC Setters
+public:
+
+    // PRIVATE Setters
+private:
 };
 
 #endif // DATABASE_H

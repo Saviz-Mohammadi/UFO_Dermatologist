@@ -4,13 +4,11 @@
 
 #include "date.hpp"
 
-
 Date *Date::m_Instance = Q_NULLPTR;
 
-// Constructors, Initializers, Destructor
+// Constructors, Init, ShutDown, Destructor
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
-
 
 Date::Date(QObject *parent, const QString &name)
     : QObject{parent}
@@ -18,26 +16,18 @@ Date::Date(QObject *parent, const QString &name)
     this->setObjectName(name);
 
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "None";
-    qDebug() << "Log Output           :" << "None";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
+    qDebug() << "Log Output :" << "None";
 #endif
 }
 
 Date::~Date()
 {
 #ifdef QT_DEBUG
-    qDebug() << "[DEBUG]";
-    qDebug() << "--------------------------------------------------------------------------------";
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "function Information :" << Q_FUNC_INFO;
-    qDebug() << "Arguments            :" << "None";
-    qDebug() << "Log Output           :" << "None";
-    qDebug() << "--------------------------------------------------------------------------------";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
+    qDebug() << "Log Output :" << "None";
 #endif
 }
 
@@ -65,6 +55,20 @@ Date *Date::cppInstance(QObject *parent)
     m_Instance = instance;
 
     return (instance);
+}
+
+// NOTE (SAVIZ): Not needed. However, provided just in case.
+void Date::Init()
+{
+    // Init resources;
+}
+
+// NOTE (SAVIZ): In Qt, this isn't necessary due to its parent-child memory management system. However, in standard C++, it's a good practice to either explicitly call this when we're done with the object or ensure it gets invoked within the destructor.
+void Date::ShutDown()
+{
+    delete (m_Instance);
+
+    m_Instance = Q_NULLPTR;
 }
 
 // [[------------------------------------------------------------------------]]

@@ -8,7 +8,7 @@
 
 Database *Database::m_Instance = Q_NULLPTR;
 
-// Constructors, Initializers, Destructor *
+// Constructors, Init, ShutDown, Destructor
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 
@@ -72,6 +72,20 @@ Database *Database::cppInstance(QObject *parent)
     return (instance);
 }
 
+// NOTE (SAVIZ): Not needed. However, provided just in case.
+void Database::Init()
+{
+    // Init resources;
+}
+
+// NOTE (SAVIZ): In Qt, this isn't necessary due to its parent-child memory management system. However, in standard C++, it's a good practice to either explicitly call this when we're done with the object or ensure it gets invoked within the destructor.
+void Database::ShutDown()
+{
+    delete (m_Instance);
+
+    m_Instance = Q_NULLPTR;
+}
+
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 
@@ -83,7 +97,7 @@ Database *Database::cppInstance(QObject *parent)
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 
-// CONNECTIONS *
+// CONNECTIONS
 bool Database::establishConnection(const QString &ipAddress, qint16 port, const QString &schema, const QString &username, const QString &password)
 {
 #ifdef QT_DEBUG
@@ -232,7 +246,7 @@ bool Database::disconnectFromDatabase()
     return (true);
 }
 
-// INSERT *
+// INSERT
 bool Database::createPatient(const QString &firstName, const QString &lastName, quint32 birthYear, const QString &phoneNumber, const QString &gender, const QString &maritalStatus)
 {
 #ifdef QT_DEBUG
@@ -291,7 +305,7 @@ bool Database::createPatient(const QString &firstName, const QString &lastName, 
     return (true);
 }
 
-// SEARCH *
+// SEARCH
 bool Database::findPatient(const quint64 patientID)
 {
 #ifdef QT_DEBUG
@@ -2156,7 +2170,7 @@ bool Database::changeDeletionStatus(bool newStatus)
 
 
 
-// PRIVATE Methods *
+// PRIVATE Methods
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 
@@ -2469,7 +2483,7 @@ QPair<bool, QString> Database::populateLabList()
 
 
 
-// PUBLIC Getters *
+// PUBLIC Getters
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 

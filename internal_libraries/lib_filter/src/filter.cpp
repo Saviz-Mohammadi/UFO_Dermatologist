@@ -4,7 +4,7 @@
 
 #include "filter.hpp"
 
-// Constructors, Initializers, Destructor
+// Constructors, Init, ShutDown, Destructor
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 
@@ -14,9 +14,18 @@ CustomProxyModel::CustomProxyModel(QObject *parent)
     setFilterCaseSensitivity(Qt::CaseInsensitive);
 
 #ifdef QT_DEBUG
-    qDebug() << "objectName           :" << this->objectName();
-    qDebug() << "Arguments            :" << "None";
-    qDebug() << "Log Output           :" << "None";
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
+    qDebug() << "Log Output :" << "None";
+#endif
+}
+
+CustomProxyModel::~CustomProxyModel()
+{
+#ifdef QT_DEBUG
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
+    qDebug() << "Log Output :" << "None";
 #endif
 }
 
@@ -70,7 +79,9 @@ bool CustomProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &source
     QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
     QVariant data = sourceModel()->data(index, roleIndex);
 
+#ifdef QT_DEBUG
     qDebug() << "Data for filtering:" << data << "Type:" << data.typeName();
+#endif
 
     return data.toString().contains(m_filterText, Qt::CaseInsensitive);
 }
