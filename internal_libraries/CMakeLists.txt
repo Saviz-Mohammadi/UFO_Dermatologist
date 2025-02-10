@@ -7,8 +7,7 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib_database")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib_date")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib_filter")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib_printer")
-
-# Add more internal libraries as needed...
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib_notifier")
 
 # [[ ----------------------------------------------------------------------- ]]
 # [[ ----------------------------------------------------------------------- ]]

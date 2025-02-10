@@ -16,7 +16,7 @@ ApplicationWindow {
     height: 600
 
     visible: true
-    title: qsTr("UFO_Dermatologist")
+    title: qsTr("DermaBase")
 
     menuBar: UFO_MenuBar {
         spacing: 0

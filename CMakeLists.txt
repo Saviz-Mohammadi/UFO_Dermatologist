@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 # [[ ----------------------------------------------------------------------- ]]
 # [[ ----------------------------------------------------------------------- ]]
 
-project("UFO_Dermatologist"
+project("DermaBase"
 
     VERSION 0.0.1
 
@@ -253,7 +253,8 @@ target_link_libraries(${EXECUTABLE_NAME}
     "Lib_Database"
     "Lib_Date"
     "Lib_Filter"
-    "Lib_Printer")
+    "Lib_Printer"
+    "Lib_NOTIFIER")
 
 # [[ ----------------------------------------------------------------------- ]]
 # [[ ----------------------------------------------------------------------- ]]

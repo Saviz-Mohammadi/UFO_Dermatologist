@@ -11,6 +11,7 @@
 #include "date.hpp"
 #include "filter.hpp"
 #include "printer.hpp"
+#include "notifier.hpp"
 
 
 void registerTypes();

@@ -2163,6 +2163,56 @@ bool Database::changeDeletionStatus(bool newStatus)
     return (true);
 }
 
+// Notifier
+QList<QVariantMap> Database::getUpcomingVisits()
+{
+#ifdef QT_DEBUG
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
+#endif
+
+    QList<QVariantMap> patients;
+
+    QSqlQuery query(m_QSqlDatabase);
+
+    QString queryString = R"(
+        SELECT email, DATEDIFF(expected_visit_date, CURDATE()) AS days_left FROM patients
+        WHERE expected_visit_date IS NOT NULL AND DATEDIFF(expected_visit_date, CURDATE()) BETWEEN 1 AND 3
+    )";
+
+    query.prepare(queryString);
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
+#endif
+
+        return (patients);
+    }
+
+    if (query.size() == 0)
+    {
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Query returned no results.";
+#endif
+
+        return (patients);
+    }
+
+    while (query.next())
+    {
+        QVariantMap patient;
+
+        patient["email"] = query.value("email").toString();
+        patient["days_left"] = query.value("days_left").toInt();
+
+        patients.append(patient);
+    }
+
+    return patients;
+}
+
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 

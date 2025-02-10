@@ -1,0 +1,19 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/out
+/build
+/Testing
+/.vscode/tasks.json
+/.vscode/launch.json
+/.vscode/settings.json
+simpleclient
+.cache
+tags
+Session.vim
+.vimspector.json
+.ccls-cache
+.idea
+cmake-build-debug

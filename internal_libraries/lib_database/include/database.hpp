@@ -115,6 +115,9 @@ public:
     // DELETION
     Q_INVOKABLE bool changeDeletionStatus(bool newStatus);
 
+    // Notifier
+    QList<QVariantMap> getUpcomingVisits();
+
     // PRIVATE Methods
 private:
     QPair<bool, QString> populateDiagnosisList();
