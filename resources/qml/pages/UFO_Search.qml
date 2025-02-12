@@ -64,6 +64,8 @@ UFO_SplitView {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
 
+                anchors.margins: 15
+
                 spacing: 2
                 clip: true
 

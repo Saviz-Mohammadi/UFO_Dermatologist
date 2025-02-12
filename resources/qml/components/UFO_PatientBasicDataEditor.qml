@@ -35,732 +35,582 @@ Item {
         title: qsTr("اطلاعات پایه")
         contentSpacing: 2
 
-        GridLayout {
+        ScrollView {
             Layout.fillWidth: true
-            Layout.fillHeight: true
+            Layout.preferredHeight: 550
 
-            Layout.margins: 15
+            Layout.topMargin: 20
+            Layout.bottomMargin: 20
 
-            columns: 2
-            rows: 20
+            contentWidth: -1
 
-            columnSpacing: 5
-            rowSpacing: 7
+            ColumnLayout {
+                anchors.fill: parent
 
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                Layout.column: 0
-                Layout.columnSpan: 2
-                Layout.row: 0
-
-                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Background"])
+                anchors.leftMargin: 20
+                anchors.rightMargin: 20
 
                 Text {
-                    id: text_PatientID
+                    Layout.fillWidth: true
 
-                    anchors.fill: parent
+                    text: qsTr("نام")
 
-                    text: qsTr("شماره پرونده ()")
-
-                    verticalAlignment: Text.AlignVCenter
+                    verticalAlignment: Text.AlignBottom
 
                     color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
                 }
 
-                Connections {
-                    target: Database
+                UFO_TextField {
+                    id: textField_FirstName
 
-                    function onQueryExecuted(type, success, message) {
-                        if(type !== Database.QueryType.SELECT) {
-                            return;
-                        }
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 35
 
-                        if(success === false) {
-                            return;
-                        }
+                    enabled: (Database.connectionStatus === true) ? true : false
 
-                        text_PatientID.text = qsTr("شماره پرونده (") + Database.getPatientDataMap()["patient_id"] + qsTr(")");
-                    }
-                }
-            }
-
-            Text {
-                Layout.fillWidth: true
-
-                Layout.column: 1
-                Layout.row: 1
-
-                Layout.topMargin: 7
-
-                text: qsTr("نام")
-
-                verticalAlignment: Text.AlignBottom
-
-                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-            }
-
-            UFO_TextField {
-                id: textField_FirstName
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                Layout.column: 1
-                Layout.row: 2
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                validator: RegularExpressionValidator {
-                    regularExpression: /^[A-Za-z]+$/
-                }
-
-                Connections {
-                    target: Database
-
-                    function onQueryExecuted(type, success, message) {
-                        if(type !== Database.QueryType.SELECT) {
-                            return;
-                        }
-
-                        if(success === false) {
-                            return;
-                        }
-
-                        textField_FirstName.text = Database.getPatientDataMap()["first_name"];
-                    }
-                }
-            }
-
-            Text {
-                Layout.fillWidth: true
-
-                Layout.column: 0
-                Layout.row: 1
-
-                Layout.topMargin: 7
-
-                text: qsTr("نام خانوادگی")
-
-                verticalAlignment: Text.AlignBottom
-
-                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-            }
-
-            UFO_TextField {
-                id: textField_LastName
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                Layout.column: 0
-                Layout.row: 2
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                validator: RegularExpressionValidator {
-                    regularExpression: /^[A-Za-z]+$/
-                }
-
-                Connections {
-                    target: Database
-
-                    function onQueryExecuted(type, success, message) {
-                        if(type !== Database.QueryType.SELECT) {
-                            return;
-                        }
-
-                        if(success === false) {
-                            return;
-                        }
-
-                        textField_LastName.text = Database.getPatientDataMap()["last_name"];
-                    }
-                }
-            }
-
-            Text {
-                Layout.fillWidth: true
-
-                Layout.column: 1
-                Layout.row: 3
-
-                text: qsTr("سال تولد")
-
-                verticalAlignment: Text.AlignBottom
-
-                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-            }
-
-            UFO_TextField {
-                id: textField_BirthYear
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                Layout.column: 1
-                Layout.row: 4
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                horizontalAlignment: Text.AlignRight
-
-                validator: RegularExpressionValidator {
-                    regularExpression: /^[1-9]\d*$/
-                }
-
-                Connections {
-                    target: Database
-
-                    function onQueryExecuted(type, success, message) {
-                        if(type !== Database.QueryType.SELECT) {
-                            return;
-                        }
-
-                        if(success === false) {
-                            return;
-                        }
-
-                        textField_BirthYear.text = Database.getPatientDataMap()["birth_year"];
-                    }
-                }
-            }
-
-            Text {
-                Layout.fillWidth: true
-
-                Layout.column: 0
-                Layout.row: 3
-
-                text: qsTr("سن")
-
-                verticalAlignment: Text.AlignBottom
-
-                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-            }
-
-            UFO_TextField {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                Layout.column: 0
-                Layout.row: 4
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                readOnly: true
-                horizontalAlignment: Text.AlignRight
-                text: (textField_BirthYear.text.trim() === "") ? "0" : Date.calculateJalaliAge(parseInt(textField_BirthYear.text.trim(), 10))
-            }
-
-            Text {
-                Layout.fillWidth: true
-
-                Layout.column: 0
-                Layout.columnSpan: 2
-                Layout.row: 5
-
-                text: qsTr("شماره تلفن")
-
-                verticalAlignment: Text.AlignBottom
-
-                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-            }
-
-            UFO_TextField {
-                id: textField_PhoneNumber
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                Layout.column: 0
-                Layout.columnSpan: 2
-                Layout.row: 6
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                horizontalAlignment: Text.AlignRight
-
-                validator: RegularExpressionValidator {
-                    regularExpression: /^\+\d{1,3} \(\d{3}\) \d{3}-\d{4}$/
-                }
-
-                Connections {
-                    target: Database
-
-                    function onQueryExecuted(type, success, message) {
-                        if(type !== Database.QueryType.SELECT) {
-                            return;
-                        }
-
-                        if(success === false) {
-                            return;
-                        }
-
-                        textField_PhoneNumber.text = Database.getPatientDataMap()["phone_number"];
-                    }
-                }
-            }
-
-            Text {
-                Layout.fillWidth: true
-
-                Layout.column: 1
-                Layout.row: 7
-
-                Layout.topMargin: 25
-
-                text: qsTr("جنسیت")
-
-                elide: Text.ElideRight
-                wrapMode: Text.NoWrap
-
-                verticalAlignment: Text.AlignBottom
-
-                font.pixelSize: Qt.application.font.pixelSize * 1
-                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-            }
-
-            UFO_ComboBox {
-                id: comboBox_Gender
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                Layout.column: 1
-                Layout.row: 8
-
-                enabled: (Database.connectionStatus === true) ? true : false
-                model: ["نامشخص", "مرد", "زن"]
-
-                Connections {
-                    target: Database
-
-                    function onQueryExecuted(type, success, message) {
-                        if(type !== Database.QueryType.SELECT) {
-                            return;
-                        }
-
-                        if(success === false) {
-                            return;
-                        }
-
-                        switch (Database.getPatientDataMap()["gender"]) {
-                            case "نامشخص":
-                                comboBox_Gender.currentIndex = 0;
-                                break;
-                            case "مرد":
-                                comboBox_Gender.currentIndex = 1;
-                                break;
-                            default:
-                                comboBox_Gender.currentIndex = 2;
-                        };
-                    }
-                }
-            }
-
-            Text {
-                Layout.fillWidth: true
-
-                Layout.column: 0
-                Layout.row: 7
-
-                Layout.topMargin: 25
-
-                text: qsTr("وضعیت تأهل")
-
-                elide: Text.ElideRight
-                wrapMode: Text.NoWrap
-
-                verticalAlignment: Text.AlignBottom
-
-                font.pixelSize: Qt.application.font.pixelSize * 1
-                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-            }
-
-            UFO_ComboBox {
-                id: comboBox_MaritalStatus
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                Layout.column: 0
-                Layout.row: 8
-
-                enabled: (Database.connectionStatus === true) ? true : false
-                model: ["نامشخص", "مجرد", "متاهل"]
-
-                Connections {
-                    target: Database
-
-                    function onQueryExecuted(type, success, message) {
-                        if(type !== Database.QueryType.SELECT) {
-                            return;
-                        }
-
-                        if(success === false) {
-                            return;
-                        }
-
-                        switch (Database.getPatientDataMap()["marital_status"]) {
-                            case "نامشخص":
-                                comboBox_Gender.currentIndex = 0;
-                                break;
-                            case "مجرد":
-                                comboBox_Gender.currentIndex = 1;
-                                break;
-                            default:
-                                comboBox_Gender.currentIndex = 2;
-                        };
-                    }
-                }
-            }
-
-            Text {
-                Layout.fillWidth: true
-
-                Layout.column: 0
-                Layout.columnSpan: 2
-                Layout.row: 9
-
-                Layout.topMargin: 25
-
-                text: qsTr("تعداد بازدیدهای قبلی")
-
-                elide: Text.ElideRight
-                wrapMode: Text.NoWrap
-
-                verticalAlignment: Text.AlignBottom
-
-                font.pixelSize: Qt.application.font.pixelSize * 1
-                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-            }
-
-            UFO_TextField {
-                id: textField_NumberOfPreviousVisits
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                Layout.column: 0
-                Layout.columnSpan: 2
-                Layout.row: 10
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                horizontalAlignment: Text.AlignRight
-
-                validator: RegularExpressionValidator {
-                    regularExpression: /^[0-9]\d*$/
-                }
-
-                Connections {
-                    target: Database
-
-                    function onQueryExecuted(type, success, message) {
-                        if(type !== Database.QueryType.SELECT) {
-                            return;
-                        }
-
-                        if(success === false) {
-                            return;
-                        }
-
-                        textField_NumberOfPreviousVisits.text = Database.getPatientDataMap()["number_of_previous_visits"];
-                    }
-                }
-            }
-
-            Text {
-                Layout.fillWidth: true
-
-                Layout.column: 1
-                Layout.row: 11
-
-                text: qsTr("تاریخ اولین بازدید")
-
-                elide: Text.ElideRight
-                wrapMode: Text.NoWrap
-
-                verticalAlignment: Text.AlignBottom
-
-                font.pixelSize: Qt.application.font.pixelSize * 1
-                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-            }
-
-            UFO_TextField {
-                id: textField_FirstVisitDate
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                Layout.column: 1
-                Layout.row: 12
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                horizontalAlignment: Text.AlignRight
-
-                validator: RegularExpressionValidator {
-                    regularExpression: /^[12]\d{3}-[01]\d-[0-3]\d$/
-                }
-
-                Connections {
-                    target: Database
-
-                    function onQueryExecuted(type, success, message) {
-                        if(type !== Database.QueryType.SELECT) {
-                            return;
-                        }
-
-                        if(success === false) {
-                            return;
-                        }
-
-                        textField_FirstVisitDate.text = Database.getPatientDataMap()["first_visit_date"];
-                    }
-                }
-            }
-
-            Text {
-                Layout.fillWidth: true
-
-                Layout.column: 0
-                Layout.row: 11
-
-                text: qsTr("زمان گذشته از اولین بازدید")
-
-                elide: Text.ElideRight
-                wrapMode: Text.NoWrap
-
-                verticalAlignment: Text.AlignBottom
-
-                font.pixelSize: Qt.application.font.pixelSize * 1
-                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-            }
-
-            UFO_TextField {
-                id: textField_DifferenceFirstDate
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                Layout.column: 0
-                Layout.row: 12
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                horizontalAlignment: Text.AlignRight
-
-                readOnly: true
-
-                Connections {
-                    target: textField_FirstVisitDate
-
-                    // TODO: (Saviz): Add trim() to texts:
-                    function onTextChanged() {
-
-                        if (textField_FirstVisitDate.text.match(/^[12]\d{3}-[01]\d-[0-3]\d$/)) { // Validate the format
-                            const year = textField_FirstVisitDate.text.substring(0, 4);   // Extract year
-                            const month = textField_FirstVisitDate.text.substring(5, 7); // Extract month
-                            const day = textField_FirstVisitDate.text.substring(8, 10);  // Extract day
-
-                            textField_DifferenceFirstDate.text = Date.differenceToDateJalali(year, month, day);
-
-                            return;
-                        }
-
-                        textField_DifferenceFirstDate.clear();
+                    validator: RegularExpressionValidator {
+                        regularExpression: /^[A-Za-z]+$/
                     }
 
-                    function onTextEdited() {
+                    Connections {
+                        target: Database
 
-                        if (textField_FirstVisitDate.text.match(/^[12]\d{3}-[01]\d-[0-3]\d$/)) { // Validate the format
-                            const year = textField_FirstVisitDate.text.substring(0, 4);   // Extract year
-                            const month = textField_FirstVisitDate.text.substring(5, 7); // Extract month
-                            const day = textField_FirstVisitDate.text.substring(8, 10);  // Extract day
+                        function onQueryExecuted(type, success, message) {
+                            if(type !== Database.QueryType.SELECT) {
+                                return;
+                            }
 
-                            textField_DifferenceFirstDate.text = Date.differenceToDateJalali(year, month, day);
+                            if(success === false) {
+                                return;
+                            }
 
-                            return;
+                            textField_FirstName.text = Database.getPatientDataMap()["first_name"];
                         }
-
-                        textField_DifferenceFirstDate.clear();
                     }
                 }
-            }
 
-            Text {
-                Layout.fillWidth: true
+                Text {
+                    Layout.fillWidth: true
 
-                Layout.column: 1
-                Layout.row: 13
+                    text: qsTr("نام خانوادگی")
 
-                text: qsTr("تاریخ آخرین بازدید")
+                    verticalAlignment: Text.AlignBottom
 
-                elide: Text.ElideRight
-                wrapMode: Text.NoWrap
-
-                verticalAlignment: Text.AlignBottom
-
-                font.pixelSize: Qt.application.font.pixelSize * 1
-                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-            }
-
-            UFO_TextField {
-                id: textField_RecentVisitDate
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                Layout.column: 1
-                Layout.row: 14
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                horizontalAlignment: Text.AlignRight
-
-                validator: RegularExpressionValidator {
-                    regularExpression: /^[12]\d{3}-[01]\d-[0-3]\d$/
+                    color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
                 }
 
-                Connections {
-                    target: Database
+                UFO_TextField {
+                    id: textField_LastName
 
-                    function onQueryExecuted(type, success, message) {
-                        if(type !== Database.QueryType.SELECT) {
-                            return;
-                        }
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 35
 
-                        if(success === false) {
-                            return;
-                        }
+                    enabled: (Database.connectionStatus === true) ? true : false
 
-                        textField_RecentVisitDate.text = Database.getPatientDataMap()["recent_visit_date"];
-                    }
-                }
-            }
-
-            Text {
-                Layout.fillWidth: true
-
-                Layout.column: 0
-                Layout.row: 13
-
-                text: qsTr("زمان گذشته از آخرین بازدید")
-
-                elide: Text.ElideRight
-                wrapMode: Text.NoWrap
-
-                verticalAlignment: Text.AlignBottom
-
-                font.pixelSize: Qt.application.font.pixelSize * 1
-                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-            }
-
-            UFO_TextField {
-                id: textField_DifferenceRecentDate
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
-
-                Layout.column: 0
-                Layout.row: 14
-
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                horizontalAlignment: Text.AlignRight
-
-                readOnly: true
-
-                Connections {
-                    target: textField_RecentVisitDate
-
-                    // TODO: (Saviz): Add trim() to texts:
-                    function onTextChanged() {
-
-                        if (textField_RecentVisitDate.text.match(/^[12]\d{3}-[01]\d-[0-3]\d$/)) { // Validate the format
-                            const year = textField_RecentVisitDate.text.substring(0, 4);   // Extract year
-                            const month = textField_RecentVisitDate.text.substring(5, 7); // Extract month
-                            const day = textField_RecentVisitDate.text.substring(8, 10);  // Extract day
-
-                            textField_DifferenceRecentDate.text = Date.differenceToDateJalali(year, month, day);
-
-                            return;
-                        }
-
-                        textField_RecentVisitDate.clear();
+                    validator: RegularExpressionValidator {
+                        regularExpression: /^[A-Za-z]+$/
                     }
 
-                    function onTextEdited() {
+                    Connections {
+                        target: Database
 
-                        if (textField_RecentVisitDate.text.match(/^[12]\d{3}-[01]\d-[0-3]\d$/)) { // Validate the format
-                            const year = textField_RecentVisitDate.text.substring(0, 4);   // Extract year
-                            const month = textField_RecentVisitDate.text.substring(5, 7); // Extract month
-                            const day = textField_RecentVisitDate.text.substring(8, 10);  // Extract day
+                        function onQueryExecuted(type, success, message) {
+                            if(type !== Database.QueryType.SELECT) {
+                                return;
+                            }
 
-                            textField_DifferenceRecentDate.text = Date.differenceToDateJalali(year, month, day);
+                            if(success === false) {
+                                return;
+                            }
 
-                            return;
+                            textField_LastName.text = Database.getPatientDataMap()["last_name"];
                         }
-
-                        textField_RecentVisitDate.clear();
                     }
                 }
-            }
 
-            Text {
-                Layout.fillWidth: true
+                RowLayout {
+                    Layout.fillWidth: true
 
-                Layout.topMargin: 25
+                    spacing: 20
 
-                Layout.column: 0
-                Layout.columnSpan: 2
-                Layout.row: 15
+                    Item {
+                        Layout.fillWidth: true
+                    }
 
-                text: qsTr("قیمت خدمات")
+                    Text {
+                        Layout.preferredWidth: 30
 
-                elide: Text.ElideRight
-                wrapMode: Text.NoWrap
+                        text: (textField_BirthYear.text.trim() === "") ? " >> سن " + "(0)" : " >> سن " + "(" + Date.calculateJalaliAge(parseInt(textField_BirthYear.text.trim(), 10)) + ")"
 
-                verticalAlignment: Text.AlignBottom
+                        verticalAlignment: Text.AlignBottom
 
-                font.pixelSize: Qt.application.font.pixelSize * 1
-                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
-            }
+                        color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+                    }
 
-            UFO_TextField {
-                id: textField_ServicePrice
+                    Text {
+                        Layout.preferredWidth: 30
 
-                Layout.fillWidth: true
-                Layout.preferredHeight: 35
+                        text: qsTr("سال تولد")
 
-                Layout.column: 0
-                Layout.columnSpan: 2
-                Layout.row: 16
+                        verticalAlignment: Text.AlignBottom
 
-                enabled: (Database.connectionStatus === true) ? true : false
-
-                horizontalAlignment: Text.AlignRight
-
-                validator: RegularExpressionValidator {
-                    regularExpression: /^[0-9]*\.?[0-9]+$/
+                        color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+                    }
                 }
 
-                Connections {
-                    target: Database
+                UFO_TextField {
+                    id: textField_BirthYear
 
-                    function onQueryExecuted(type, success, message) {
-                        if(type !== Database.QueryType.SELECT) {
-                            return;
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 35
+
+                    enabled: (Database.connectionStatus === true) ? true : false
+
+                    horizontalAlignment: Text.AlignRight
+
+                    validator: RegularExpressionValidator {
+                        regularExpression: /^[1-9]\d*$/
+                    }
+
+                    Connections {
+                        target: Database
+
+                        function onQueryExecuted(type, success, message) {
+                            if(type !== Database.QueryType.SELECT) {
+                                return;
+                            }
+
+                            if(success === false) {
+                                return;
+                            }
+
+                            textField_BirthYear.text = Database.getPatientDataMap()["birth_year"];
+                        }
+                    }
+                }
+
+                Text {
+                    Layout.fillWidth: true
+
+                    text: qsTr("شماره تلفن")
+
+                    verticalAlignment: Text.AlignBottom
+
+                    color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+                }
+
+                UFO_TextField {
+                    id: textField_PhoneNumber
+
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 35
+
+                    enabled: (Database.connectionStatus === true) ? true : false
+
+                    horizontalAlignment: Text.AlignRight
+
+                    validator: RegularExpressionValidator {
+                        regularExpression: /^\+\d{1,3} \(\d{3}\) \d{3}-\d{4}$/
+                    }
+
+                    Connections {
+                        target: Database
+
+                        function onQueryExecuted(type, success, message) {
+                            if(type !== Database.QueryType.SELECT) {
+                                return;
+                            }
+
+                            if(success === false) {
+                                return;
+                            }
+
+                            textField_PhoneNumber.text = Database.getPatientDataMap()["phone_number"];
+                        }
+                    }
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 1
+
+                    Layout.topMargin: 35
+                    Layout.bottomMargin: 25
+
+                    color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Separator"])
+                }
+
+                Text {
+                    Layout.fillWidth: true
+
+                    text: qsTr("جنسیت")
+
+                    elide: Text.ElideRight
+                    wrapMode: Text.NoWrap
+
+                    verticalAlignment: Text.AlignBottom
+
+                    font.pixelSize: Qt.application.font.pixelSize * 1
+                    color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+                }
+
+                UFO_ComboBox {
+                    id: comboBox_Gender
+
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 35
+
+                    enabled: (Database.connectionStatus === true) ? true : false
+                    model: ["نامشخص", "مرد", "زن"]
+
+                    Connections {
+                        target: Database
+
+                        function onQueryExecuted(type, success, message) {
+                            if(type !== Database.QueryType.SELECT) {
+                                return;
+                            }
+
+                            if(success === false) {
+                                return;
+                            }
+
+                            switch (Database.getPatientDataMap()["gender"]) {
+                                case "نامشخص":
+                                    comboBox_Gender.currentIndex = 0;
+                                    break;
+                                case "مرد":
+                                    comboBox_Gender.currentIndex = 1;
+                                    break;
+                                default:
+                                    comboBox_Gender.currentIndex = 2;
+                            };
+                        }
+                    }
+                }
+
+                Text {
+                    Layout.fillWidth: true
+
+                    Layout.topMargin: 25
+
+                    text: qsTr("وضعیت تأهل")
+
+                    elide: Text.ElideRight
+                    wrapMode: Text.NoWrap
+
+                    verticalAlignment: Text.AlignBottom
+
+                    font.pixelSize: Qt.application.font.pixelSize * 1
+                    color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+                }
+
+                UFO_ComboBox {
+                    id: comboBox_MaritalStatus
+
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 35
+
+                    enabled: (Database.connectionStatus === true) ? true : false
+                    model: ["نامشخص", "مجرد", "متاهل"]
+
+                    Connections {
+                        target: Database
+
+                        function onQueryExecuted(type, success, message) {
+                            if(type !== Database.QueryType.SELECT) {
+                                return;
+                            }
+
+                            if(success === false) {
+                                return;
+                            }
+
+                            switch (Database.getPatientDataMap()["marital_status"]) {
+                                case "نامشخص":
+                                    comboBox_Gender.currentIndex = 0;
+                                    break;
+                                case "مجرد":
+                                    comboBox_Gender.currentIndex = 1;
+                                    break;
+                                default:
+                                    comboBox_Gender.currentIndex = 2;
+                            };
+                        }
+                    }
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 1
+
+                    Layout.topMargin: 35
+                    Layout.bottomMargin: 25
+
+                    color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Separator"])
+                }
+
+                Text {
+                    Layout.fillWidth: true
+
+                    text: qsTr("تعداد بازدیدهای قبلی")
+
+                    elide: Text.ElideRight
+                    wrapMode: Text.NoWrap
+
+                    verticalAlignment: Text.AlignBottom
+
+                    font.pixelSize: Qt.application.font.pixelSize * 1
+                    color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+                }
+
+                UFO_TextField {
+                    id: textField_NumberOfPreviousVisits
+
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 35
+
+                    enabled: (Database.connectionStatus === true) ? true : false
+
+                    horizontalAlignment: Text.AlignRight
+
+                    validator: RegularExpressionValidator {
+                        regularExpression: /^[0-9]\d*$/
+                    }
+
+                    Connections {
+                        target: Database
+
+                        function onQueryExecuted(type, success, message) {
+                            if(type !== Database.QueryType.SELECT) {
+                                return;
+                            }
+
+                            if(success === false) {
+                                return;
+                            }
+
+                            textField_NumberOfPreviousVisits.text = Database.getPatientDataMap()["number_of_previous_visits"];
+                        }
+                    }
+                }
+
+                Text {
+                    id: text_FirstVisitDate
+
+                    Layout.fillWidth: true
+
+                    text: qsTr("تاریخ اولین بازدید")
+
+                    elide: Text.ElideRight
+                    wrapMode: Text.NoWrap
+
+                    verticalAlignment: Text.AlignBottom
+
+                    font.pixelSize: Qt.application.font.pixelSize * 1
+                    color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+
+                    Connections {
+                        target: textField_FirstVisitDate
+
+                        // TODO: (Saviz): Add trim() to texts:
+                        function onTextChanged() {
+
+                            if (textField_FirstVisitDate.text.match(/^[12]\d{3}-[01]\d-[0-3]\d$/)) { // Validate the format
+                                const year = textField_FirstVisitDate.text.substring(0, 4);   // Extract year
+                                const month = textField_FirstVisitDate.text.substring(5, 7); // Extract month
+                                const day = textField_FirstVisitDate.text.substring(8, 10);  // Extract day
+
+                                text_FirstVisitDate.text = "تاریخ اولین بازدید" + " " + Date.differenceToDateJalali(year, month, day);
+
+                                return;
+                            }
+
+                            text_FirstVisitDate.text = "تاریخ اولین بازدید";
                         }
 
-                        if(success === false) {
-                            return;
+                        function onTextEdited() {
+
+                            if (textField_FirstVisitDate.text.match(/^[12]\d{3}-[01]\d-[0-3]\d$/)) { // Validate the format
+                                const year = textField_FirstVisitDate.text.substring(0, 4);   // Extract year
+                                const month = textField_FirstVisitDate.text.substring(5, 7); // Extract month
+                                const day = textField_FirstVisitDate.text.substring(8, 10);  // Extract day
+
+                                text_FirstVisitDate.text = "تاریخ اولین بازدید" + " " + Date.differenceToDateJalali(year, month, day);
+
+                                return;
+                            }
+
+                            text_FirstVisitDate.text = "تاریخ اولین بازدید";
+                        }
+                    }
+                }
+
+                UFO_TextField {
+                    id: textField_FirstVisitDate
+
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 35
+
+                    enabled: (Database.connectionStatus === true) ? true : false
+
+                    horizontalAlignment: Text.AlignRight
+
+                    validator: RegularExpressionValidator {
+                        regularExpression: /^[12]\d{3}-[01]\d-[0-3]\d$/
+                    }
+
+                    Connections {
+                        target: Database
+
+                        function onQueryExecuted(type, success, message) {
+                            if(type !== Database.QueryType.SELECT) {
+                                return;
+                            }
+
+                            if(success === false) {
+                                return;
+                            }
+
+                            textField_FirstVisitDate.text = Database.getPatientDataMap()["first_visit_date"];
+                        }
+                    }
+                }
+
+                Text {
+                    id: text_RecentVisitDate
+
+                    Layout.fillWidth: true
+
+                    text: qsTr("تاریخ آخرین بازدید")
+
+                    elide: Text.ElideRight
+                    wrapMode: Text.NoWrap
+
+                    verticalAlignment: Text.AlignBottom
+
+                    font.pixelSize: Qt.application.font.pixelSize * 1
+                    color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+
+                    Connections {
+                        target: textField_RecentVisitDate
+
+                        // TODO: (Saviz): Add trim() to texts:
+                        function onTextChanged() {
+
+                            if (textField_RecentVisitDate.text.match(/^[12]\d{3}-[01]\d-[0-3]\d$/)) { // Validate the format
+                                const year = textField_RecentVisitDate.text.substring(0, 4);   // Extract year
+                                const month = textField_RecentVisitDate.text.substring(5, 7); // Extract month
+                                const day = textField_RecentVisitDate.text.substring(8, 10);  // Extract day
+
+                                text_RecentVisitDate.text = "تاریخ آخرین بازدید" + " " + Date.differenceToDateJalali(year, month, day);
+
+                                return;
+                            }
+
+                            text_RecentVisitDate.text = "تاریخ آخرین بازدید";
                         }
 
-                        textField_ServicePrice.text = Database.getPatientDataMap()["service_price"];
+                        function onTextEdited() {
+
+                            if (textField_RecentVisitDate.text.match(/^[12]\d{3}-[01]\d-[0-3]\d$/)) { // Validate the format
+                                const year = textField_RecentVisitDate.text.substring(0, 4);   // Extract year
+                                const month = textField_RecentVisitDate.text.substring(5, 7); // Extract month
+                                const day = textField_RecentVisitDate.text.substring(8, 10);  // Extract day
+
+                                text_RecentVisitDate.text = "تاریخ آخرین بازدید" + " " + Date.differenceToDateJalali(year, month, day);
+
+                                return;
+                            }
+
+                            text_RecentVisitDate.text = "تاریخ آخرین بازدید";
+                        }
+                    }
+                }
+
+                UFO_TextField {
+                    id: textField_RecentVisitDate
+
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 35
+
+                    enabled: (Database.connectionStatus === true) ? true : false
+
+                    horizontalAlignment: Text.AlignRight
+
+                    validator: RegularExpressionValidator {
+                        regularExpression: /^[12]\d{3}-[01]\d-[0-3]\d$/
+                    }
+
+                    Connections {
+                        target: Database
+
+                        function onQueryExecuted(type, success, message) {
+                            if(type !== Database.QueryType.SELECT) {
+                                return;
+                            }
+
+                            if(success === false) {
+                                return;
+                            }
+
+                            textField_RecentVisitDate.text = Database.getPatientDataMap()["recent_visit_date"];
+                        }
+                    }
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 1
+
+                    Layout.topMargin: 35
+                    Layout.bottomMargin: 25
+
+                    color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Separator"])
+                }
+
+                Text {
+                    Layout.fillWidth: true
+
+                    text: qsTr("قیمت خدمات")
+
+                    elide: Text.ElideRight
+                    wrapMode: Text.NoWrap
+
+                    verticalAlignment: Text.AlignBottom
+
+                    font.pixelSize: Qt.application.font.pixelSize * 1
+                    color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+                }
+
+                UFO_TextField {
+                    id: textField_ServicePrice
+
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 35
+
+                    enabled: (Database.connectionStatus === true) ? true : false
+
+                    horizontalAlignment: Text.AlignRight
+
+                    validator: RegularExpressionValidator {
+                        regularExpression: /^[0-9]*\.?[0-9]+$/
+                    }
+
+                    Connections {
+                        target: Database
+
+                        function onQueryExecuted(type, success, message) {
+                            if(type !== Database.QueryType.SELECT) {
+                                return;
+                            }
+
+                            if(success === false) {
+                                return;
+                            }
+
+                            textField_ServicePrice.text = Database.getPatientDataMap()["service_price"];
+                        }
                     }
                 }
             }

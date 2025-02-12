@@ -156,7 +156,7 @@ Item {
 
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: 250
+            Layout.preferredHeight: 300
 
             Layout.topMargin: 5
             Layout.leftMargin: 15

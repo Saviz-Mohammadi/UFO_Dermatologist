@@ -18,16 +18,57 @@ UFO_Page {
 
     contentVisible: false
 
-    UFO_Button {
-        id: ufo_Button_MarkedForDeletion
+    RowLayout {
+        Layout.fillWidth: true
 
-        Layout.preferredHeight: 40
+        UFO_Button {
+            id: ufo_Button_MarkedForDeletion
 
-        enabled: (Database.connectionStatus === true) ? true : false
+            Layout.preferredHeight: 40
 
-        text: qsTr("علامت‌گذاری برای حذف")
-        icon.source: "./../../icons/Google icons/flag.svg"
-        checkable: true
+            enabled: (Database.connectionStatus === true) ? true : false
+
+            text: qsTr("علامت‌گذاری برای حذف")
+            icon.source: "./../../icons/Google icons/flag.svg"
+            checkable: true
+
+            Connections {
+                target: Database
+
+                function onQueryExecuted(type, success, message) {
+                    if(type !== Database.QueryType.SELECT) {
+                        return;
+                    }
+
+                    if(success === false) {
+                        return;
+                    }
+
+                    ufo_Button_MarkedForDeletion.checked = Database.getPatientDataMap()["marked_for_deletion"];
+                }
+            }
+
+            onToggled: {
+                Database.changeDeletionStatus(ufo_Button_MarkedForDeletion.checked);
+            }
+        }
+
+        Item {
+            Layout.fillWidth: true
+        }
+
+        // NOTE (SAVIZ): There is a disagreement weather this should be in basic section or just universally visible.
+        Text {
+            id: text_PatientID
+
+            text: qsTr("شماره پرونده ()")
+
+            verticalAlignment: Text.AlignVCenter
+
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+
+            font.pixelSize: Qt.application.font.pixelSize * 1.5
+        }
 
         Connections {
             target: Database
@@ -41,62 +82,229 @@ UFO_Page {
                     return;
                 }
 
-                ufo_Button_MarkedForDeletion.checked = Database.getPatientDataMap()["marked_for_deletion"];
+                text_PatientID.text = qsTr("شماره پرونده (") + Database.getPatientDataMap()["patient_id"] + qsTr(")");
+            }
+        }
+    }
+
+    RowLayout {
+        id: rowLayout
+
+        Layout.fillWidth: true
+
+        ButtonGroup { id: buttonGroup }
+
+        UFO_Button {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            text: qsTr("Basic")
+
+            ButtonGroup.group: buttonGroup
+
+            checkable: true
+            autoExclusive: true
+            checked: false
+
+            onCheckedChanged: {
+                if(this.checked === true) {
+                    rowLayout.openTab("Basic")
+                }
             }
         }
 
-        onToggled: {
-            Database.changeDeletionStatus(ufo_Button_MarkedForDeletion.checked);
+        UFO_Button {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            text: qsTr("Diagnoses")
+
+            ButtonGroup.group: buttonGroup
+
+            checkable: true
+            autoExclusive: true
+            checked: false
+
+            onCheckedChanged: {
+                if(this.checked === true) {
+                    rowLayout.openTab("Diagnoses")
+                }
+            }
+        }
+
+        UFO_Button {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            text: qsTr("Treatments")
+
+            ButtonGroup.group: buttonGroup
+
+            checkable: true
+            autoExclusive: true
+            checked: false
+
+            onCheckedChanged: {
+                if(this.checked === true) {
+                    rowLayout.openTab("Treatments")
+                }
+            }
+        }
+
+        UFO_Button {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            text: qsTr("Medical Drugs")
+
+            ButtonGroup.group: buttonGroup
+
+            checkable: true
+            autoExclusive: true
+            checked: false
+
+            onCheckedChanged: {
+                if(this.checked === true) {
+                    rowLayout.openTab("Medical Drugs")
+                }
+            }
+        }
+
+        UFO_Button {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            text: qsTr("Procedures")
+
+            ButtonGroup.group: buttonGroup
+
+            checkable: true
+            autoExclusive: true
+            checked: false
+
+            onCheckedChanged: {
+                if(this.checked === true) {
+                    rowLayout.openTab("Procedures")
+                }
+            }
+        }
+
+        UFO_Button {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            text: qsTr("Consultations")
+
+            ButtonGroup.group: buttonGroup
+
+            checkable: true
+            autoExclusive: true
+            checked: false
+
+            onCheckedChanged: {
+                if(this.checked === true) {
+                    rowLayout.openTab("Consultations")
+                }
+            }
+        }
+
+        UFO_Button {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            text: qsTr("Lab Tests")
+
+            ButtonGroup.group: buttonGroup
+
+            checkable: true
+            autoExclusive: true
+            checked: false
+
+            onCheckedChanged: {
+                if(this.checked === true) {
+                    rowLayout.openTab("Lab Tests")
+                }
+            }
+        }
+
+        function openTab(target) {
+
+            // TODO (SAVIZ): I like to replace these with an enum, but currently I don't know how in QML.
+            switch (target) {
+                case "Basic":
+                    stackLayout.currentIndex = ufo_BasicData.StackLayout.index
+                    break
+                case "Diagnoses":
+                    stackLayout.currentIndex = ufo_Diagnoses.StackLayout.index
+                    break
+                case "Treatments":
+                    stackLayout.currentIndex = ufo_Treatments.StackLayout.index
+                    break
+                case "Medical Drugs":
+                    stackLayout.currentIndex = ufo_MedicalDrugs.StackLayout.index
+                    break
+                case "Procedures":
+                    stackLayout.currentIndex = ufo_Procedures.StackLayout.index
+                    break
+                case "Consultations":
+                    stackLayout.currentIndex = ufo_Consultations.StackLayout.index
+                    break
+                case "Lab Tests":
+                    stackLayout.currentIndex = ufo_LabTests.StackLayout.index
+                    break
+                default:
+                    console.log("No valid value");
+            }
         }
     }
 
-    UFO_PatientBasicDataEditor {
-        id: ufo_BasicData
+    StackLayout {
+        id: stackLayout
 
         Layout.fillWidth: true
         // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
-    }
 
-    UFO_PatientDiagnosesEditor {
-        id: ufo_Diagnoses
+        UFO_PatientBasicDataEditor {
+            id: ufo_BasicData
 
-        Layout.fillWidth: true
-        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
-    }
+            Layout.fillWidth: true
+        }
 
-    UFO_PatientTreatmentsEditor {
-        id: ufo_Treatments
+        UFO_PatientDiagnosesEditor {
+            id: ufo_Diagnoses
 
-        Layout.fillWidth: true
-        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
-    }
+            Layout.fillWidth: true
+        }
 
-    UFO_PatientMedicalDrugsEditor {
-        id: ufo_MedicalDrugs
+        UFO_PatientTreatmentsEditor {
+            id: ufo_Treatments
 
-        Layout.fillWidth: true
-        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
-    }
+            Layout.fillWidth: true
+        }
 
-    UFO_PatientProceduresEditor {
-        id: ufo_Procedures
+        UFO_PatientMedicalDrugsEditor {
+            id: ufo_MedicalDrugs
 
-        Layout.fillWidth: true
-        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
-    }
+            Layout.fillWidth: true
+        }
 
-    UFO_PatientConsultationsEditor {
-        id: ufo_Consultations
+        UFO_PatientProceduresEditor {
+            id: ufo_Procedures
 
-        Layout.fillWidth: true
-        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
-    }
+            Layout.fillWidth: true
+        }
 
-    UFO_PatientLabTestsEditor {
-        id: ufo_LabTests
+        UFO_PatientConsultationsEditor {
+            id: ufo_Consultations
 
-        Layout.fillWidth: true
-        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
+            Layout.fillWidth: true
+        }
+
+        UFO_PatientLabTestsEditor {
+            id: ufo_LabTests
+
+            Layout.fillWidth: true
+        }
     }
 
     // Pull and Push
