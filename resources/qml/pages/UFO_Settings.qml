@@ -8,7 +8,6 @@ import "./../components"
 // Custom CPP Registered Types
 import AppTheme 1.0
 import Database 1.0
-import Notifier 1.0
 
 UFO_Page {
     id: root
@@ -301,24 +300,6 @@ UFO_Page {
                 onClicked: {
                     Database.disconnectFromDatabase();
                 }
-            }
-        }
-    }
-
-    UFO_GroupBox {
-        Layout.fillWidth: true
-        // NOTE (SAVIZ): No point using "Layout.fillHeight" as "UFO_Page" ignores height to enable vertical scrolling.
-
-        title: qsTr("Message")
-        contentSpacing: 7
-
-        Button {
-            text: "Send message"
-
-            enabled: (Database.connectionStatus === true) ? true : false
-
-            onClicked: {
-                Notifier.sendEmail();
             }
         }
     }

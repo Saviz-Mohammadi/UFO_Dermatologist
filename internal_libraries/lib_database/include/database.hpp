@@ -116,7 +116,7 @@ public:
     Q_INVOKABLE bool changeDeletionStatus(bool newStatus);
 
     // Notifier
-    QList<QVariantMap> getUpcomingVisits();
+    QList<QVariantMap> getUpcomingVisits(int daysBefore);
 
     // PRIVATE Methods
 private:

@@ -101,6 +101,19 @@ ApplicationWindow {
                 leftPadding: 10
                 rightPadding: 10
 
+                text: qsTr("ارسال پیام")
+
+                onTriggered: {
+                    stackLayout.currentIndex = ufo_Notify.StackLayout.index
+
+                    ufo_SideBar_Main.checkTabButton("Notify Page")
+                }
+            }
+
+            UFO_MenuItem {
+                leftPadding: 10
+                rightPadding: 10
+
                 text: qsTr("صفحه تنظیمات")
 
                 onTriggered: {
@@ -204,6 +217,13 @@ ApplicationWindow {
                 Layout.fillHeight: true
             }
 
+            UFO_Notify {
+                id: ufo_Notify
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
             UFO_Settings {
                 id: ufo_Settings
 
@@ -242,6 +262,9 @@ ApplicationWindow {
                             break
                         case "Print Page":
                             stackLayout.currentIndex = ufo_Print.StackLayout.index
+                            break
+                        case "Notify Page":
+                            stackLayout.currentIndex = ufo_Notify.StackLayout.index
                             break
                         case "Edit Page":
                             stackLayout.currentIndex = ufo_Edit.StackLayout.index

@@ -5,13 +5,34 @@
 #include "database.hpp"
 #include "notifier.hpp"
 
+// NOTE (SAVIZ): I don't know why, but for whatever reason I cannot access these files in 'hpp' files. Therefore, I have to change my method of coding.
 #include "cpp/opportunisticsecuresmtpclient.hpp"
 #include "cpp/plaintextmessage.hpp"
-#include "cpp/htmlmessage.hpp"
-#include <iostream>
-#include <stdexcept>
 
-using namespace jed_utils::cpp;
+template<typename T>
+class ClientWrapper {
+public:
+    ClientWrapper(T client,
+                  jed_utils::cpp::Credential&& credentials) : mClient{std::move(client)} {
+        mClient.setCredentials(credentials);
+    }
+
+    auto client() -> T& { return mClient; }
+
+private:
+    jed_utils::cpp::OpportunisticSecureSMTPClient mClient;
+};
+
+auto buildClient(const QString &username, const QString &password) -> jed_utils::cpp::OpportunisticSecureSMTPClient& {
+
+    // WARNING (SAVIZ): The instance must be created as 'static' and live through the application life time. Otherwise, we will get a crash.
+    static ClientWrapper clientWrapper {
+        jed_utils::cpp::OpportunisticSecureSMTPClient{"smtp.gmail.com", 587},
+        jed_utils::cpp::Credential(username.toStdString(), password.toStdString())
+    };
+
+    return clientWrapper.client();
+}
 
 Notifier *Notifier::m_Instance = Q_NULLPTR;
 
@@ -90,62 +111,57 @@ void Notifier::ShutDown()
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 
-bool Notifier::establishConnection(const QString &email, const QString &password)
+//client.setCredentials(Credential("savizdummymohammadidummy@gmail.com", "iilvalwxpwgggmuk"));
+
+bool Notifier::sendEmail(int daysBefore, const QString &username, const QString &password)
 {
-    return true;
-}
+    // NOTE (SAVIZ): In this context, username is the same as sender email address.
+    // NOTE (SAVIZ): In this context, password is the same as app password.
+    auto &client = buildClient(username, password);
 
-bool Notifier::disconnectFromEmail() { return true; }
+    jed_utils::cpp::MessageAddress sender = jed_utils::cpp::MessageAddress(username.toStdString(), "Doctor Name");
 
-bool Notifier::sendEmail()
-{
+    QList<QVariantMap> patients = Database::cppInstance()->getUpcomingVisits(daysBefore);
 
-    // QList<QVariantMap> patients = Database::cppInstance()->getUpcomingVisits();
+    for (const QVariantMap &patient : patients)
+    {
+        QString recipientEmail = patient["email"].toString();
+        int daysLeft = patient["days_left"].toInt();
+        QString expected_visit_date = patient["expected_visit_date"].toString();
+        QString subject = "Upcoming Visit Reminder";
 
-    // for (const QVariantMap &p : patients) {
-    //     QString email = p["email"].toString();
-    //     int daysLeft = p["days_left"].toInt();
+        // Correct grammar: "1 day" vs. "X days"
+        QString daysText = (daysLeft == 1) ? "day" : "days";
 
-    //     QString subject = "Upcoming Visit Reminder";
-    //     QString body = QString("Your next visit is expected in %1 days. Please confirm your appointment.")
-    //                        .arg(daysLeft);
+        QString message = QString("Your next visit is scheduled in %1 %2, on %3. Please ensure you arrive on time for your appointment.")
+                              .arg(daysLeft)
+                              .arg(daysText)
+                              .arg(expected_visit_date);
 
-    //     sendEmail(email, subject, body);
-    // }
+        jed_utils::cpp::MessageAddress recipient = jed_utils::cpp::MessageAddress(recipientEmail.toStdString(), "Recipient Name");
 
-    // return (true);
+        jed_utils::cpp::PlaintextMessage email(sender, { recipient }, subject.toStdString(), message.toStdString());
 
-    submitEmail("", "", "");
+        int err_no = client.sendMail(email);
 
-    return true;
-}
+        if (err_no != 0)
+        {
+#ifdef QT_DEBUG
+            std::string errorMessage = client.getErrorMessage(err_no);
+            qDebug() << "An error occurred: " << QString::fromStdString(errorMessage) << " (error no: " << err_no << ")";
+            qDebug() << QString::fromStdString(client.getCommunicationLog()) << '\n';
+#endif
+        }
 
-bool Notifier::getConnectionStatus() const {return true;}
-
-void Notifier::submitEmail(const QString &recipientAddress, const QString &subject, const QString &body)
-{
-    // Here is a full working example: https://github.com/jeremydumais/CPP-SMTPClient-library/blob/master/src/cpp/example/send-mail.cpp
-
-    // These 2 lines are used by the smpt engine to authenticate.
-    OpportunisticSecureSMTPClient client("smtp.gmail.com", 587);  // Use 587 for STARTTLS
-    client.setCredentials(Credential("savizdummymohammadidummy@gmail.com", "iilvalwxpwgggmuk")); // This is used for SMPT login.
-
-    PlaintextMessage msg(MessageAddress("savizdummymohammadidummy@gmail.com", "Test Address Display"),
-                         { MessageAddress("savizdummymohammadidummy@gmail.com", "Another Address display") },
-                         "This is a test (Subject)",
-                         "Hello\nHow are you?");
-
-    int err_no = client.sendMail(msg);
-    if (err_no != 0) {
-        std::cerr << client.getCommunicationLog() << '\n';
-        std::string errorMessage = client.getErrorMessage(err_no);
-        std::stringstream err{};
-        err << "An error occurred: " << errorMessage << " (error no: " << err_no << ")";
-        throw std::invalid_argument{err.str()};
+#ifdef QT_DEBUG
+        qDebug() << client.getCommunicationLog() << '\n';
+#endif
     }
 
-    std::cout << client.getCommunicationLog() << '\n';
-    std::cout << "Operation completed!" << std::endl;
+    // Notify QML:
+    emit emailSent(true, "پیام‌ها با موفقیت برای بیماران ارسال شدند.");
+
+    return (true);
 }
 
 // [[------------------------------------------------------------------------]]

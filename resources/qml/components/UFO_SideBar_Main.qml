@@ -26,6 +26,9 @@ Item {
             case "Print Page":
                 ufo_SideBar_Button_Print.checked = true
                 break
+            case "Notify Page":
+                ufo_SideBar_Button_Notify.checked = true
+                break
             case "Settings Page":
                 ufo_SideBar_Button_Settings.checked = true
                 break
@@ -158,6 +161,29 @@ Item {
 
                         onClicked: {
                             root.tabChanged("Print Page")
+                        }
+                    }
+
+                    UFO_SideBar_Button {
+                        id: ufo_SideBar_Button_Notify
+
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 40
+
+                        Layout.leftMargin: 15
+                        Layout.rightMargin: 15
+
+                        ButtonGroup.group: buttonGroup
+
+                        checkable: true
+                        autoExclusive: true
+                        checked: false
+
+                        text: qsTr("ارسال پیام")
+                        icon.source: "./../../icons/Google icons/mail.svg"
+
+                        onClicked: {
+                            root.tabChanged("Notify Page")
                         }
                     }
 

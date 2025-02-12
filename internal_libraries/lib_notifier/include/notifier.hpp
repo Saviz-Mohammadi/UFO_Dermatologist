@@ -17,7 +17,6 @@ class Notifier : public QObject
     Q_DISABLE_COPY_MOVE(Notifier) // Needed for Singleton
 
     // Q_PROPERTY
-    Q_PROPERTY(bool connectionStatus READ getConnectionStatus NOTIFY connectionStatusChanged FINAL)
 
 public:
     explicit Notifier(QObject *parent = Q_NULLPTR, const QString& name = "No name");
@@ -34,11 +33,10 @@ public:
     // Fields
 private:
     static Notifier *m_Instance;
-    //SmtpClient m_Smtp;
+
 
     // Signals
 signals:
-    void connectionStatusChanged(const QString &message);
     void emailSent(bool status, const QString &message);
 
     // PUBLIC Slots:
@@ -49,19 +47,14 @@ private slots:
 
     // PUBLIC Methods
 public:
-    Q_INVOKABLE bool establishConnection(const QString &email, const QString &password);
-    Q_INVOKABLE bool disconnectFromEmail();
-
     // SEARCH
-    Q_INVOKABLE bool sendEmail();
+    Q_INVOKABLE bool sendEmail(int daysBefore, const QString &username, const QString &password);
 
     // PRIVATE Methods
 private:
-    void submitEmail(const QString &recipientAddress, const QString &subject, const QString &body);
 
     // PUBLIC Getters
 public:
-    bool getConnectionStatus() const;
 
     // PRIVATE Getters
 public:

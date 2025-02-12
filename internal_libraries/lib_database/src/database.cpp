@@ -2164,7 +2164,7 @@ bool Database::changeDeletionStatus(bool newStatus)
 }
 
 // Notifier
-QList<QVariantMap> Database::getUpcomingVisits()
+QList<QVariantMap> Database::getUpcomingVisits(int daysBefore) // TODO (SAVIZ): Maybe make this an unsigned int.
 {
 #ifdef QT_DEBUG
     qDebug() << "objectName :" << this->objectName();
@@ -2176,11 +2176,13 @@ QList<QVariantMap> Database::getUpcomingVisits()
     QSqlQuery query(m_QSqlDatabase);
 
     QString queryString = R"(
-        SELECT email, DATEDIFF(expected_visit_date, CURDATE()) AS days_left FROM patients
-        WHERE expected_visit_date IS NOT NULL AND DATEDIFF(expected_visit_date, CURDATE()) BETWEEN 1 AND 3
+        SELECT email, expected_visit_date, DATEDIFF(expected_visit_date, CURDATE()) AS days_left
+        FROM patients
+        WHERE expected_visit_date IS NOT NULL AND DATEDIFF(expected_visit_date, CURDATE()) BETWEEN 1 AND ?
     )";
 
     query.prepare(queryString);
+    query.addBindValue(daysBefore);
 
     if (!query.exec())
     {
@@ -2207,10 +2209,19 @@ QList<QVariantMap> Database::getUpcomingVisits()
         patient["email"] = query.value("email").toString();
         patient["days_left"] = query.value("days_left").toInt();
 
+        QDate expectedVisitGregorianDate = query.value("expected_visit_date").toDate();
+
+        if(!expectedVisitGregorianDate.isNull())
+        {
+            QString expectedVisitJaliliDateString = Date::cppInstance()->gregorianToJalali(expectedVisitGregorianDate);
+
+            patient["expected_visit_date"] = expectedVisitJaliliDateString;
+        }
+
         patients.append(patient);
     }
 
-    return patients;
+    return (patients);
 }
 
 // [[------------------------------------------------------------------------]]
