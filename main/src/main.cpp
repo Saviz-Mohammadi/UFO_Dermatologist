@@ -47,6 +47,7 @@ void registerTypes()
     qmlRegisterType<CustomProxyModel>("CustomProxyModel", 1, 0, "CustomProxyModel");
     qmlRegisterSingletonType<Printer>("Printer", 1, 0, "Printer", &Printer::qmlInstance);
     qmlRegisterSingletonType<Notifier>("Notifier", 1, 0, "Notifier", &Notifier::qmlInstance);
+    qmlRegisterSingletonType<ImageProvider>("ImageProvider", 1, 0, "ImageProvider", &ImageProvider::qmlInstance);
 }
 
 void setupThemeSystem()

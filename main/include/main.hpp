@@ -12,6 +12,7 @@
 #include "filter.hpp"
 #include "printer.hpp"
 #include "notifier.hpp"
+#include "image_provider.hpp"
 
 
 void registerTypes();

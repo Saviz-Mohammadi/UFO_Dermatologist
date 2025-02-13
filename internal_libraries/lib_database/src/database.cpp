@@ -759,6 +759,7 @@ bool Database::pullPatientBasicData(const quint64 index)
         m_PatientDataMap["number_of_previous_visits"] = query.value("number_of_previous_visits").toUInt();
         m_PatientDataMap["first_visit_date"] = "";
         m_PatientDataMap["recent_visit_date"] = "";
+        m_PatientDataMap["expected_visit_date"] = "";
         m_PatientDataMap["service_price"] = query.value("service_price").toReal();
         m_PatientDataMap["marked_for_deletion"] = query.value("marked_for_deletion").toBool();
 

@@ -254,7 +254,8 @@ target_link_libraries(${EXECUTABLE_NAME}
     "Lib_Date"
     "Lib_Filter"
     "Lib_Printer"
-    "Lib_NOTIFIER")
+    "Lib_NOTIFIER"
+    "Lib_ImageProvider")
 
 # [[ ----------------------------------------------------------------------- ]]
 # [[ ----------------------------------------------------------------------- ]]

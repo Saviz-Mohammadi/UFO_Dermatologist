@@ -227,6 +227,25 @@ UFO_Page {
             }
         }
 
+        UFO_Button {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 35
+
+            text: qsTr("Images")
+
+            ButtonGroup.group: buttonGroup
+
+            checkable: true
+            autoExclusive: true
+            checked: false
+
+            onCheckedChanged: {
+                if(this.checked === true) {
+                    rowLayout.openTab("Images")
+                }
+            }
+        }
+
         function openTab(target) {
 
             // TODO (SAVIZ): I like to replace these with an enum, but currently I don't know how in QML.
@@ -251,6 +270,9 @@ UFO_Page {
                     break
                 case "Lab Tests":
                     stackLayout.currentIndex = ufo_LabTests.StackLayout.index
+                    break
+                case "Images":
+                    stackLayout.currentIndex = ufo_Images.StackLayout.index
                     break
                 default:
                     console.log("No valid value");
@@ -302,6 +324,12 @@ UFO_Page {
 
         UFO_PatientLabTestsEditor {
             id: ufo_LabTests
+
+            Layout.fillWidth: true
+        }
+
+        UFO_PatientImagesEditor {
+            id: ufo_Images
 
             Layout.fillWidth: true
         }
