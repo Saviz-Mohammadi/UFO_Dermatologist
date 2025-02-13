@@ -34,7 +34,7 @@ UFO_Page {
 
                 Layout.topMargin: 25
 
-                color: Qt.color(AppTheme.colors["UFO_SideBar_Text"])
+                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
                 text: qsTr("نام کاربری ایمیل")
 
                 verticalAlignment: Text.AlignBottom
@@ -58,7 +58,7 @@ UFO_Page {
             Text {
                 Layout.fillWidth: true
 
-                color: Qt.color(AppTheme.colors["UFO_SideBar_Text"])
+                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
                 text: qsTr("رمز عبور")
 
                 verticalAlignment: Text.AlignBottom

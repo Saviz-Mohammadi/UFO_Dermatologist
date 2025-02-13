@@ -126,6 +126,7 @@ private:
     QPair<bool, QString> populateProcedureList();
     QPair<bool, QString> populateConsultantList();
     QPair<bool, QString> populateLabList();
+    bool recordExists(quint64 index);
 
     // PUBLIC Getters
 public:

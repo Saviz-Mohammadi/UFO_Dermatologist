@@ -359,7 +359,7 @@ UFO_Page {
                 let birthYear = parseInt(ufo_BasicData.patientBirthYear.trim(), 10);
                 let phone_number = ufo_BasicData.patientPhoneNumber.trim();
                 let email = ufo_BasicData.patientEmail.trim();
-                let gender = gender = ufo_BasicData.patientGender;
+                let gender = ufo_BasicData.patientGender;
                 let marital_status = ufo_BasicData.patientMaritalStatus;
                 let numberOfPreviousVisits = parseInt(ufo_BasicData.patientNumberOfPreviousVisits.trim(), 10);
                 let firstVisitDate = ufo_BasicData.patientFirstVisitDate.trim();

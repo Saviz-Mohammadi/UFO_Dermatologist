@@ -647,6 +647,19 @@ bool Database::pullPatientData(const quint64 index)
     qDebug() << "Arguments  :" << "Index :" << index;
 #endif
 
+    // NOTE (SAVIZ): This check helps prevent problems when we delete a record and attempt to access it again:
+
+    if(!recordExists(index))
+    {
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Update operation failed! " << "No such record to update.";
+#endif
+
+        emit queryExecuted(QueryType::SELECT, false, "این پرونده بیمار دیگر در پایگاه داده وجود ندارد.");
+
+        return (false);
+    }
+
     struct FunctionCall
     {
         std::function<bool()> function;
@@ -1427,6 +1440,19 @@ bool Database::updatePatientData(const QString& newFirstName, const QString& new
     qDebug() << "    newConsultations      :" << newConsultations;
     qDebug() << "    newLabTests           :" << newLabTests;
 #endif
+
+    // NOTE (SAVIZ): This check helps prevent problems when we delete a record and attempt to access it again:
+
+    if(!recordExists(m_PatientDataMap["patient_id"].toULongLong()))
+    {
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Update operation failed! " << "No such record to update.";
+#endif
+
+        emit queryExecuted(QueryType::UPDATE, false, "این پرونده بیمار دیگر در پایگاه داده وجود ندارد.");
+
+        return (false);
+    }
 
     const QString prefix = "خطاهایی هنگام به‌روزرسانی اطلاعات بیمار رخ داد: ";
     const QString suffix = " لطفاً دوباره تلاش کنید.";
@@ -2566,6 +2592,36 @@ QPair<bool, QString> Database::populateLabList()
 #endif
 
     return QPair<bool, QString>(true, "");
+}
+
+bool Database::recordExists(quint64 index)
+{
+    QSqlQuery query(m_QSqlDatabase);
+
+    query.prepare("SELECT EXISTS(SELECT 1 FROM patients WHERE patient_id = :patient_id)");
+    query.bindValue(":patient_id", index);
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << query.lastError().text();
+#endif
+
+        return (false);
+    }
+
+    bool exists = false;
+
+    if (query.next())
+    {
+        exists = query.value(0).toBool();
+    }
+
+#ifdef QT_DEBUG
+    qDebug() << "Log Output :" << "Record exists: " << exists;
+#endif
+
+    return (exists);
 }
 
 // [[------------------------------------------------------------------------]]

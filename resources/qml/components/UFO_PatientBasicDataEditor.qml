@@ -371,13 +371,13 @@ Item {
 
                             switch (Database.getPatientDataMap()["marital_status"]) {
                                 case "نامشخص":
-                                    comboBox_Gender.currentIndex = 0;
+                                    comboBox_MaritalStatus.currentIndex = 0;
                                     break;
                                 case "مجرد":
-                                    comboBox_Gender.currentIndex = 1;
+                                    comboBox_MaritalStatus.currentIndex = 1;
                                     break;
                                 default:
-                                    comboBox_Gender.currentIndex = 2;
+                                    comboBox_MaritalStatus.currentIndex = 2;
                             };
                         }
                     }
@@ -679,7 +679,7 @@ Item {
                                 return;
                             }
 
-                            textField_ExpectedVisitDate.text = Database.getPatientDataMap()["expeted_visit_date"];
+                            textField_ExpectedVisitDate.text = Database.getPatientDataMap()["expected_visit_date"];
                         }
                     }
                 }
