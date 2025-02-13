@@ -358,11 +358,13 @@ UFO_Page {
                 let last_name = ufo_BasicData.patientLastName.trim();
                 let birthYear = parseInt(ufo_BasicData.patientBirthYear.trim(), 10);
                 let phone_number = ufo_BasicData.patientPhoneNumber.trim();
+                let email = ufo_BasicData.patientEmail.trim();
                 let gender = gender = ufo_BasicData.patientGender;
                 let marital_status = ufo_BasicData.patientMaritalStatus;
                 let numberOfPreviousVisits = parseInt(ufo_BasicData.patientNumberOfPreviousVisits.trim(), 10);
                 let firstVisitDate = ufo_BasicData.patientFirstVisitDate.trim();
                 let recentVisitDate = ufo_BasicData.patientRecentVisitDate.trim();
+                let expectedVisitDate = ufo_BasicData.patientExpectedVisitDate.trim();
                 let servicePrice = parseFloat(ufo_BasicData.patientServicePrice.trim());
 
                 // Lists:
@@ -380,7 +382,7 @@ UFO_Page {
                 let procedureNote = ufo_Procedures.getProcedureNote();
 
                 // Push:
-                Database.updatePatientData(first_name, last_name, birthYear, phone_number, gender, marital_status, numberOfPreviousVisits, firstVisitDate, recentVisitDate, servicePrice, newDiagnoses, diagnosisNote, treatments, treatmentNote, medicalDrugs, medicalDrugNote, procedures, procedureNote, consultations, labTests);
+                Database.updatePatientData(first_name, last_name, birthYear, phone_number, email, gender, marital_status, numberOfPreviousVisits, firstVisitDate, recentVisitDate, expectedVisitDate, servicePrice, newDiagnoses, diagnosisNote, treatments, treatmentNote, medicalDrugs, medicalDrugNote, procedures, procedureNote, consultations, labTests);
             }
         }
     }

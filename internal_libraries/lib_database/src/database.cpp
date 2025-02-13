@@ -247,17 +247,17 @@ bool Database::disconnectFromDatabase()
 }
 
 // INSERT
-bool Database::createPatient(const QString &firstName, const QString &lastName, quint32 birthYear, const QString &phoneNumber, const QString &gender, const QString &maritalStatus)
+bool Database::createPatient(const QString &firstName, const QString &lastName, quint32 birthYear, const QString &phoneNumber, const QString &email, const QString &gender, const QString &maritalStatus)
 {
 #ifdef QT_DEBUG
     qDebug() << "objectName :" << this->objectName();
-    qDebug() << "Arguments  :" << "First name :" << firstName << ", " << "Last name :" << lastName << ", " << "Phone number :" << phoneNumber << ", " << "Birth year :" << birthYear << ", " << "Gender :" << gender << ", " << "Marital status :" << maritalStatus;
+    qDebug() << "Arguments  :" << "First name :" << firstName << ", " << "Last name :" << lastName << ", " << "Phone number :" << phoneNumber << ", " << "Email: " << email << ", " << "Birth year :" << birthYear << ", " << "Gender :" << gender << ", " << "Marital status :" << maritalStatus;
 #endif
 
     QString queryString = R"(
-        INSERT IGNORE INTO patients (first_name, last_name, birth_year, phone_number, gender, marital_status, first_visit_date, recent_visit_date)
+        INSERT IGNORE INTO patients (first_name, last_name, birth_year, phone_number, email, gender, marital_status, first_visit_date, recent_visit_date)
 
-        VALUES (:first_name, :last_name, :birth_year, :phone_number, :gender, :marital_status, :first_visit_date, :recent_visit_date)
+        VALUES (:first_name, :last_name, :birth_year, :phone_number, :email, :gender, :marital_status, :first_visit_date, :recent_visit_date)
     )";
 
     QSqlQuery query(m_QSqlDatabase);
@@ -268,6 +268,7 @@ bool Database::createPatient(const QString &firstName, const QString &lastName, 
     query.bindValue(":last_name", lastName);
     query.bindValue(":birth_year", birthYear);
     query.bindValue(":phone_number", phoneNumber);
+    query.bindValue(":email", email);
     query.bindValue(":gender", gender);
     query.bindValue(":marital_status", maritalStatus);
 
@@ -739,6 +740,7 @@ bool Database::pullPatientBasicData(const quint64 index)
         m_PatientDataMap["last_name"] = query.value("last_name").toString();
         m_PatientDataMap["birth_year"] = query.value("birth_year").toString();
         m_PatientDataMap["phone_number"] = query.value("phone_number").toString();
+        m_PatientDataMap["email"] = query.value("email").toString();
         m_PatientDataMap["gender"] = query.value("gender").toString();
         m_PatientDataMap["marital_status"] = query.value("marital_status").toString();
         m_PatientDataMap["number_of_previous_visits"] = query.value("number_of_previous_visits").toUInt();
@@ -765,6 +767,15 @@ bool Database::pullPatientBasicData(const quint64 index)
             QString recentVisitJaliliDateString = Date::cppInstance()->gregorianToJalali(recentVisitGregorianDate);
 
             m_PatientDataMap["recent_visit_date"] = recentVisitJaliliDateString;
+        }
+
+        QDate expectedVisitGregorianDate = query.value("expected_visit_date").toDate();
+
+        if(!expectedVisitGregorianDate.isNull())
+        {
+            QString expectedVisitJaliliDateString = Date::cppInstance()->gregorianToJalali(expectedVisitGregorianDate);
+
+            m_PatientDataMap["expected_visit_date"] = expectedVisitJaliliDateString;
         }
     }
 
@@ -1388,7 +1399,7 @@ bool Database::pullLabTests(const quint64 index)
 }
 
 // UPDATE
-bool Database::updatePatientData(const QString& newFirstName, const QString& newLastName, quint32 newBirthYear, const QString& newPhoneNumber, const QString& newGender, const QString& newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString& newFirstVisitDate, const QString& newRecentVisitDate, qreal newServicePrice, const QVariantList& newDiagnoses, const QString& newDiagnosisNote, const QVariantList& newTreatments, const QString& newTreatmentNote, const QVariantList& newMedicalDrugs, const QString& newMedicalDrugNote, const QVariantList& newProcedures, const QString& newProcedureNote, const QVariantList& newConsultations, const QVariantList& newLabTests)
+bool Database::updatePatientData(const QString& newFirstName, const QString& newLastName, quint32 newBirthYear, const QString& newPhoneNumber, const QString &newEmail, const QString& newGender, const QString& newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString& newFirstVisitDate, const QString& newRecentVisitDate, const QString &newExpectedVisitDate, qreal newServicePrice, const QVariantList& newDiagnoses, const QString& newDiagnosisNote, const QVariantList& newTreatments, const QString& newTreatmentNote, const QVariantList& newMedicalDrugs, const QString& newMedicalDrugNote, const QVariantList& newProcedures, const QString& newProcedureNote, const QVariantList& newConsultations, const QVariantList& newLabTests)
 {
 #ifdef QT_DEBUG
     qDebug() << "objectName :" << this->objectName();
@@ -1397,11 +1408,13 @@ bool Database::updatePatientData(const QString& newFirstName, const QString& new
     qDebug() << "    newLastName           :" << newLastName;
     qDebug() << "    newBirthYear          :" << newBirthYear;
     qDebug() << "    newPhoneNumber        :" << newPhoneNumber;
+    qDebug() << "    newEmail              :" << newEmail;
     qDebug() << "    newGender             :" << newGender;
     qDebug() << "    newMaritalStatus      :" << newMaritalStatus;
     qDebug() << "    newNumberOfVisits     :" << newNumberOfPreviousVisits;
     qDebug() << "    newFirstVisitDate     :" << newFirstVisitDate;
     qDebug() << "    newRecentVisitDate    :" << newRecentVisitDate;
+    qDebug() << "    newExpectedVisitDate  :" << newExpectedVisitDate;
     qDebug() << "    newServicePrice       :" << newServicePrice;
     qDebug() << "    newDiagnoses          :" << newDiagnoses;
     qDebug() << "    newDiagnosisNote      :" << newDiagnosisNote;
@@ -1438,7 +1451,7 @@ bool Database::updatePatientData(const QString& newFirstName, const QString& new
     // Prepare the tasks array
     const std::array<FunctionCall, 11> calls =
     {{
-        { std::bind(&Database::updateBasicData, this, newFirstName, newLastName, newBirthYear, newPhoneNumber, newGender, newMaritalStatus, newNumberOfPreviousVisits, newFirstVisitDate, newRecentVisitDate, newServicePrice), "خطا در به‌روزرسانی اطلاعات اولیه بیمار" },
+        { std::bind(&Database::updateBasicData, this, newFirstName, newLastName, newBirthYear, newPhoneNumber, newEmail, newGender, newMaritalStatus, newNumberOfPreviousVisits, newFirstVisitDate, newRecentVisitDate, newExpectedVisitDate, newServicePrice), "خطا در به‌روزرسانی اطلاعات اولیه بیمار" },
         { std::bind(&Database::updateDiagnoses, this, newDiagnoses), "خطا در به‌روزرسانی تشخیص‌ها" },
         { std::bind(&Database::updateTreatments, this, newTreatments), "خطا در به‌روزرسانی درمان‌ها" },
         { std::bind(&Database::updateMedicalDrugs, this, newMedicalDrugs), "خطا در به‌روزرسانی داروهای بیمار" },
@@ -1487,7 +1500,7 @@ bool Database::updatePatientData(const QString& newFirstName, const QString& new
     return (true);
 }
 
-bool Database::updateBasicData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, qreal newServicePrice)
+bool Database::updateBasicData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newEmail, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, const QString &newExpectedVisitDate, qreal newServicePrice)
 {
 #ifdef QT_DEBUG
     qDebug() << "objectName :" << this->objectName();
@@ -1496,11 +1509,13 @@ bool Database::updateBasicData(const QString &newFirstName, const QString &newLa
     qDebug() << "    newLastName           :" << newLastName;
     qDebug() << "    newBirthYear          :" << newBirthYear;
     qDebug() << "    newPhoneNumber        :" << newPhoneNumber;
+    qDebug() << "    newEmail              :" << newEmail;
     qDebug() << "    newGender             :" << newGender;
     qDebug() << "    newMaritalStatus      :" << newMaritalStatus;
     qDebug() << "    newNumberOfVisits     :" << newNumberOfPreviousVisits;
     qDebug() << "    newFirstVisitDate     :" << newFirstVisitDate;
     qDebug() << "    newRecentVisitDate    :" << newRecentVisitDate;
+    qDebug() << "    newExpectedVisitDate  :" << newExpectedVisitDate;
     qDebug() << "    newServicePrice       :" << newServicePrice;
 #endif
 
@@ -1510,11 +1525,13 @@ bool Database::updateBasicData(const QString &newFirstName, const QString &newLa
         last_name = :last_name,
         birth_year = :birth_year,
         phone_number = :phone_number,
+        email = :email,
         gender = :gender,
         marital_status = :marital_status,
         number_of_previous_visits = :number_of_previous_visits,
         first_visit_date = :first_visit_date,
         recent_visit_date = :recent_visit_date,
+        expected_visit_date = :expected_visit_date,
         service_price = :service_price
 
         WHERE patient_id = :patient_id
@@ -1527,6 +1544,7 @@ bool Database::updateBasicData(const QString &newFirstName, const QString &newLa
     query.bindValue(":last_name", newLastName);
     query.bindValue(":birth_year", newBirthYear);
     query.bindValue(":phone_number", newPhoneNumber);
+    query.bindValue(":email", newEmail);
     query.bindValue(":gender", newGender);
     query.bindValue(":marital_status", newMaritalStatus);
     query.bindValue(":number_of_previous_visits", newNumberOfPreviousVisits);
@@ -1542,6 +1560,9 @@ bool Database::updateBasicData(const QString &newFirstName, const QString &newLa
 
     QDate recentVisitGregorianDate;
     recentVisitGregorianDate = QDate::fromString(newRecentVisitDate, "yyyy-MM-dd", calendarJalali);
+
+    QDate expectedVisitGregorianDate;
+    expectedVisitGregorianDate = QDate::fromString(newExpectedVisitDate, "yyyy-MM-dd", calendarJalali);
 
     if(firstVisitGregorianDate.isNull() || !firstVisitGregorianDate.isValid())
     {
@@ -1561,6 +1582,16 @@ bool Database::updateBasicData(const QString &newFirstName, const QString &newLa
     else
     {
         query.bindValue(":recent_visit_date", recentVisitGregorianDate);
+    }
+
+    if(expectedVisitGregorianDate.isNull() || !expectedVisitGregorianDate.isValid())
+    {
+        query.bindValue(":expected_visit_date", QVariant(QMetaType::fromType<QDate>()));
+    }
+
+    else
+    {
+        query.bindValue(":expected_visit_date", expectedVisitGregorianDate);
     }
 
     if (!query.exec())

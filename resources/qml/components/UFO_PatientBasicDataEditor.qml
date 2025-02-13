@@ -17,11 +17,13 @@ Item {
     property alias patientLastName: textField_LastName.text
     property alias patientBirthYear: textField_BirthYear.text
     property alias patientPhoneNumber: textField_PhoneNumber.text
+    property alias patientEmail: textField_Email.text
     property alias patientGender: comboBox_Gender.currentText
     property alias patientMaritalStatus: comboBox_MaritalStatus.currentText
     property alias patientNumberOfPreviousVisits: textField_NumberOfPreviousVisits.text
     property alias patientFirstVisitDate: textField_FirstVisitDate.text
     property alias patientRecentVisitDate: textField_RecentVisitDate.text
+    property alias patientExpectedVisitDate: textField_ExpectedVisitDate.text
     property alias patientServicePrice: textField_ServicePrice.text
 
     implicitWidth: 200
@@ -226,6 +228,47 @@ Item {
                             }
 
                             textField_PhoneNumber.text = Database.getPatientDataMap()["phone_number"];
+                        }
+                    }
+                }
+
+                Text {
+                    Layout.fillWidth: true
+
+                    text: qsTr("آدرس ایمیل")
+
+                    verticalAlignment: Text.AlignBottom
+
+                    color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+                }
+
+                UFO_TextField {
+                    id: textField_Email
+
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 35
+
+                    enabled: (Database.connectionStatus === true) ? true : false
+
+                    horizontalAlignment: Text.AlignRight
+
+                    validator: RegularExpressionValidator {
+                        regularExpression: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+                    }
+
+                    Connections {
+                        target: Database
+
+                        function onQueryExecuted(type, success, message) {
+                            if(type !== Database.QueryType.SELECT) {
+                                return;
+                            }
+
+                            if(success === false) {
+                                return;
+                            }
+
+                            textField_Email.text = Database.getPatientDataMap()["email"];
                         }
                     }
                 }
@@ -555,6 +598,88 @@ Item {
                             }
 
                             textField_RecentVisitDate.text = Database.getPatientDataMap()["recent_visit_date"];
+                        }
+                    }
+                }
+
+                Text {
+                    id: text_ExpectedVisitDate
+
+                    Layout.fillWidth: true
+
+                    text: qsTr("تاریخ مورد انتظار ویزیت")
+
+                    elide: Text.ElideRight
+                    wrapMode: Text.NoWrap
+
+                    verticalAlignment: Text.AlignBottom
+
+                    font.pixelSize: Qt.application.font.pixelSize * 1
+                    color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+
+                    Connections {
+                        target: textField_ExpectedVisitDate
+
+                        // TODO: (Saviz): Add trim() to texts:
+                        function onTextChanged() {
+
+                            if (textField_ExpectedVisitDate.text.match(/^[12]\d{3}-[01]\d-[0-3]\d$/)) { // Validate the format
+                                const year = textField_ExpectedVisitDate.text.substring(0, 4);   // Extract year
+                                const month = textField_ExpectedVisitDate.text.substring(5, 7); // Extract month
+                                const day = textField_ExpectedVisitDate.text.substring(8, 10);  // Extract day
+
+                                text_ExpectedVisitDate.text = "تاریخ مورد انتظار ویزیت" + " " + Date.differenceToDateJalali(year, month, day);
+
+                                return;
+                            }
+
+                            text_ExpectedVisitDate.text = "تاریخ مورد انتظار ویزیت";
+                        }
+
+                        function onTextEdited() {
+
+                            if (textField_ExpectedVisitDate.text.match(/^[12]\d{3}-[01]\d-[0-3]\d$/)) { // Validate the format
+                                const year = textField_ExpectedVisitDate.text.substring(0, 4);   // Extract year
+                                const month = textField_ExpectedVisitDate.text.substring(5, 7); // Extract month
+                                const day = textField_ExpectedVisitDate.text.substring(8, 10);  // Extract day
+
+                                text_ExpectedVisitDate.text = "تاریخ مورد انتظار ویزیت" + " " + Date.differenceToDateJalali(year, month, day);
+
+                                return;
+                            }
+
+                            text_ExpectedVisitDate.text = "تاریخ مورد انتظار ویزیت";
+                        }
+                    }
+                }
+
+                UFO_TextField {
+                    id: textField_ExpectedVisitDate
+
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 35
+
+                    enabled: (Database.connectionStatus === true) ? true : false
+
+                    horizontalAlignment: Text.AlignRight
+
+                    validator: RegularExpressionValidator {
+                        regularExpression: /^[12]\d{3}-[01]\d-[0-3]\d$/
+                    }
+
+                    Connections {
+                        target: Database
+
+                        function onQueryExecuted(type, success, message) {
+                            if(type !== Database.QueryType.SELECT) {
+                                return;
+                            }
+
+                            if(success === false) {
+                                return;
+                            }
+
+                            textField_ExpectedVisitDate.text = Database.getPatientDataMap()["expeted_visit_date"];
                         }
                     }
                 }

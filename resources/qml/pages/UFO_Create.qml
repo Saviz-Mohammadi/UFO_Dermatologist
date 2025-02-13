@@ -193,6 +193,46 @@ UFO_Page {
                 }
             }
 
+            Text {
+                Layout.fillWidth: true
+
+                text: qsTr("آدرس ایمیل")
+
+                elide: Text.ElideRight
+                wrapMode: Text.NoWrap
+
+                verticalAlignment: Text.AlignBottom
+
+                font.pixelSize: Qt.application.font.pixelSize * 1
+                color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+            }
+
+            UFO_TextField {
+                id: textField_Email
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+
+                Layout.column: 1
+                Layout.row: 1
+
+                enabled: (Database.connectionStatus === true) ? true : false
+
+                horizontalAlignment: Text.AlignRight
+
+                validator: RegularExpressionValidator {
+                    regularExpression: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+                }
+
+                Connections {
+                    target: ufo_Button_Clear
+
+                    function onClearButtonClicked() {
+                        textField_Email.clear();
+                    }
+                }
+            }
+
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 1
@@ -363,12 +403,13 @@ UFO_Page {
                 let firstName = textField_FirstName.text.trim();
                 let lastName = textField_LastName.text.trim();
                 let birthYear = parseInt(textField_BirthYear.text.trim(), 10);
-                let phoneNumber = textField_PhoneNumber.text;
+                let phoneNumber = textField_PhoneNumber.text.trim();
+                let email = textField_Email.text.trim()
                 let gender = comboBox_Gender.currentText;
                 let maritalStatus = comboBox_MaritalStatus.currentText;
 
 
-                Database.createPatient(firstName, lastName, birthYear, phoneNumber, gender, maritalStatus);
+                Database.createPatient(firstName, lastName, birthYear, phoneNumber, email, gender, maritalStatus);
             }
         }
     }
