@@ -22,6 +22,7 @@ Database::Database(QObject *parent, const QString &name)
     , m_ProcedureList(QVariantList{})
     , m_ConsultantList(QVariantList{})
     , m_LabList(QVariantList{})
+    , m_ImageList(QVariantList{})
     , m_SearchResultList(QVariantList{})
     , m_PatientDataMap(QVariantMap{})
 {
@@ -667,7 +668,7 @@ bool Database::pullPatientData(const quint64 index)
         QString errorMessage;
     };
 
-    const std::array<FunctionCall, 11> calls =
+    const std::array<FunctionCall, 12> calls =
     {{
         { [this, index] { return pullPatientBasicData(index); }, "خطا در دریافت اطلاعات اولیه بیمار" },
         { [this, index] { return pullPatientDiagnoses(index); }, "خطا در دریافت تشخیص‌ها" },
@@ -680,6 +681,7 @@ bool Database::pullPatientData(const quint64 index)
         { [this, index] { return pullProcedureNote(index); }, "خطا در دریافت یادداشت‌های مربوط به اقدامات پزشکی" },
         { [this, index] { return pullConsultations(index); }, "خطا در دریافت مشاوره‌ها" },
         { [this, index] { return pullLabTests(index); }, "خطا در دریافت آزمایش‌ها" },
+        { [this, index] { return pullImages(index); }, "خطا در دریافت تصاویر" }
     }};
 
     const QString prefix = "خطاهایی هنگام دریافت اطلاعات بیمار رخ داد: ";
@@ -1412,6 +1414,66 @@ bool Database::pullLabTests(const quint64 index)
     return (true);
 }
 
+bool Database::pullImages(const quint64 index)
+{
+#ifdef QT_DEBUG
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "Index :" << index;
+#endif
+
+    QString queryString = R"(
+        SELECT image_name, image_data FROM patient_images
+
+        WHERE patient_id = :patient_id
+    )";
+
+    QSqlQuery query(m_QSqlDatabase);
+    query.prepare(queryString);
+
+    query.bindValue(":patient_id", index);
+
+    if (!query.exec())
+    {
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
+#endif
+
+        return (false);
+    }
+
+    if (query.size() == 0)
+    {
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Query returned no results.";
+#endif
+
+        return (true);
+    }
+
+    QVariantList images;
+
+    while (query.next())
+    {
+        if (!query.value("image_id").isNull() && !query.value("image_name").isNull())
+        {
+            QVariantMap imageMap;
+
+            imageMap["image_name"] = query.value("image_name").toString();
+            imageMap["image_data"] = query.value("image_data").toByteArray();
+
+            images.append(imageMap);
+        }
+    }
+
+    m_PatientDataMap["images"] = images;
+
+#ifdef QT_DEBUG
+    qDebug() << "Log Output :" << "Select operation succeeded!";
+#endif
+
+    return (true);
+}
+
 // UPDATE
 bool Database::updatePatientData(const QString& newFirstName, const QString& newLastName, quint32 newBirthYear, const QString& newPhoneNumber, const QString &newEmail, const QString& newGender, const QString& newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString& newFirstVisitDate, const QString& newRecentVisitDate, const QString &newExpectedVisitDate, qreal newServicePrice, const QVariantList& newDiagnoses, const QString& newDiagnosisNote, const QVariantList& newTreatments, const QString& newTreatmentNote, const QVariantList& newMedicalDrugs, const QString& newMedicalDrugNote, const QVariantList& newProcedures, const QString& newProcedureNote, const QVariantList& newConsultations, const QVariantList& newLabTests)
 {
@@ -1476,7 +1538,7 @@ bool Database::updatePatientData(const QString& newFirstName, const QString& new
     };
 
     // Prepare the tasks array
-    const std::array<FunctionCall, 11> calls =
+    const std::array<FunctionCall, 12> calls =
     {{
         { std::bind(&Database::updateBasicData, this, newFirstName, newLastName, newBirthYear, newPhoneNumber, newEmail, newGender, newMaritalStatus, newNumberOfPreviousVisits, newFirstVisitDate, newRecentVisitDate, newExpectedVisitDate, newServicePrice), "خطا در به‌روزرسانی اطلاعات اولیه بیمار" },
         { std::bind(&Database::updateDiagnoses, this, newDiagnoses), "خطا در به‌روزرسانی تشخیص‌ها" },
@@ -1489,6 +1551,7 @@ bool Database::updatePatientData(const QString& newFirstName, const QString& new
         { std::bind(&Database::updateProcedureNote, this, newProcedureNote), "خطا در به‌روزرسانی یادداشت‌های مربوط به اقدامات پزشکی" },
         { std::bind(&Database::updateConsultations, this, newConsultations), "خطا در به‌روزرسانی مشاوره‌ها" },
         { std::bind(&Database::updateLabTests, this, newLabTests), "خطا در به‌روزرسانی آزمایش‌ها" },
+        { std::bind(&Database::updateImages, this), "خطا در به‌روزرسانی تصاویر" }
     }};
 
     for (const auto& call : calls)
@@ -2185,6 +2248,76 @@ bool Database::updateLabTests(const QVariantList &newLabTests)
     return (true);
 }
 
+bool Database::updateImages()
+{
+#ifdef QT_DEBUG
+    qDebug() << "objectName :" << this->objectName();
+    qDebug() << "Arguments  :" << "None";
+#endif
+
+    QSqlQuery queryDelete(m_QSqlDatabase);
+    queryDelete.prepare("DELETE FROM patient_images WHERE patient_id = :patient_id");
+
+    queryDelete.bindValue(":patient_id", m_PatientDataMap["patient_id"].toULongLong());
+
+    if (!queryDelete.exec())
+    {
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Update operation failed! :" << queryDelete.lastError().text();
+#endif
+
+        return (false);
+    }
+
+    QVariantList imageList = m_PatientDataMap["images"].toList();
+
+    if (imageList.isEmpty())
+    {
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Image list is empty!";
+#endif
+
+        return (true);
+    }
+
+    QString queryString = "INSERT INTO patient_images (patient_id, image_name, image_data) VALUES (?, ?, ?)";
+    QSqlQuery queryInsert(m_QSqlDatabase);
+
+    queryInsert.prepare(queryString);
+
+    QVariantList patientIDs;
+    QVariantList imageNames;
+    QVariantList imageDatas;
+
+    for (const QVariant &image : imageList)
+    {
+        QVariantMap map = image.toMap();
+
+        patientIDs.append(m_PatientDataMap["patient_id"].toULongLong());
+        imageNames.append(map["image_name"].toString());
+        imageDatas.append(map["image_data"].toByteArray());
+    }
+
+    queryInsert.addBindValue(patientIDs);
+    queryInsert.addBindValue(imageNames);
+    queryInsert.addBindValue(imageDatas);
+
+    if (!queryInsert.execBatch())
+    {
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Update operation failed! :" << queryInsert.lastError().text();
+#endif
+
+        return (false);
+    }
+
+#ifdef QT_DEBUG
+    qDebug() << "Log Output :" << "Update operation succeeded!";
+#endif
+
+    return (true);
+}
+
 // DELETION
 bool Database::changeDeletionStatus(bool newStatus)
 {
@@ -2219,6 +2352,63 @@ bool Database::changeDeletionStatus(bool newStatus)
     emit queryExecuted(QueryType::DELETE, true, "عملیات حذف با موفقیت انجام شد!");
 
     return (true);
+}
+
+bool Database::addImage(const QUrl &path)
+{
+    QFile file(path.toLocalFile());
+
+    if (!file.open(QIODevice::ReadOnly))
+    {
+#ifdef QT_DEBUG
+        qDebug() << "Failed to read image file data: " << path;
+#endif
+
+        return (false);
+    }
+
+    QVariantMap map;
+    map.insert(path.fileName(), file.readAll());
+
+    m_ImageList.append(map);
+
+    return (true);
+}
+
+bool Database::deleteImage(const QString &fileName)
+{
+    bool success = false;
+
+    QVariantList images = m_PatientDataMap["images"].toList();
+
+    for (const QVariant &image : images) {
+        QVariantMap map = image.toMap();
+
+        if (map.contains(fileName)) {
+
+            map.remove(fileName);
+
+            success = true;
+        }
+    }
+
+    return success;
+}
+
+QByteArray Database::getImageData(const QString &fileName)
+{
+    QVariantList images = m_PatientDataMap["images"].toList();
+
+    for (const QVariant &image : images) {
+        QVariantMap map = image.toMap();
+
+        if (map.contains(fileName)) {
+
+            return (map["image_data"].toByteArray()) ;
+        }
+    }
+
+    return QByteArray();
 }
 
 // Notifier
@@ -2669,6 +2859,19 @@ QVariantList Database::getConsultantList() const
 QVariantList Database::getLabList() const
 {
     return (m_LabList);
+}
+
+QVariantList Database::getImageNames() const
+{
+    QVariantList list;
+
+    for(const QVariant& item: m_ImageList)
+    {
+        QVariantMap map = item.toMap();
+        list.append(map["image_name"]);
+    }
+
+    return (list);
 }
 
 QVariantList Database::getSearchResultList() const

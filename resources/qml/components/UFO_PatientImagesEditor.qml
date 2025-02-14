@@ -79,44 +79,19 @@ Item {
                 onAccepted: {
                     console.log("Selected file path:", fileDialog.selectedFile)
 
-                    let component = Qt.createComponent("./UFO_FullScreen.qml");
-                    let fullScreen = component.createObject(root, {imageUrl: fileDialog.selectedFile});
+                    fileDialog.selectedFile
 
                     // fullScreen.closing.connect(onFullScreenClosed)
 
                     return;
 
-                    // When adding >> add to back-end data structure.
-                    // When deleting >> delete from back-end data structure.
-
-                    // When clicked to view >> open image from back-end into new window image.
-
-                    // Adding >> usen file name and extension as identifier and see if already exist, if not >> then add
-                    // deleting >> use file name and extension stored as image_name and delete it.
-
-                    // Once push is pressed >> push data structure to data base.
-
-
-                    // here some advice for adding and deleting:
-                    // QString fileToDelete = "image1.png";
-
-                    // if (fileToNameMap.contains(fileToDelete)) {
-                    //     QString imageName = fileToNameMap[fileToDelete];
-                    //     imageMap.remove(imageName);
-                    //     fileToNameMap.remove(fileToDelete);
-                    // }
-
-                    // QString fileName = "image1.png";
-                    // QByteArray imageData = ...;  // Image data to be added
-
-                    // if (!imageMap.contains(fileName)) {
-                    //     imageMap.insert(fileName, imageData);
-                    //     qDebug() << "Added:" << fileName;
-                    // } else {
-                    //     qDebug() << "File already exists:" << fileName;
-                    // }
-
-                    // So essentially, all you do is add or remove from back-end and react to it.
+                    // listModel_ListView.append({
+                    //     "consultant_id": id,
+                    //     "consultant_name": name,
+                    //     "consultant_specialization": specialization,
+                    //     "consultation_date": "",
+                    //     "consultation_outcome": ""
+                    // });
                 }
             }
 
@@ -133,88 +108,81 @@ Item {
 
                 onClicked: {
                     fileDialog.open()
-
-                    // listModel_ListView.append({
-                    //     "consultant_id": id,
-                    //     "consultant_name": name,
-                    //     "consultant_specialization": specialization,
-                    //     "consultation_date": "",
-                    //     "consultation_outcome": ""
-                    // });
                 }
             }
         }
 
-        // Rectangle {
-        //     Layout.fillWidth: true
-        //     Layout.preferredHeight: 500
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 500
 
-        //     Layout.topMargin: 5
-        //     Layout.bottomMargin: 15
-        //     Layout.leftMargin: 15
-        //     Layout.rightMargin: 15
+            Layout.topMargin: 5
+            Layout.bottomMargin: 15
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
 
-        //     radius: 0
+            radius: 0
 
-        //     color: Qt.color(AppTheme.colors["UFO_GroupBox_ListView_Background"])
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_ListView_Background"])
 
-        //     ListView {
-        //         id: listView
+            ListView {
+                id: listView
 
-        //         anchors.fill: parent
+                anchors.fill: parent
 
-        //         anchors.margins: 15
+                anchors.margins: 15
 
-        //         spacing: 5
-        //         clip: true
+                spacing: 5
+                clip: true
 
-        //         model: ListModel { id: listModel_ListView }
+                model: ListModel { id: listModel_ListView }
 
-        //         ScrollBar.vertical: ScrollBar {
-        //             id: scrollBar_Consultations
+                ScrollBar.vertical: ScrollBar {
+                    id: scrollBar_Consultations
 
-        //             width: 10
-        //             policy: ScrollBar.AlwaysOn
-        //         }
+                    width: 10
+                    policy: ScrollBar.AlwaysOn
+                }
 
-        //         delegate: UFO_Delegate_Image {
-        //             width: listView.width - scrollBar_Consultations.width / 2 - 15
+                delegate: UFO_Delegate_Image {
+                    width: listView.width - scrollBar_Consultations.width / 2 - 15
 
-        //             onRemoveClicked: {
-        //                 listModel_ListView.remove(index);
-        //             }
+                    onRemoveClicked: {
+                        listModel_ListView.remove(index);
+                    }
 
-        //             onViewClicked: {
+                    onViewClicked: {
+                        let component = Qt.createComponent("./UFO_FullScreen.qml");
+                        let fullScreen = component.createObject(root, {imageUrl: fileDialog.selectedFile});
+                    }
 
-        //             }
+                    // NOTE (SAVIZ): This technically works and gets called everytime, because the list gets cleared with every SELECT query. Therefore the data will be refreshed.
+                    Component.onCompleted: {
+                        imageName = model["image_name"]
+                        imageData = model["image_data"]
+                    }
+                }
 
-        //             // NOTE (SAVIZ): This technically works and gets called everytime, because the list gets cleared with every SELECT query. Therefore the data will be refreshed.
-        //             Component.onCompleted: {
-        //                 imageName = model["image_name"]
-        //                 imageData = model["image_data"]
-        //             }
-        //         }
+                Connections {
+                    target: Database
 
-        //         Connections {
-        //             target: Database
+                    function onQueryExecuted(type, success, message) {
+                        if(type !== Database.QueryType.SELECT) {
+                            return;
+                        }
 
-        //             function onQueryExecuted(type, success, message) {
-        //                 if(type !== Database.QueryType.SELECT) {
-        //                     return;
-        //                 }
+                        if(success === false) {
+                            return;
+                        }
 
-        //                 if(success === false) {
-        //                     return;
-        //                 }
+                        listModel_ListView.clear();
 
-        //                 listModel_ListView.clear();
-
-        //                 Database.getPatientDataMap()["images"].forEach(function (image) {
-        //                     listModel_ListView.append({"image_name": image["image_name"], "image_data": image["image_data"]});
-        //                 });
-        //             }
-        //         }
-        //     }
-        // }
+                        Database.getPatientDataMap()["images"].forEach(function (image) {
+                            listModel_ListView.append({"image_name": image["image_name"], "image_data": image["image_data"]});
+                        });
+                    }
+                }
+            }
+        }
     }
 }

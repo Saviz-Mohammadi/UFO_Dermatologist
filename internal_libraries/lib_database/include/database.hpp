@@ -7,6 +7,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QFile>
 #include <QPair>
 #include <QVariant>
 #include <QVariantList>
@@ -55,6 +56,7 @@ private:
     QVariantList m_ProcedureList;
     QVariantList m_ConsultantList;
     QVariantList m_LabList;
+    QVariantList m_ImageList;
     QVariantList m_SearchResultList;
     QVariantMap m_PatientDataMap;
 
@@ -97,6 +99,7 @@ public:
     bool pullProcedureNote(const quint64 index);
     bool pullConsultations(const quint64 index);
     bool pullLabTests(const quint64 index);
+    bool pullImages(const quint64 index);
 
     // UPDATE
     Q_INVOKABLE bool updatePatientData(const QString &newFirstName, const QString &newLastName, quint32 newBirthYear, const QString &newPhoneNumber, const QString &newEmail, const QString &newGender, const QString &newMaritalStatus, quint32 newNumberOfPreviousVisits, const QString &newFirstVisitDate, const QString &newRecentVisitDate, const QString &newExpectedVisitDate, qreal newServicePrice, const QVariantList &newDiagnoses, const QString &newDiagnosisNote, const QVariantList &newTreatments, const QString &newTreatmentNote, const QVariantList &newMedicalDrugs, const QString &newMedicalDrugNote, const QVariantList &newProcedures, const QString &newProcedureNote, const QVariantList &newConsultations, const QVariantList &newLabTests);
@@ -111,9 +114,15 @@ public:
     bool updateProcedureNote(const QString &newNote);
     bool updateConsultations(const QVariantList &newConsultations);
     bool updateLabTests(const QVariantList &newLabTests);
+    bool updateImages();
 
     // DELETION
     Q_INVOKABLE bool changeDeletionStatus(bool newStatus);
+
+    // IMAGES
+    Q_INVOKABLE bool addImage(const QUrl &url);
+    Q_INVOKABLE bool deleteImage(const QString &fileName);
+    Q_INVOKABLE QByteArray getImageData(const QString &fileName);
 
     // Notifier
     QList<QVariantMap> getUpcomingVisits(int daysBefore);
@@ -137,6 +146,7 @@ public:
     Q_INVOKABLE QVariantList getProcedureList() const;
     Q_INVOKABLE QVariantList getConsultantList() const;
     Q_INVOKABLE QVariantList getLabList() const;
+    Q_INVOKABLE QVariantList getImageNames() const;
     Q_INVOKABLE QVariantList getSearchResultList() const;
     Q_INVOKABLE QVariantMap getPatientDataMap() const;
 
