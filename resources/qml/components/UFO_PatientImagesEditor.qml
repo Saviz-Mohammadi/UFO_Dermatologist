@@ -79,7 +79,12 @@ Item {
                 onAccepted: {
                     console.log("Selected file path:", fileDialog.selectedFile)
 
-                    imageView.source = fileDialog.selectedFile;
+                    let component = Qt.createComponent("./UFO_FullScreen.qml");
+                    let fullScreen = component.createObject(root, {imageUrl: fileDialog.selectedFile});
+
+                    // fullScreen.closing.connect(onFullScreenClosed)
+
+                    return;
 
                     // When adding >> add to back-end data structure.
                     // When deleting >> delete from back-end data structure.
@@ -138,15 +143,6 @@ Item {
                     // });
                 }
             }
-        }
-
-        Image {
-            id: imageView
-
-            Layout.fillWidth: true
-            Layout.preferredHeight: 500
-
-            fillMode: Image.PreserveAspectFit
         }
 
         // Rectangle {
