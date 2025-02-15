@@ -18,21 +18,6 @@ Item {
     implicitWidth: 200
     implicitHeight: ufo_GroupBox.implicitHeight
 
-    function getListOfImages() {
-        let images = [];
-
-        for (let index = 0; index < listModel_ListView.count; index++) {
-            let item = listModel_ListView.get(index);
-
-            images.push({
-                image_name: item.image_name,
-                image_data: item.image_data,
-            });
-        }
-
-        return (images);
-    }
-
     UFO_GroupBox {
         id: ufo_GroupBox
 
@@ -79,19 +64,9 @@ Item {
                 onAccepted: {
                     console.log("Selected file path:", fileDialog.selectedFile)
 
-                    fileDialog.selectedFile
+                    Database.addImage(fileDialog.selectedFile);
 
                     // fullScreen.closing.connect(onFullScreenClosed)
-
-                    return;
-
-                    // listModel_ListView.append({
-                    //     "consultant_id": id,
-                    //     "consultant_name": name,
-                    //     "consultant_specialization": specialization,
-                    //     "consultation_date": "",
-                    //     "consultation_outcome": ""
-                    // });
                 }
             }
 
@@ -148,18 +123,45 @@ Item {
                     width: listView.width - scrollBar_Consultations.width / 2 - 15
 
                     onRemoveClicked: {
+                        // TODO (SAVIZ): A better thing to do is to call this method and then see if it was succesful and only then remove index.
+                        Database.deleteImage(this.imageName);
                         listModel_ListView.remove(index);
                     }
 
                     onViewClicked: {
+                        // TODO (SAVIZ): A better thing to do is to see if temp save was succesful and then show full screen.
+                        let tempImageurl = ImageProvider.urlFromData(Database.getImageData(this.imageName));
+
+                        console.log(tempImageurl);
+
                         let component = Qt.createComponent("./UFO_FullScreen.qml");
-                        let fullScreen = component.createObject(root, {imageUrl: fileDialog.selectedFile});
+
+                        if (component.status === Component.Ready) {
+                            var fullscreen = component.createObject(root, {
+                                "imageUrl": tempImageurl
+                            });
+                        }
                     }
 
                     // NOTE (SAVIZ): This technically works and gets called everytime, because the list gets cleared with every SELECT query. Therefore the data will be refreshed.
                     Component.onCompleted: {
                         imageName = model["image_name"]
-                        imageData = model["image_data"]
+                    }
+                }
+
+                Connections {
+                    target: Database
+
+                    function onImageAdded(success, fileName) {
+
+                        // TODO (SAVIZ): You can do something better here and show something...
+                        if(success === false) {
+                            return;
+                        }
+
+                        listModel_ListView.append({
+                            "image_name": fileName
+                        });
                     }
                 }
 
@@ -178,7 +180,7 @@ Item {
                         listModel_ListView.clear();
 
                         Database.getPatientDataMap()["images"].forEach(function (image) {
-                            listModel_ListView.append({"image_name": image["image_name"], "image_data": image["image_data"]});
+                            listModel_ListView.append({"image_name": image["image_name"]});
                         });
                     }
                 }

@@ -5,6 +5,7 @@
 #include <QQmlEngine>
 #include <QVariant>
 #include <QVariantList>
+#include <QDir>
 #include <QFile>
 #include <QBuffer>
 #include <QImageReader>

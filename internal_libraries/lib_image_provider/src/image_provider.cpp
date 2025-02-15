@@ -133,18 +133,21 @@ QUrl ImageProvider::urlFromData(const QByteArray &data)
 {
     QImage image;
 
-    QString format = QImageReader::imageFormat(data);
-    QString filePath = "./cache/images/temp_" + QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss") + "." + format;
+    QDir dir("./cache/images");
+    QString filePath = dir.absolutePath() + "temp_" + QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss") + ".png";
 
     if (!image.loadFromData(data)) {
+        qDebug() << "Failed to load";
         return QUrl();  // Failed to load image from QByteArray
     }
 
-    if (image.save(filePath)) {
-        return QUrl::fromLocalFile(filePath);  // Convert file path to QUrl
+    // NOTE (SAVIZ): nullptr forces the QImage to decide for itself what the best format for the image file will be.
+    if (!image.save(filePath, nullptr)) {
+        qDebug() << "Failed to save to path: " << filePath;
+        return QUrl();
     }
 
-    return QUrl();
+    return QUrl::fromLocalFile(filePath);  // Convert file path to QUrl
 }
 
 // [[------------------------------------------------------------------------]]

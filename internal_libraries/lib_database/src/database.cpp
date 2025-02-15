@@ -22,7 +22,6 @@ Database::Database(QObject *parent, const QString &name)
     , m_ProcedureList(QVariantList{})
     , m_ConsultantList(QVariantList{})
     , m_LabList(QVariantList{})
-    , m_ImageList(QVariantList{})
     , m_SearchResultList(QVariantList{})
     , m_PatientDataMap(QVariantMap{})
 {
@@ -1422,7 +1421,7 @@ bool Database::pullImages(const quint64 index)
 #endif
 
     QString queryString = R"(
-        SELECT image_name, image_data FROM patient_images
+        SELECT * FROM patient_images
 
         WHERE patient_id = :patient_id
     )";
@@ -2364,13 +2363,23 @@ bool Database::addImage(const QUrl &path)
         qDebug() << "Failed to read image file data: " << path;
 #endif
 
+        emit imageAdded(false, "Failed to read image file data");
+
         return (false);
     }
 
     QVariantMap map;
-    map.insert(path.fileName(), file.readAll());
+    map["image_name"] = path.fileName();
+    map["image_data"] = file.readAll();
 
-    m_ImageList.append(map);
+    QVariantList list = m_PatientDataMap["images"].toList();
+
+    list.append(map);
+
+    m_PatientDataMap["images"] = list;
+
+    // TODO (SAVIZ): This is really stupid, but for now my brain can't comeup with anything better.
+    emit imageAdded(true, path.fileName());
 
     return (true);
 }
@@ -2381,16 +2390,18 @@ bool Database::deleteImage(const QString &fileName)
 
     QVariantList images = m_PatientDataMap["images"].toList();
 
-    for (const QVariant &image : images) {
-        QVariantMap map = image.toMap();
+    for (int index = 0; index < images.size(); ++index) {
+        QVariantMap map = images[index].toMap();
 
-        if (map.contains(fileName)) {
+        if (map["image_name"] == fileName) {
 
-            map.remove(fileName);
+            images.removeAt(index);
 
             success = true;
         }
     }
+
+    m_PatientDataMap["images"] = images;
 
     return success;
 }
@@ -2402,7 +2413,7 @@ QByteArray Database::getImageData(const QString &fileName)
     for (const QVariant &image : images) {
         QVariantMap map = image.toMap();
 
-        if (map.contains(fileName)) {
+        if (map["image_name"] == fileName) {
 
             return (map["image_data"].toByteArray()) ;
         }
@@ -2865,7 +2876,7 @@ QVariantList Database::getImageNames() const
 {
     QVariantList list;
 
-    for(const QVariant& item: m_ImageList)
+    for(const QVariant& item: m_PatientDataMap["images"].toList())
     {
         QVariantMap map = item.toMap();
         list.append(map["image_name"]);

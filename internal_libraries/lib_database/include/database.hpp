@@ -56,7 +56,6 @@ private:
     QVariantList m_ProcedureList;
     QVariantList m_ConsultantList;
     QVariantList m_LabList;
-    QVariantList m_ImageList;
     QVariantList m_SearchResultList;
     QVariantMap m_PatientDataMap;
 
@@ -64,6 +63,7 @@ private:
 signals:
     void connectionStatusChanged(const QString &message);
     void queryExecuted(QueryType type, bool success, const QString &message);
+    void imageAdded(bool success, const QString &message);
 
     // PUBLIC Slots:
 public slots:

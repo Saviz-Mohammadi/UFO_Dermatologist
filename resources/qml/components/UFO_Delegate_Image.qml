@@ -11,7 +11,6 @@ Item {
 
 
     property alias imageName: ufo_TextField_ImageName.text
-    property string imageData;
 
     signal removeClicked
     signal viewClicked
@@ -33,13 +32,14 @@ Item {
                 Layout.preferredWidth: 120
                 Layout.preferredHeight: 35
 
-                checkable: true
-                checked: false
-
                 enabled: (Database.connectionStatus === true) ? true : false
 
                 text: qsTr("مشاهده")
                 icon.source: "./../../icons/Google icons/visibility.svg"
+
+                onClicked: {
+                    root.viewClicked();
+                }
             }
 
             UFO_Button {
@@ -52,8 +52,7 @@ Item {
                 icon.source: "./../../icons/Google icons/delete.svg"
 
                 onClicked: {
-                    // Notify Model:
-                    root.removeClicked()
+                    root.removeClicked();
                 }
             }
         }
