@@ -648,7 +648,6 @@ bool Database::pullPatientData(const quint64 index)
 #endif
 
     // NOTE (SAVIZ): This check helps prevent problems when we delete a record and attempt to access it again:
-
     if(!recordExists(index))
     {
 #ifdef QT_DEBUG
@@ -660,47 +659,247 @@ bool Database::pullPatientData(const quint64 index)
         return (false);
     }
 
-    struct FunctionCall
-    {
-        std::function<bool()> function;
-
-        QString errorMessage;
-    };
-
-    const std::array<FunctionCall, 12> calls =
-    {{
-        { [this, index] { return pullPatientBasicData(index); }, "خطا در دریافت اطلاعات اولیه بیمار" },
-        { [this, index] { return pullPatientDiagnoses(index); }, "خطا در دریافت تشخیص‌ها" },
-        { [this, index] { return pullPatientTreatments(index); }, "خطا در دریافت درمان‌ها" },
-        { [this, index] { return pullPatientMedicalDrugs(index); }, "خطا در دریافت اطلاعات دارویی" },
-        { [this, index] { return pullPatientProcedures(index); }, "خطا در دریافت اقدامات پزشکی" },
-        { [this, index] { return pullDiagnosisNote(index); }, "خطا در دریافت یادداشت‌های تشخیصی" },
-        { [this, index] { return pullTreatmentNote(index); }, "خطا در دریافت یادداشت‌های درمانی" },
-        { [this, index] { return pullMedicalDrugNote(index); }, "خطا در دریافت یادداشت‌های دارویی" },
-        { [this, index] { return pullProcedureNote(index); }, "خطا در دریافت یادداشت‌های مربوط به اقدامات پزشکی" },
-        { [this, index] { return pullConsultations(index); }, "خطا در دریافت مشاوره‌ها" },
-        { [this, index] { return pullLabTests(index); }, "خطا در دریافت آزمایش‌ها" },
-        { [this, index] { return pullImages(index); }, "خطا در دریافت تصاویر" }
-    }};
-
     const QString prefix = "خطاهایی هنگام دریافت اطلاعات بیمار رخ داد: ";
     const QString suffix = " لطفاً دوباره تلاش کنید.";
 
-    for (const auto& call : calls)
+#pragma region BASICDATA {
+
+    QPair<bool, QVariantMap> patientBasicData = pullPatientBasicData(index);
+
+    if(patientBasicData.first == false)
     {
-        if (call.function() == false)
-        {
-            QString fullMessage = prefix + call.errorMessage + suffix;
+        QString fullMessage = prefix + "خطا در دریافت اطلاعات اولیه بیمار" + suffix;
 
 #ifdef QT_DEBUG
-            qDebug() << "Log Output :" << "Select operation failed! : " << call.errorMessage;
+        qDebug() << "Log Output :" << "Select operation failed! : " << "خطا در دریافت اطلاعات اولیه بیمار";
 #endif
 
-            emit queryExecuted(QueryType::SELECT, false, fullMessage);
+        emit queryExecuted(QueryType::SELECT, false, fullMessage);
 
-            return (false);
-        }
+        return (false);
     }
+
+    // NOTE (SAVIZ): We could write each key separatly, but this can save time:
+    m_PatientDataMap = patientBasicData.second;
+
+#pragma endregion }
+
+#pragma region DIAGNOSES {
+
+    QPair<bool, QVariantList> diagnoses = pullPatientDiagnoses(index);
+
+    if(diagnoses.first == false)
+    {
+        QString fullMessage = prefix + "خطا در دریافت تشخیص‌ها" + suffix;
+
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Select operation failed! : " << "خطا در دریافت تشخیص‌ها";
+#endif
+
+        emit queryExecuted(QueryType::SELECT, false, fullMessage);
+
+        return (false);
+    }
+
+    m_PatientDataMap["diagnoses"] = diagnoses.second;
+
+#pragma endregion }
+
+#pragma region TREATMENTS {
+
+    QPair<bool, QVariantList> treatments = pullPatientTreatments(index);
+
+    if(treatments.first == false)
+    {
+        QString fullMessage = prefix + "خطا در دریافت درمان‌ها" + suffix;
+
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Select operation failed! : " << "خطا در دریافت درمان‌ها";
+#endif
+
+        emit queryExecuted(QueryType::SELECT, false, fullMessage);
+
+        return (false);
+    }
+
+    m_PatientDataMap["treatments"] = treatments.second;
+
+#pragma endregion }
+
+#pragma region MEDICALDRUGS {
+
+    QPair<bool, QVariantList> medicalDrugs = pullPatientMedicalDrugs(index);
+
+    if(medicalDrugs.first == false)
+    {
+        QString fullMessage = prefix + "خطا در دریافت اطلاعات دارویی" + suffix;
+
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Select operation failed! : " << "خطا در دریافت اطلاعات دارویی";
+#endif
+
+        emit queryExecuted(QueryType::SELECT, false, fullMessage);
+
+        return (false);
+    }
+
+    m_PatientDataMap["medicalDrugs"] = medicalDrugs.second;
+
+#pragma endregion }
+
+#pragma region PROCEDURES {
+
+    QPair<bool, QVariantList> procedures = pullPatientProcedures(index);
+
+    if(procedures.first == false)
+    {
+        QString fullMessage = prefix + "خطا در دریافت اقدامات پزشکی" + suffix;
+
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Select operation failed! : " << "خطا در دریافت اقدامات پزشکی";
+#endif
+
+        emit queryExecuted(QueryType::SELECT, false, fullMessage);
+
+        return (false);
+    }
+
+    m_PatientDataMap["procedures"] = procedures.second;
+
+#pragma endregion }
+
+#pragma region DIAGNOSISNOTE {
+
+    QPair<bool, QString> diagnosisNote = pullDiagnosisNote(index);
+
+    if(diagnosisNote.first == false)
+    {
+        QString fullMessage = prefix + "خطا در دریافت یادداشت‌های تشخیصی" + suffix;
+
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Select operation failed! : " << "خطا در دریافت یادداشت‌های تشخیصی";
+#endif
+
+        emit queryExecuted(QueryType::SELECT, false, fullMessage);
+
+        return (false);
+    }
+
+    m_PatientDataMap["diagnosis_note"] = diagnosisNote.second;
+
+#pragma endregion }
+
+#pragma region TREATMENTNOTE {
+
+    QPair<bool, QString> treatmentNote = pullTreatmentNote(index);
+
+    if(treatmentNote.first == false)
+    {
+        QString fullMessage = prefix + "خطا در دریافت یادداشت‌های درمانی" + suffix;
+
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Select operation failed! : " << "خطا در دریافت یادداشت‌های درمانی";
+#endif
+
+        emit queryExecuted(QueryType::SELECT, false, fullMessage);
+
+        return (false);
+    }
+
+    m_PatientDataMap["treatment_note"] = treatmentNote.second;
+
+#pragma endregion }
+
+#pragma region MEDICALDRUGNOTE {
+
+    QPair<bool, QString> medicalDrugNote = pullTreatmentNote(index);
+
+    if(medicalDrugNote.first == false)
+    {
+        QString fullMessage = prefix + "خطا در دریافت یادداشت‌های دارویی" + suffix;
+
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Select operation failed! : " << "خطا در دریافت یادداشت‌های دارویی";
+#endif
+
+        emit queryExecuted(QueryType::SELECT, false, fullMessage);
+
+        return (false);
+    }
+
+    m_PatientDataMap["medical_drug_note"] = medicalDrugNote.second;
+
+#pragma endregion }
+
+#pragma region PROCEDURENOTE {
+
+    QPair<bool, QString> procedureNote = pullTreatmentNote(index);
+
+    if(procedureNote.first == false)
+    {
+        QString fullMessage = prefix + "خطا در دریافت یادداشت‌های مربوط به اقدامات پزشکی" + suffix;
+
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Select operation failed! : " << "خطا در دریافت یادداشت‌های مربوط به اقدامات پزشکی";
+#endif
+
+        emit queryExecuted(QueryType::SELECT, false, fullMessage);
+
+        return (false);
+    }
+
+    m_PatientDataMap["procedure_note"] = procedureNote.second;
+
+#pragma endregion }
+
+#pragma region CONSULTATIONS {
+
+    QPair<bool, QVariantList> consultations = pullConsultations(index);
+
+    if(consultations.first == false)
+    {
+        QString fullMessage = prefix + "خطا در دریافت مشاوره‌ها" + suffix;
+
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Select operation failed! : " << "خطا در دریافت مشاوره‌ها";
+#endif
+
+        emit queryExecuted(QueryType::SELECT, false, fullMessage);
+
+        return (false);
+    }
+
+    m_PatientDataMap["consultations"] = consultations.second;
+
+#pragma endregion }
+
+#pragma region LABTESTS {
+
+    QPair<bool, QVariantList> labTests = pullLabTests(index);
+
+    if(labTests.first == false)
+    {
+        QString fullMessage = prefix + "خطا در دریافت آزمایش‌ها" + suffix;
+
+#ifdef QT_DEBUG
+        qDebug() << "Log Output :" << "Select operation failed! : " << "خطا در دریافت آزمایش‌ها";
+#endif
+
+        emit queryExecuted(QueryType::SELECT, false, fullMessage);
+
+        return (false);
+    }
+
+    m_PatientDataMap["labTests"] = labTests.second;
+
+#pragma endregion }
+
+#pragma region IMAGES {
+
+    // FIXME (SAVIZ): Images are still a mess, because I need to figure out how to propertly handle them.
+    pullImages(index);
+
+#pragma endregion }
 
 #ifdef QT_DEBUG
     qDebug() << "Log Output :" << "Select operation succeeded!";
@@ -711,7 +910,7 @@ bool Database::pullPatientData(const quint64 index)
     return (true);
 }
 
-bool Database::pullPatientBasicData(const quint64 index)
+QPair<bool, QVariantMap> Database::pullPatientBasicData(const quint64 index)
 {
 #ifdef QT_DEBUG
     qDebug() << "objectName :" << this->objectName();
@@ -735,7 +934,7 @@ bool Database::pullPatientBasicData(const quint64 index)
         qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
-        return (false);
+        return (QPair<bool, QVariantMap>(false, QVariantMap()));
     }
 
     if (query.size() == 0)
@@ -744,25 +943,27 @@ bool Database::pullPatientBasicData(const quint64 index)
         qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
-        return (true);
+        return (QPair<bool, QVariantMap>(true, QVariantMap()));
     }
+
+    QVariantMap patientBasicDataMap = QVariantMap();
 
     while (query.next())
     {
-        m_PatientDataMap["patient_id"] = query.value("patient_id").toULongLong();
-        m_PatientDataMap["first_name"] = query.value("first_name").toString();
-        m_PatientDataMap["last_name"] = query.value("last_name").toString();
-        m_PatientDataMap["birth_year"] = query.value("birth_year").toString();
-        m_PatientDataMap["phone_number"] = query.value("phone_number").toString();
-        m_PatientDataMap["email"] = query.value("email").toString();
-        m_PatientDataMap["gender"] = query.value("gender").toString();
-        m_PatientDataMap["marital_status"] = query.value("marital_status").toString();
-        m_PatientDataMap["number_of_previous_visits"] = query.value("number_of_previous_visits").toUInt();
-        m_PatientDataMap["first_visit_date"] = "";
-        m_PatientDataMap["recent_visit_date"] = "";
-        m_PatientDataMap["expected_visit_date"] = "";
-        m_PatientDataMap["service_price"] = query.value("service_price").toReal();
-        m_PatientDataMap["marked_for_deletion"] = query.value("marked_for_deletion").toBool();
+        patientBasicDataMap["patient_id"] = query.value("patient_id").toULongLong();
+        patientBasicDataMap["first_name"] = query.value("first_name").toString();
+        patientBasicDataMap["last_name"] = query.value("last_name").toString();
+        patientBasicDataMap["birth_year"] = query.value("birth_year").toString();
+        patientBasicDataMap["phone_number"] = query.value("phone_number").toString();
+        patientBasicDataMap["email"] = query.value("email").toString();
+        patientBasicDataMap["gender"] = query.value("gender").toString();
+        patientBasicDataMap["marital_status"] = query.value("marital_status").toString();
+        patientBasicDataMap["number_of_previous_visits"] = query.value("number_of_previous_visits").toUInt();
+        patientBasicDataMap["first_visit_date"] = "";
+        patientBasicDataMap["recent_visit_date"] = "";
+        patientBasicDataMap["expected_visit_date"] = "";
+        patientBasicDataMap["service_price"] = query.value("service_price").toReal();
+        patientBasicDataMap["marked_for_deletion"] = query.value("marked_for_deletion").toBool();
 
         // NOTE (SAVIZ): If Gregorian dates are available for the 'first_visit_date' and 'recent_visit_date' fields in the database, they must be converted to the Jalali calendar format before caching:
 
@@ -772,7 +973,7 @@ bool Database::pullPatientBasicData(const quint64 index)
         {
             QString firstVisitJaliliDateString = Date::cppInstance()->gregorianToJalali(firstVisitGregorianDate);
 
-            m_PatientDataMap["first_visit_date"] = firstVisitJaliliDateString;
+            patientBasicDataMap["first_visit_date"] = firstVisitJaliliDateString;
         }
 
         QDate recentVisitGregorianDate = query.value("recent_visit_date").toDate();
@@ -781,7 +982,7 @@ bool Database::pullPatientBasicData(const quint64 index)
         {
             QString recentVisitJaliliDateString = Date::cppInstance()->gregorianToJalali(recentVisitGregorianDate);
 
-            m_PatientDataMap["recent_visit_date"] = recentVisitJaliliDateString;
+            patientBasicDataMap["recent_visit_date"] = recentVisitJaliliDateString;
         }
 
         QDate expectedVisitGregorianDate = query.value("expected_visit_date").toDate();
@@ -790,7 +991,7 @@ bool Database::pullPatientBasicData(const quint64 index)
         {
             QString expectedVisitJaliliDateString = Date::cppInstance()->gregorianToJalali(expectedVisitGregorianDate);
 
-            m_PatientDataMap["expected_visit_date"] = expectedVisitJaliliDateString;
+            patientBasicDataMap["expected_visit_date"] = expectedVisitJaliliDateString;
         }
     }
 
@@ -798,10 +999,10 @@ bool Database::pullPatientBasicData(const quint64 index)
     qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
-    return (true);
+    return (QPair<bool, QVariantMap>(true, patientBasicDataMap));
 }
 
-bool Database::pullPatientDiagnoses(const quint64 index)
+QPair<bool, QVariantList> Database::pullPatientDiagnoses(const quint64 index)
 {
 #ifdef QT_DEBUG
     qDebug() << "objectName :" << this->objectName();
@@ -828,7 +1029,7 @@ bool Database::pullPatientDiagnoses(const quint64 index)
         qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
-        return (false);
+        return QPair<bool, QVariantList>(false, QVariantList());
     }
 
     if (query.size() == 0)
@@ -837,7 +1038,7 @@ bool Database::pullPatientDiagnoses(const quint64 index)
         qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
-        return (true);
+        return QPair<bool, QVariantList>(true, QVariantList());
     }
 
     QVariantList diagnoses;
@@ -857,16 +1058,14 @@ bool Database::pullPatientDiagnoses(const quint64 index)
         }
     }
 
-    m_PatientDataMap["diagnoses"] = diagnoses;
-
 #ifdef QT_DEBUG
     qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
-    return (true);
+    return QPair<bool, QVariantList>(true, diagnoses);
 }
 
-bool Database::pullPatientTreatments(const quint64 index)
+QPair<bool, QVariantList> Database::pullPatientTreatments(const quint64 index)
 {
 #ifdef QT_DEBUG
     qDebug() << "objectName :" << this->objectName();
@@ -893,7 +1092,7 @@ bool Database::pullPatientTreatments(const quint64 index)
         qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
-        return (false);
+        return QPair<bool, QVariantList>(false, QVariantList());
     }
 
     if (query.size() == 0)
@@ -902,7 +1101,7 @@ bool Database::pullPatientTreatments(const quint64 index)
         qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
-        return (true);
+        return QPair<bool, QVariantList>(true, QVariantList());
     }
 
     QVariantList treatments;
@@ -922,16 +1121,14 @@ bool Database::pullPatientTreatments(const quint64 index)
         }
     }
 
-    m_PatientDataMap["treatments"] = treatments;
-
 #ifdef QT_DEBUG
     qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
-    return (true);
+    return QPair<bool, QVariantList>(true, treatments);
 }
 
-bool Database::pullPatientMedicalDrugs(const quint64 index)
+QPair<bool, QVariantList> Database::pullPatientMedicalDrugs(const quint64 index)
 {
 #ifdef QT_DEBUG
     qDebug() << "objectName :" << this->objectName();
@@ -958,7 +1155,7 @@ bool Database::pullPatientMedicalDrugs(const quint64 index)
         qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
-        return (false);
+        return QPair<bool, QVariantList>(false, QVariantList());
     }
 
     if (query.size() == 0)
@@ -967,7 +1164,7 @@ bool Database::pullPatientMedicalDrugs(const quint64 index)
         qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
-        return (true);
+        return QPair<bool, QVariantList>(true, QVariantList());
     }
 
     QVariantList medicalDrugs;
@@ -987,16 +1184,14 @@ bool Database::pullPatientMedicalDrugs(const quint64 index)
         }
     }
 
-    m_PatientDataMap["medicalDrugs"] = medicalDrugs;
-
 #ifdef QT_DEBUG
     qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
-    return (true);
+    return QPair<bool, QVariantList>(true, medicalDrugs);
 }
 
-bool Database::pullPatientProcedures(const quint64 index)
+QPair<bool, QVariantList> Database::pullPatientProcedures(const quint64 index)
 {
 #ifdef QT_DEBUG
     qDebug() << "objectName :" << this->objectName();
@@ -1023,7 +1218,7 @@ bool Database::pullPatientProcedures(const quint64 index)
         qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
-        return (false);
+        return QPair<bool, QVariantList>(false, QVariantList());
     }
 
     if (query.size() == 0)
@@ -1032,7 +1227,7 @@ bool Database::pullPatientProcedures(const quint64 index)
         qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
-        return (true);
+        return QPair<bool, QVariantList>(true, QVariantList());
     }
 
     QVariantList procedures;
@@ -1052,16 +1247,14 @@ bool Database::pullPatientProcedures(const quint64 index)
         }
     }
 
-    m_PatientDataMap["procedures"] = procedures;
-
 #ifdef QT_DEBUG
     qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
-    return (true);
+    return QPair<bool, QVariantList>(true, procedures);
 }
 
-bool Database::pullDiagnosisNote(const quint64 index)
+QPair<bool, QString> Database::pullDiagnosisNote(const quint64 index)
 {
 #ifdef QT_DEBUG
     qDebug() << "objectName :" << this->objectName();
@@ -1085,7 +1278,7 @@ bool Database::pullDiagnosisNote(const quint64 index)
         qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
-        return (false);
+        return (QPair<bool, QString>(false, QString()));
     }
 
     if (query.size() == 0)
@@ -1094,22 +1287,24 @@ bool Database::pullDiagnosisNote(const quint64 index)
         qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
-        return (true);
+        return (QPair<bool, QString>(true, QString()));
     }
+
+    QString diagnosisNote;
 
     while (query.next())
     {
-        m_PatientDataMap["diagnosis_note"] = query.value("note").toString();
+        diagnosisNote = query.value("note").toString();
     }
 
 #ifdef QT_DEBUG
     qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
-    return (true);
+    return (QPair<bool, QString>(true, diagnosisNote));
 }
 
-bool Database::pullTreatmentNote(const quint64 index)
+QPair<bool, QString> Database::pullTreatmentNote(const quint64 index)
 {
 #ifdef QT_DEBUG
     qDebug() << "objectName :" << this->objectName();
@@ -1133,7 +1328,7 @@ bool Database::pullTreatmentNote(const quint64 index)
         qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
-        return (false);
+        return (QPair<bool, QString>(false, QString()));
     }
 
     if (query.size() == 0)
@@ -1142,22 +1337,24 @@ bool Database::pullTreatmentNote(const quint64 index)
         qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
-        return (true);
+        return (QPair<bool, QString>(true, QString()));
     }
+
+    QString treatmentNote;
 
     while (query.next())
     {
-        m_PatientDataMap["treatment_note"] = query.value("note").toString();
+        treatmentNote = query.value("note").toString();
     }
 
 #ifdef QT_DEBUG
     qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
-    return (true);
+    return (QPair<bool, QString>(true, treatmentNote));
 }
 
-bool Database::pullMedicalDrugNote(const quint64 index)
+QPair<bool, QString> Database::pullMedicalDrugNote(const quint64 index)
 {
 #ifdef QT_DEBUG
     qDebug() << "objectName :" << this->objectName();
@@ -1181,7 +1378,7 @@ bool Database::pullMedicalDrugNote(const quint64 index)
         qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
-        return (false);
+        return (QPair<bool, QString>(false, QString()));
     }
 
     if (query.size() == 0)
@@ -1190,22 +1387,24 @@ bool Database::pullMedicalDrugNote(const quint64 index)
         qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
-        return (true);
+        return (QPair<bool, QString>(true, QString()));
     }
+
+    QString medicalDrugNote;
 
     while (query.next())
     {
-        m_PatientDataMap["medical_drug_note"] = query.value("note").toString();
+        medicalDrugNote = query.value("note").toString();
     }
 
 #ifdef QT_DEBUG
     qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
-    return (true);
+    return (QPair<bool, QString>(true, medicalDrugNote));
 }
 
-bool Database::pullProcedureNote(const quint64 index)
+QPair<bool, QString> Database::pullProcedureNote(const quint64 index)
 {
 #ifdef QT_DEBUG
     qDebug() << "objectName :" << this->objectName();
@@ -1229,7 +1428,7 @@ bool Database::pullProcedureNote(const quint64 index)
         qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
-        return (false);
+        return (QPair<bool, QString>(false, QString()));
     }
 
     if (query.size() == 0)
@@ -1238,22 +1437,24 @@ bool Database::pullProcedureNote(const quint64 index)
         qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
-        return (true);
+        return (QPair<bool, QString>(true, QString()));
     }
+
+    QString procedureNote;
 
     while (query.next())
     {
-        m_PatientDataMap["procedure_note"] = query.value("note").toString();
+        procedureNote = query.value("note").toString();
     }
 
 #ifdef QT_DEBUG
     qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
-    return (true);
+    return (QPair<bool, QString>(true, procedureNote));
 }
 
-bool Database::pullConsultations(const quint64 index)
+QPair<bool, QVariantList> Database::pullConsultations(const quint64 index)
 {
 #ifdef QT_DEBUG
     qDebug() << "objectName :" << this->objectName();
@@ -1274,15 +1475,13 @@ bool Database::pullConsultations(const quint64 index)
 
     query.bindValue(":patient_id", index);
 
-
-
     if (!query.exec())
     {
 #ifdef QT_DEBUG
         qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
-        return (false);
+        return (QPair<bool, QVariantList>(false, QVariantList()));
     }
 
     if (query.size() == 0)
@@ -1291,7 +1490,7 @@ bool Database::pullConsultations(const quint64 index)
         qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
-        return (true);
+        return (QPair<bool, QVariantList>(true, QVariantList()));
     }
 
     QVariantList consultations;
@@ -1325,16 +1524,14 @@ bool Database::pullConsultations(const quint64 index)
         }
     }
 
-    m_PatientDataMap["consultations"] = consultations;
-
 #ifdef QT_DEBUG
     qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
-    return (true);
+    return (QPair<bool, QVariantList>(true, consultations));
 }
 
-bool Database::pullLabTests(const quint64 index)
+QPair<bool, QVariantList> Database::pullLabTests(const quint64 index)
 {
 #ifdef QT_DEBUG
     qDebug() << "objectName :" << this->objectName();
@@ -1361,7 +1558,7 @@ bool Database::pullLabTests(const quint64 index)
         qDebug() << "Log Output :" << "Select operation failed! :" << query.lastError().text();
 #endif
 
-        return (false);
+        return (QPair<bool, QVariantList>(false, QVariantList()));
     }
 
     if (query.size() == 0)
@@ -1370,7 +1567,7 @@ bool Database::pullLabTests(const quint64 index)
         qDebug() << "Log Output :" << "Query returned no results.";
 #endif
 
-        return (true);
+        return (QPair<bool, QVariantList>(true, QVariantList()));
     }
 
     QVariantList labTests;
@@ -1404,13 +1601,11 @@ bool Database::pullLabTests(const quint64 index)
         }
     }
 
-    m_PatientDataMap["labTests"] = labTests;
-
 #ifdef QT_DEBUG
     qDebug() << "Log Output :" << "Select operation succeeded!";
 #endif
 
-    return (true);
+    return (QPair<bool, QVariantList>(true, labTests));
 }
 
 bool Database::pullImages(const quint64 index)

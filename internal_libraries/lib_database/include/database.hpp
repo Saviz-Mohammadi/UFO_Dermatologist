@@ -88,17 +88,17 @@ public:
 
     // SELECT
     Q_INVOKABLE bool pullPatientData(const quint64 index);
-    bool pullPatientBasicData(const quint64 index);
-    bool pullPatientDiagnoses(const quint64 index);
-    bool pullPatientTreatments(const quint64 index);
-    bool pullPatientMedicalDrugs(const quint64 index);
-    bool pullPatientProcedures(const quint64 index);
-    bool pullDiagnosisNote(const quint64 index);
-    bool pullTreatmentNote(const quint64 index);
-    bool pullMedicalDrugNote(const quint64 index);
-    bool pullProcedureNote(const quint64 index);
-    bool pullConsultations(const quint64 index);
-    bool pullLabTests(const quint64 index);
+    QPair<bool, QVariantMap> pullPatientBasicData(const quint64 index);
+    QPair<bool, QVariantList> pullPatientDiagnoses(const quint64 index);
+    QPair<bool, QVariantList> pullPatientTreatments(const quint64 index);
+    QPair<bool, QVariantList> pullPatientMedicalDrugs(const quint64 index);
+    QPair<bool, QVariantList> pullPatientProcedures(const quint64 index);
+    QPair<bool, QString> pullDiagnosisNote(const quint64 index);
+    QPair<bool, QString> pullTreatmentNote(const quint64 index);
+    QPair<bool, QString> pullMedicalDrugNote(const quint64 index);
+    QPair<bool, QString> pullProcedureNote(const quint64 index);
+    QPair<bool, QVariantList> pullConsultations(const quint64 index);
+    QPair<bool, QVariantList> pullLabTests(const quint64 index);
     bool pullImages(const quint64 index);
 
     // UPDATE
