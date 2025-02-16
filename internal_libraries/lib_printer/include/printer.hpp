@@ -11,6 +11,7 @@
 #include <QTextDocument>
 #include <QStringList>
 #include <QStandardPaths>
+#include <QPair>
 
 class Printer : public QObject
 {
@@ -51,7 +52,7 @@ private slots:
 
     // PUBLIC Methods
 public:
-    Q_INVOKABLE void printPatientData();
+    Q_INVOKABLE bool printPatientData();
 
     // PRIVATE Methods
 private:

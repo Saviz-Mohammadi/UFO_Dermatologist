@@ -23,6 +23,24 @@ UFO_Page {
         title: qsTr("تنظیمات")
         contentSpacing: 0
 
+        Text {
+            Layout.fillWidth: true
+
+            Layout.topMargin: 15
+            Layout.leftMargin: 15
+            Layout.rightMargin: 15
+
+            text: qsTr("توجه داشته باشید که جدیدترین داده‌ها مستقیماً از پایگاه داده بازیابی می‌شوند. بنابراین، هر تغییری باید قبل از چاپ به پایگاه داده ارسال شود.")
+
+            elide: Text.ElideRight
+            wrapMode: Text.NoWrap
+
+            verticalAlignment: Text.AlignVCenter
+
+            font.pixelSize: Qt.application.font.pixelSize * 1
+            color: Qt.color(AppTheme.colors["UFO_GroupBox_Content_Text"])
+        }
+
         ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -57,24 +75,6 @@ UFO_Page {
                     regularExpression: /^\p{Nd}+$/
                 }
             }
-
-            // UFO_ComboBox {
-            //     id: comboBox_Gender
-
-            //     Layout.fillWidth: true
-            //     Layout.preferredHeight: 35
-
-            //     enabled: (Database.connectionStatus === true) ? true : false
-            //     model: ["نامشخص", "مرد", "زن"]
-
-            //     Connections {
-            //         target: ufo_Button_Clear
-
-            //         function onClearButtonClicked() {
-            //             comboBox_Gender.currentIndex = 0;
-            //         }
-            //     }
-            // }
         }
     }
 
@@ -97,28 +97,6 @@ UFO_Page {
             text: qsTr("چاپ")
             icon.source: "./../../icons/Google icons/print.svg"
 
-            Connections {
-                target: ufo_Dialog
-
-                function onAccepted() {
-                    if(ufo_Dialog.callbackIdentifier === "<UFO_Print>: Print PDF") {
-                        ufo_Dialog.close();
-
-                        Printer.printPatientData();
-
-                        return;
-                    }
-                }
-
-                function onRejected() {
-                    if(ufo_Dialog.callbackIdentifier === "<UFO_Print>: Print PDF") {
-                        ufo_Dialog.close();
-
-                        return;
-                    }
-                }
-            }
-
             onClicked: {
                 let id = parseInt(textField_PatientID.text.trim(), 10);
 
@@ -127,15 +105,7 @@ UFO_Page {
                 }
 
                 Printer.setPatientID(id);
-
-                ufo_Dialog.titleString = "<b>هشدار!<b>";
-                ufo_Dialog.messageString = "هرگونه تغییر ذخیره‌نشده حذف خواهد شد. آیا می‌خواهید ادامه دهید؟";
-                ufo_Dialog.callbackIdentifier = "<UFO_Print>: Print PDF";
-                ufo_Dialog.hasAccept = true;
-                ufo_Dialog.hasReject = true;
-                ufo_Dialog.acceptButtonText = qsTr("Print PDF")
-                ufo_Dialog.rejectButtonText = qsTr("Cancel")
-                ufo_Dialog.open();
+                Printer.printPatientData();
             }
         }
     }

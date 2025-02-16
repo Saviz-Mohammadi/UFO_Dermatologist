@@ -92,67 +92,82 @@ void Printer::ShutDown()
 // [[------------------------------------------------------------------------]]
 // [[------------------------------------------------------------------------]]
 
-void Printer::printPatientData()
+bool Printer::printPatientData()
 {
     Database *database = Database::cppInstance();
 
-    database->pullPatientData(m_PatientID);
+    // NOTE (SAVIZ): This check is unnecessary because the database is guaranteed to be connected when this function is called. However, I included it as a precaution:
+    if(database->getConnectionStatus() == false)
+    {
+#ifdef QT_DEBUG
+        qDebug() << "Connection to database is not established!";
+#endif
 
-    // Load the HTML template
+        emit printStateChanged(false, "اتصالی به پایگاه داده شناسایی نشد");
+
+        return (false);
+    }
+
+    QPair<bool, QVariantMap> patientBasicData = database->pullPatientBasicData(m_PatientID);
+    QPair<bool, QVariantList> medicalDrugs = database->pullPatientMedicalDrugs(m_PatientID);
+
     QFile file(m_TemplateFilePath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning("Failed to open HTML template.");
-        return;
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+#ifdef QT_DEBUG
+        qDebug() << "Failed to open HTML template.";
+#endif
+
+        emit printStateChanged(false, "امکان خواندن فایل الگو وجود ندارد");
+
+        return (false);
     }
 
     QTextStream in(&file);
     QString htmlContent = in.readAll();
     file.close();
 
-    QVariantMap map = database->getPatientDataMap();
-
-    // Get the Documents folder path
     QString outputFolder = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 
-    // Extract first and last names
-    QString firstName = map["first_name"].toString().trimmed();
-    QString lastName = map["last_name"].toString().trimmed();
+    QString firstName = patientBasicData.second["first_name"].toString().trimmed();
+    QString lastName = patientBasicData.second["last_name"].toString().trimmed();
 
     m_OutputFilePath = QString("%1/Report_%2_%3.pdf")
                            .arg(outputFolder, firstName, lastName);
 
-    // Replace placeholders with data
-    htmlContent.replace("{{id}}", QString::number(map["patient_id"].toInt()));
-    htmlContent.replace("{{first_name}}", map["first_name"].toString());
-    htmlContent.replace("{{last_name}}", map["last_name"].toString());
-    htmlContent.replace("{{service_price}}", QString::number(map["service_price"].toDouble(), 'f', 3));
+    htmlContent.replace("{{id}}", QString::number(patientBasicData.second["patient_id"].toInt()));
+    htmlContent.replace("{{first_name}}", patientBasicData.second["first_name"].toString());
+    htmlContent.replace("{{last_name}}", patientBasicData.second["last_name"].toString());
+    htmlContent.replace("{{service_price}}", QString::number(patientBasicData.second["service_price"].toDouble(), 'f', 3));
 
-    // Handle medical drugs list
     QStringList drugList;
-    for (const QVariant &drug : map["medicalDrugs"].toList()) {
+    for (const QVariant &drug : medicalDrugs.second)
+    {
         QVariantMap drugMap = drug.toMap();
 
         drugList.append("<li>" + drugMap["medical_drug_name"].toString() + "</li>");
     }
+
     htmlContent.replace("{{medical_drugs}}", drugList.join(""));
 
-    // Create a QTextDocument and set the modified HTML content
     QTextDocument document;
     document.setHtml(htmlContent);
 
-    // Configure the PDF printer
+    // TODO (SAVIZ): Make this available and changabel in QML and have it be set via properties.
     QPrinter printer(QPrinter::PrinterResolution);
     printer.setOutputFormat(QPrinter::PdfFormat);
     printer.setOutputFileName(m_OutputFilePath);
 
-    // Render the document to the PDF
     document.print(&printer);
 
 #ifdef QT_DEBUG
     qDebug() << "PDF saved to:" << m_OutputFilePath;
 #endif
 
-    emit printStateChanged(true, "File generated");
+    emit printStateChanged(true, "فایل ایجاد شد و در مسیر قرار گرفت: " + m_OutputFilePath);
+
+    return (true);
 }
 
 void Printer::setPatientID(unsigned int newPatientID)
