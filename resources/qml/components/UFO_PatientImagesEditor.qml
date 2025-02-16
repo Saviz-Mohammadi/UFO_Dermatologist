@@ -70,6 +70,10 @@ Item {
                 }
             }
 
+            Item {
+                Layout.fillWidth: true
+            }
+
             UFO_Button {
                 Layout.preferredWidth: 120
                 Layout.preferredHeight: 35

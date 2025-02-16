@@ -28,8 +28,16 @@ Item {
 
             spacing: 5
 
+            UFO_TextField {
+                id: ufo_TextField_ImageName
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 35
+
+                enabled: (Database.connectionStatus === true) ? true : false
+            }
+
             UFO_Button {
-                Layout.preferredWidth: 120
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
@@ -43,7 +51,6 @@ Item {
             }
 
             UFO_Button {
-                Layout.preferredWidth: 120
                 Layout.preferredHeight: 35
 
                 enabled: (Database.connectionStatus === true) ? true : false
@@ -55,15 +62,6 @@ Item {
                     root.removeClicked();
                 }
             }
-        }
-
-        UFO_TextField {
-            id: ufo_TextField_ImageName
-
-            Layout.fillWidth: true
-            Layout.preferredHeight: 35
-
-            enabled: (Database.connectionStatus === true) ? true : false
         }
     }
 }
