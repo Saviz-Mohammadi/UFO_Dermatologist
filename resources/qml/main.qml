@@ -62,6 +62,19 @@ ApplicationWindow {
                 leftPadding: 10
                 rightPadding: 10
 
+                text: qsTr("صفحه تاریخچه جستجو")
+
+                onTriggered: {
+                    stackLayout.currentIndex = ufo_SearchHistory.StackLayout.index
+
+                    ufo_SideBar_Main.checkTabButton("Search History Page")
+                }
+            }
+
+            UFO_MenuItem {
+                leftPadding: 10
+                rightPadding: 10
+
                 text: qsTr("صفحه ویرایش")
 
                 onTriggered: {
@@ -196,6 +209,13 @@ ApplicationWindow {
                 Layout.fillHeight: true
             }
 
+            UFO_SearchHistory {
+                id: ufo_SearchHistory
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
             UFO_Edit {
                 id: ufo_Edit
 
@@ -251,6 +271,18 @@ ApplicationWindow {
             }
 
             Connections {
+                target: ufo_SearchHistory
+
+                function onPatientSelectedForEdit() {
+                    ufo_Edit.contentVisible = true
+
+                    stackLayout.currentIndex = ufo_Edit.StackLayout.index
+
+                    ufo_SideBar_Main.checkTabButton("Edit Page")
+                }
+            }
+
+            Connections {
                 target: ufo_SideBar_Main
 
                 function onTabChanged(pageName) {
@@ -271,6 +303,9 @@ ApplicationWindow {
                             break
                         case "Search Page":
                             stackLayout.currentIndex = ufo_Search.StackLayout.index
+                            break
+                        case "Search History Page":
+                            stackLayout.currentIndex = ufo_SearchHistory.StackLayout.index
                             break
                         case "Settings Page":
                             stackLayout.currentIndex = ufo_Settings.StackLayout.index

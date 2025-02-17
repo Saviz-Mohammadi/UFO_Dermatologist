@@ -17,6 +17,9 @@ Item {
             case "Search Page":
                 ufo_SideBar_Button_Search.checked = true
                 break
+            case "Search History Page":
+                ufo_SideBar_Button_SearchHistory.checked = true
+                break
             case "Edit Page":
                 ufo_SideBar_Button_Edit.checked = true
                 break
@@ -71,6 +74,29 @@ Item {
 
                     clip: true
                     spacing: 10
+
+                    UFO_SideBar_Button {
+                        id: ufo_SideBar_Button_SearchHistory
+
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 40
+
+                        Layout.leftMargin: 15
+                        Layout.rightMargin: 15
+
+                        ButtonGroup.group: buttonGroup
+
+                        checkable: true
+                        autoExclusive: true
+                        checked: false
+
+                        text: qsTr("تاریخچه جستجو")
+                        icon.source: "./../../icons/Google icons/history.svg"
+
+                        onClicked: {
+                            root.tabChanged("Search History Page")
+                        }
+                    }
 
                     UFO_SideBar_Button {
                         id: ufo_SideBar_Button_Search
